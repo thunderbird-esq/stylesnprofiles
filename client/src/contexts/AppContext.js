@@ -1,0 +1,98 @@
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import ApodApp from '../components/apps/ApodApp';
+import NeoWsApp from '../components/apps/NeoWsApp';
+import ResourceNavigatorApp from '../components/apps/ResourceNavigatorApp';
+
+const AppContext = createContext();
+
+// App definitions with System 6 window properties
+const APPS = {
+  'apod': {
+    id: 'apod',
+    title: 'APOD Viewer',
+    icon: '🖼️', // Will be replaced with proper System 6 icon
+    component: (props) => <ApodApp {...props} />,
+    defaultWidth: 500,
+    defaultHeight: 400,
+  },
+  'neo': {
+    id: 'neo',
+    title: 'NEO Tracker',
+    icon: '☄️', // Will be replaced with proper System 6 icon
+    component: (props) => <NeoWsApp {...props} />,
+    defaultWidth: 500,
+    defaultHeight: 400,
+  },
+  'resources': {
+    id: 'resources',
+    title: 'Resource Navigator',
+    icon: '📊', // Will be replaced with proper System 6 icon
+    component: (props) => <ResourceNavigatorApp {...props} />,
+    defaultWidth: 500,
+    defaultHeight: 400,
+  },
+};
+
+export const AppProvider = ({ children }) => {
+  const [windows, setWindows] = useState([]);
+  const [nextZIndex, setNextZIndex] = useState(10);
+  const [activeWindow, setActiveWindow] = useState(null);
+
+  const openApp = useCallback((appId) => {
+    const app = APPS[appId];
+    if (!app) return;
+
+    const newWindowId = `${appId}-${Date.now()}`;
+    const newZIndex = nextZIndex + 1;
+
+    const newWindow = {
+      ...app,
+      windowId: newWindowId,
+      zIndex: newZIndex,
+      x: 100 + (Math.random() * 200),
+      y: 50 + (Math.random() * 100),
+    };
+
+    setWindows((prev) => [...prev, newWindow]);
+    setNextZIndex(newZIndex);
+    setActiveWindow(newWindowId);
+  }, [nextZIndex]);
+
+  const closeApp = useCallback((windowId) => {
+    setWindows((prev) => prev.filter((w) => w.windowId !== windowId));
+    if (activeWindow === windowId) {
+      setActiveWindow(null);
+    }
+  }, [activeWindow]);
+
+  const focusApp = useCallback((windowId) => {
+    if (activeWindow === windowId) return;
+
+    const newZIndex = nextZIndex + 1;
+    setNextZIndex(newZIndex);
+    setWindows((prev) =>
+      prev.map((w) =>
+        w.windowId === windowId ? { ...w, zIndex: newZIndex } : w
+      )
+    );
+    setActiveWindow(windowId);
+  }, [activeWindow, nextZIndex]);
+
+  const value = {
+    windows,
+    openApp,
+    closeApp,
+    focusApp,
+    activeWindow,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export const useApps = () => {
+  return useContext(AppContext);
+};
+
+export const useDesktop = () => {
+  return { APPS };
+}

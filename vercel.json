@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    },
+    {
+      "src": "server/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/server/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/$1"
+    }
+  ],
+  "env": {
+    "NASA_API_KEY": "@nasa_api_key",
+    "DB_HOST": "@db_host",
+    "DB_DATABASE": "@db_database",
+    "DB_USER": "@db_user",
+    "DB_PASSWORD": "@db_password",
+    "DB_PORT": "@db_port"
+  },
+  "functions": {
+    "server/server.js": {
+      "maxDuration": 30
+    }
+  }
+}
