@@ -127,7 +127,7 @@ proto.emitEvent = function( eventName, args ) {
   let jqArgs = args;
   let isFirstArgEvent = args && args[0] instanceof Event;
   if ( isFirstArgEvent ) [ event, ...jqArgs ] = args;
-  /* eslint-disable-next-line new-cap */
+   
   let $event = jquery.Event( event );
   $event.type = eventName;
   this.$element.trigger( $event, jqArgs );

@@ -3,6 +3,11 @@ import { useApps, useDesktop } from '../../contexts/AppContext';
 import DesktopIcon from './DesktopIcon';
 import Window from './Window';
 
+/**
+ * Desktop component that renders desktop icons and manages application windows
+ * @component
+ * @returns {JSX.Element} The desktop interface with icons and windows
+ */
 export default function Desktop() {
   const { windows, openApp } = useApps();
   const { APPS } = useDesktop();
@@ -29,7 +34,7 @@ export default function Desktop() {
       </div>
 
       {/* Render Open Windows */}
-      {windows.map((win) => (
+      {windows.map(win => (
         <Window
           key={win.windowId}
           windowId={win.windowId}

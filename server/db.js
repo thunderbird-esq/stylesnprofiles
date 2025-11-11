@@ -1,5 +1,9 @@
 const { Pool } = require('pg');
 
+/**
+ * PostgreSQL database connection pool
+ * @type {Pool}
+ */
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
@@ -8,7 +12,14 @@ const pool = new Pool({
   port: parseInt(process.env.DB_PORT || '5432'),
 });
 
-// Function to initialize the database
+/**
+ * Initializes the NASA System 6 database schema
+ * Creates the necessary tables for saved items and search history
+ * @async
+ * @function initDb
+ * @returns {Promise<void>}
+ * @throws {Error} If database initialization fails
+ */
 const initDb = async () => {
   console.log('Initializing NASA System 6 database schema...');
   const client = await pool.connect();
@@ -49,8 +60,17 @@ const initDb = async () => {
   }
 };
 
+/**
+ * Executes a SQL query with optional parameters
+ * @function query
+ * @param {string} text - SQL query text
+ * @param {Array} [params] - Optional query parameters
+ * @returns {Promise<Object>} Query result object
+ */
+const query = (text, params) => pool.query(text, params);
+
 module.exports = {
-  query: (text, params) => pool.query(text, params),
+  query,
   initDb,
   pool,
 };

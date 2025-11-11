@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { getApod } from '../../services/nasaApi';
 
-export default function ApodApp() {
+/**
+ * Astronomy Picture of the Day (APOD) application component
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} [props.windowId] - Optional window ID for window management
+ * @returns {JSX.Element} APOD viewer interface
+ */
+export default function ApodApp({ windowId: _windowId }) {
   const [apodData, setApodData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,7 +22,7 @@ export default function ApodApp() {
         setError(null);
       })
       .catch(err => {
-        console.error("Failed to fetch APOD:", err);
+        console.error('Failed to fetch APOD:', err);
         setError(err.message);
       })
       .finally(() => {
@@ -43,18 +51,13 @@ export default function ApodApp() {
               width: '100%',
               maxWidth: '400px',
               height: 'auto',
-              border: '1px solid var(--secondary)'
+              border: '1px solid var(--secondary)',
             }}
           />
         </div>
       ) : (
         <div className="mb-2">
-          <a
-            href={apodData.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nasa-link"
-          >
+          <a href={apodData.url} target="_blank" rel="noopener noreferrer" className="nasa-link">
             View Video (YouTube)
           </a>
         </div>
@@ -73,3 +76,11 @@ export default function ApodApp() {
     </div>
   );
 }
+
+ApodApp.propTypes = {
+  windowId: PropTypes.string,
+};
+
+ApodApp.defaultProps = {
+  windowId: null,
+};

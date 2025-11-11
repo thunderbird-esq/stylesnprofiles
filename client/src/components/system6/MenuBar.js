@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 
+/**
+ * Menu bar component that displays the system menu and current time
+ * @component
+ * @returns {JSX.Element} The menu bar with system controls and time display
+ */
 export default function MenuBar() {
   const [time, setTime] = useState(new Date());
 
@@ -8,7 +13,12 @@ export default function MenuBar() {
     return () => clearInterval(timer);
   }, []);
 
-  const formatTime = (date) => {
+  /**
+   * Formats a date object into a time string
+   * @param {Date} date - Date object to format
+   * @returns {string} Formatted time string
+   */
+  const formatTime = date => {
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',

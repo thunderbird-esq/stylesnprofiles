@@ -1,10 +1,10 @@
 /**
  * Resource Navigator Router
- * 
+ *
  * Handles CRUD operations for saved NASA resources and search history.
  * Provides endpoints for managing user-saved items and tracking search queries
  * for analytics and user experience improvement.
- * 
+ *
  * @module resourceNavigator
  * @requires express
  * @requires ../db
@@ -19,14 +19,16 @@ const validateSavedItem = [
   body('id').isString().isLength({ min: 1, max: 100 }).trim().escape(),
   body('type').isString().isIn(['APOD', 'NEO', 'MARS', 'IMAGES']).trim().escape(),
   body('title').isString().isLength({ min: 1, max: 200 }).trim().escape(),
-  body('url').optional().isURL({ protocols: ['http', 'https'] }),
+  body('url')
+    .optional()
+    .isURL({ protocols: ['http', 'https'] }),
   body('category').optional().isString().isLength({ max: 50 }).trim().escape(),
   body('description').optional().isString().isLength({ max: 1000 }).trim().escape(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        error: 'Validation failed', 
+      return res.status(400).json({
+        error: 'Validation failed',
         details: errors.array().map(err => ({ field: err.path, message: err.msg })),
       });
     }
@@ -39,8 +41,8 @@ const validateSearchQuery = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        error: 'Validation failed', 
+      return res.status(400).json({
+        error: 'Validation failed',
         details: errors.array().map(err => ({ field: err.path, message: err.msg })),
       });
     }
@@ -52,16 +54,16 @@ const validateSearchQuery = [
 
 /**
  * Get all saved items
- * 
+ *
  * Retrieves all saved NASA resources from the database.
  * Currently returns mock data for demonstration purposes.
- * 
+ *
  * @function
  * @async
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * // GET /api/resources/saved
  * // Response: [
@@ -99,10 +101,10 @@ router.get('/saved', async (req, res) => {
 
 /**
  * Save a new item
- * 
+ *
  * Creates a new saved item in the database with the provided details.
  * Currently uses mock implementation for demonstration purposes.
- * 
+ *
  * @function
  * @async
  * @param {Object} req - Express request object
@@ -115,7 +117,7 @@ router.get('/saved', async (req, res) => {
  * @param {string} [req.body.description] - Optional description
  * @param {Object} res - Express response object
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * // POST /api/resources/saved
  * // Body: {
@@ -151,10 +153,10 @@ router.post('/saved', validateSavedItem, async (req, res) => {
 
 /**
  * Save a search query
- * 
+ *
  * Logs a search query to the database for analytics and search history tracking.
  * Currently uses mock implementation for demonstration purposes.
- * 
+ *
  * @function
  * @async
  * @param {Object} req - Express request object
@@ -162,7 +164,7 @@ router.post('/saved', validateSavedItem, async (req, res) => {
  * @param {string} req.body.query_string - The search query string to save
  * @param {Object} res - Express response object
  * @returns {Promise<void>}
- * 
+ *
  * @example
  * // POST /api/resources/search
  * // Body: { "query_string": "mars rover photos" }

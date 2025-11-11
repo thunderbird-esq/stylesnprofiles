@@ -10,18 +10,21 @@ A nostalgic web application that brings NASA's vast collection of space data to 
 ## 🚀 Features
 
 ### Core NASA Integrations
+
 - **🖼️ Astronomy Picture of the Day (APOD)**: Daily stunning space imagery with detailed explanations
 - **☄️ Near Earth Object Tracking**: Real-time monitoring of asteroids and comets approaching Earth
 - **📊 Resource Navigator**: Comprehensive catalog of NASA software, datasets, and research tools
 - **🔍 Advanced Search**: Intelligent search across all NASA resources with filters and sorting
 
 ### Authentic System 7 Experience
+
 - **🪟 Classic Window Management**: Draggable, resizable windows with proper z-index handling
 - **🎨 Retro Design System**: Faithful recreation of System 7's iconic Chicago font and platinum interface
 - **⚡ Smooth Animations**: Modern performance powered by Framer Motion
 - **📱 Responsive Design**: System 7 aesthetic adapted for modern devices
 
 ### Technical Features
+
 - **🔒 Secure API Integration**: Proxy server prevents NASA API key exposure
 - **💾 Data Persistence**: PostgreSQL database for saved items and search history
 - **⚡ Performance Optimized**: Intelligent caching and bundle optimization
@@ -32,27 +35,38 @@ A nostalgic web application that brings NASA's vast collection of space data to 
 ### Technology Stack
 
 #### Frontend (React)
-React 18.2+          # Modern UI framework with hooksFramer Motion         # Smooth animations and gesturesTailwind CSS          # Utility-first stylingAxios                 # HTTP client for API callsD3.js                 # Data visualization
+
+React 18.2+ # Modern UI framework with hooksFramer Motion # Smooth animations and gesturesTailwind CSS # Utility-first stylingAxios # HTTP client for API callsD3.js # Data visualization
+
 #### Backend (Node.js)
-Express.js            # Web framework and API serverAxios                 # NASA/JPL API integrationPostgreSQL (pg)       # Database connectionCORS                  # Cross-origin resource sharingdotenv               # Environment management
+
+Express.js # Web framework and API serverAxios # NASA/JPL API integrationPostgreSQL (pg) # Database connectionCORS # Cross-origin resource sharingdotenv # Environment management
+
 #### Database
-PostgreSQL            # Primary data storeConnection Pooling    # Efficient connection managementMigrations            # Database schema versioning
+
+PostgreSQL # Primary data storeConnection Pooling # Efficient connection managementMigrations # Database schema versioning
+
 ### Project Structure
-nasa_system7_portal/├── client/                     # React frontend application│   ├── src/│   │   ├── components/│   │   │   ├── system7/       # System 7 UI components│   │   │   │   ├── Desktop.js│   │   │   │   ├── Window.js│   │   │   │   ├── MenuBar.js│   │   │   │   └── DesktopIcon.js│   │   │   ├── apps/          # NASA data applications│   │   │   │   ├── ApodApp.js│   │   │   │   ├── NeoWsApp.js│   │   │   │   └── ResourceNavigatorApp.js│   │   │   └── common/        # Shared components│   │   ├── contexts/          # React context providers│   │   │   └── AppContext.js  # Window management state│   │   ├── hooks/             # Custom React hooks│   │   ├── services/          # API service functions│   │   │   └── nasaApi.js│   │   └── assets/            # Static assets and icons│   ├── public/                # Static files│   ├── package.json           # Frontend dependencies│   └── tailwind.config.js     # Tailwind configuration├── server/                    # Node.js/Express backend│   ├── routes/│   │   ├── apiProxy.js        # NASA API proxy handler│   │   └── resourceNavigator.js # Resource catalog API│   ├── services/              # Business logic│   ├── middleware/            # Express middleware│   ├── db.js                  # PostgreSQL connection & setup│   ├── server.js              # Main server entry point│   ├── .env                   # Environment variables│   └── package.json           # Backend dependencies├── archive/                   # Archived documentation└── README.md                  # This file
+
+nasa_system7_portal/├── client/ # React frontend application│ ├── src/│ │ ├── components/│ │ │ ├── system7/ # System 7 UI components│ │ │ │ ├── Desktop.js│ │ │ │ ├── Window.js│ │ │ │ ├── MenuBar.js│ │ │ │ └── DesktopIcon.js│ │ │ ├── apps/ # NASA data applications│ │ │ │ ├── ApodApp.js│ │ │ │ ├── NeoWsApp.js│ │ │ │ └── ResourceNavigatorApp.js│ │ │ └── common/ # Shared components│ │ ├── contexts/ # React context providers│ │ │ └── AppContext.js # Window management state│ │ ├── hooks/ # Custom React hooks│ │ ├── services/ # API service functions│ │ │ └── nasaApi.js│ │ └── assets/ # Static assets and icons│ ├── public/ # Static files│ ├── package.json # Frontend dependencies│ └── tailwind.config.js # Tailwind configuration├── server/ # Node.js/Express backend│ ├── routes/│ │ ├── apiProxy.js # NASA API proxy handler│ │ └── resourceNavigator.js # Resource catalog API│ ├── services/ # Business logic│ ├── middleware/ # Express middleware│ ├── db.js # PostgreSQL connection & setup│ ├── server.js # Main server entry point│ ├── .env # Environment variables│ └── package.json # Backend dependencies├── archive/ # Archived documentation└── README.md # This file
+
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
+
 - **Node.js** version 14.0 or higher
 - **PostgreSQL** version 12.0 or higher
 - **npm** or **yarn** package manager
 
 ### 1. Obtain NASA API Key
+
 1. Visit [api.nasa.gov](https://api.nasa.gov)
 2. Sign up for a free API key
 3. Keep your API key secure and never commit it to version control
 
 ### 2. Database Setup
-```bash
+
+````bash
 # Create PostgreSQL database
 createdb nasa_system7_portal
 
@@ -235,13 +249,13 @@ const initDb = async () => {
           search_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
     `;
-    
+
     await client.query(createSavedItemsTable);
     console.log('Table "saved_items" created or already exists.');
-    
+
     await client.query(createSavedSearchesTable);
     console.log('Table "saved_searches" created or already exists.');
-    
+
     console.log('✅ Database initialization complete.');
   } catch (err) {
     console.error('❌ Error initializing database:', err.message);
@@ -307,7 +321,7 @@ router.post('/saved', async (req, res) => {
   if (!id || !type || !title) {
     return res.status(400).json({ error: 'Missing required fields: id, type, title' });
   }
-  
+
   try {
     const text = 'INSERT INTO saved_items(id, type, title, url, category, description) VALUES($1, $2, $3, $4, $5, $6) RETURNING *';
     const values = [id, type, title, url, category, description];
@@ -803,11 +817,11 @@ export default function ApodApp() {
     <div className="flex flex-col h-full">
       <h2 className="font-chicago text-lg mb-2">{apodData.title}</h2>
       <p className="text-sm mb-2">Date: {apodData.date}</p>
-      
+
       {apodData.media_type === 'image' ? (
-        <img 
-          src={apodData.url} 
-          alt={apodData.title} 
+        <img
+          src={apodData.url}
+          alt={apodData.title}
           className="w-full object-contain mb-2"
         />
       ) : (
@@ -815,7 +829,7 @@ export default function ApodApp() {
           View Video (YouTube)
         </a>
       )}
-      
+
       <div className="overflow-auto flex-1">
         <h3 className="font-chicago">Explanation:</h3>
         <p className="text-sm">{apodData.explanation}</p>
@@ -870,7 +884,7 @@ export default function NeoWsApp() {
       <p className="text-sm mb-2">
         Found {neoData.element_count} objects today.
       </p>
-      
+
       <div className="space-y-2">
         {neos.length > 0 ? (
           neos.map(neo => (
@@ -928,7 +942,7 @@ export default function ResourceNavigatorApp() {
     if (search.trim()) {
       // Log the search to the database
       saveSearch(search).catch(err => console.error("Failed to save search:", err));
-      
+
       // NOTE: This is a placeholder.
       // The "Path 1" to-do list includes "Advanced search functionality".
       // This would be where you filter items or make a new API call.
@@ -942,14 +956,14 @@ export default function ResourceNavigatorApp() {
   return (
     <div className="h-full flex flex-col">
       <h2 className="font-chicago text-lg mb-2">Resource Navigator</h2>
-      
+
       <form onSubmit={handleSearch} className="flex mb-2">
-        <input 
-          type="text" 
+        <input
+          type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="flex-1 border border-black px-1" 
-          placeholder="Search all resources..." 
+          className="flex-1 border border-black px-1"
+          placeholder="Search all resources..."
         />
         <button type="submit" className="font-chicago border border-black px-2 ml-1 bg-s7-gray">
           Search
@@ -973,3 +987,4 @@ export default function ResourceNavigatorApp() {
   );
 }
 
+````

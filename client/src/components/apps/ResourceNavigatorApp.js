@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { getSavedItems, saveSearch } from '../../services/nasaApi';
 
-export default function ResourceNavigatorApp() {
+/**
+ * Resource Navigator application component for managing saved NASA resources
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} [props.windowId] - Optional window ID for window management
+ * @returns {JSX.Element} Resource navigator interface
+ */
+export default function ResourceNavigatorApp({ windowId: _windowId }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +23,7 @@ export default function ResourceNavigatorApp() {
         setError(null);
       })
       .catch(err => {
-        console.error("Failed to fetch saved items:", err);
+        console.error('Failed to fetch saved items:', err);
         setError(err.message);
       })
       .finally(() => {
@@ -27,11 +35,11 @@ export default function ResourceNavigatorApp() {
     fetchItems();
   }, []);
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     e.preventDefault();
     if (search.trim()) {
       // Log the search to the database
-      saveSearch(search).catch(err => console.error("Failed to save search:", err));
+      saveSearch(search).catch(err => console.error('Failed to save search:', err));
 
       // NOTE: This is a placeholder.
       // The "Path 1" to-do list includes "Advanced search functionality".
@@ -50,7 +58,9 @@ export default function ResourceNavigatorApp() {
       {/* Search Form using System.css classes */}
       <form onSubmit={handleSearch} className="mt-2 mb-2">
         <div className="field-row" style={{ justifyContent: 'flex-start' }}>
-          <label htmlFor="search" className="modeless-text">Search:</label>
+          <label htmlFor="search" className="modeless-text">
+            Search:
+          </label>
           <input
             id="search"
             type="text"
@@ -72,30 +82,31 @@ export default function ResourceNavigatorApp() {
 
       {/* Saved Items List */}
       <div className="nasa-data-title mb-1">My Saved Items</div>
-      <div style={{
-        height: '200px',
-        overflowY: 'auto',
-        border: '1px solid var(--secondary)',
-        padding: '8px',
-        backgroundColor: 'var(--primary)'
-      }}>
+      <div
+        style={{
+          height: '200px',
+          overflowY: 'auto',
+          border: '1px solid var(--secondary)',
+          padding: '8px',
+          backgroundColor: 'var(--primary)',
+        }}
+      >
         {items.length > 0 ? (
           items.map(item => (
-            <div key={item.id} style={{
-              borderBottom: '1px solid var(--tertiary)',
-              paddingBottom: '8px',
-              marginBottom: '8px'
-            }}>
+            <div
+              key={item.id}
+              style={{
+                borderBottom: '1px solid var(--tertiary)',
+                paddingBottom: '8px',
+                marginBottom: '8px',
+              }}
+            >
               <div className="nasa-data-title">
                 {item.title}
-                <small style={{ display: 'block', opacity: 0.7 }}>
-                  ({item.type})
-                </small>
+                <small style={{ display: 'block', opacity: 0.7 }}>({item.type})</small>
               </div>
               <div className="nasa-data-content">
-                <small>
-                  {item.description || 'No description'}
-                </small>
+                <small>{item.description || 'No description'}</small>
               </div>
               <div style={{ marginTop: '4px' }}>
                 <small style={{ opacity: 0.6 }}>
@@ -106,7 +117,8 @@ export default function ResourceNavigatorApp() {
           ))
         ) : (
           <div className="nasa-data-content text-center">
-            You have no saved items.<br/>
+            You have no saved items.
+            <br />
             <small>Use APOD and NEO apps to save items!</small>
           </div>
         )}
@@ -114,3 +126,11 @@ export default function ResourceNavigatorApp() {
     </div>
   );
 }
+
+ResourceNavigatorApp.propTypes = {
+  windowId: PropTypes.string,
+};
+
+ResourceNavigatorApp.defaultProps = {
+  windowId: null,
+};

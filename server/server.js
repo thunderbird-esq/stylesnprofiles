@@ -1,12 +1,12 @@
 /**
  * NASA System 6 Portal - Backend Server
- * 
+ *
  * Express server that provides:
  * - NASA API proxy with authentication
  * - Resource navigator endpoints for saved items
  * - Database integration for persistence
  * - CORS configuration for React frontend
- * 
+ *
  * @module server
  * @requires express
  * @requires cors
@@ -32,21 +32,32 @@ const apiProxyRouter = require('./routes/apiProxy');
 const resourceNavigatorRouter = require('./routes/resourceNavigator');
 require('./db'); // Import db to ensure pool is created
 
+/**
+ * Express application instance
+ * @constant {express.Application}
+ */
 const app = express();
+
+/**
+ * Server port number from environment or default
+ * @constant {number}
+ */
 const PORT = process.env.PORT || 3001;
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'", 'https://api.nasa.gov'],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", 'https://api.nasa.gov'],
+      },
     },
-  },
-}));
+  }),
+);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -63,17 +74,31 @@ app.use('/api/', limiter);
 
 // Middleware
 // Allow requests from the React client with proper security
-app.use(cors({ 
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-domain.com'] 
-    : ['http://localhost:3000', 'http://localhost:3001'],
-  credentials: true,
-  optionsSuccessStatus: 200,
-}));
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? ['https://your-domain.com']
+        : ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true,
+    optionsSuccessStatus: 200,
+  }),
+);
 app.use(express.json());
 
-// Input validation middleware
+/**
+ * Input validation middleware for NASA API proxy requests
+ * Validates that the API path contains only safe characters
+ * @constant {Array<Function>}
+ */
 const validateApiProxy = [
+  /**
+   * Validates the request path format
+   * @param {express.Request} req - Express request object
+   * @param {express.Response} res - Express response object
+   * @param {express.NextFunction} next - Express next middleware function
+   * @returns {void|express.Response} Returns error response if validation fails
+   */
   (req, res, next) => {
     // Validate that the path doesn't contain malicious characters
     const path = req.path;
@@ -84,19 +109,33 @@ const validateApiProxy = [
   },
 ];
 
+/**
+ * Input validation middleware for resource navigator endpoints
+ * Validates request body fields for saved items and searches
+ * @constant {Array<Function>}
+ */
 const validateResourceInput = [
   body('id').optional().isString().isLength({ min: 1, max: 100 }),
   body('type').optional().isString().isIn(['APOD', 'NEO', 'MARS', 'IMAGES']),
   body('title').optional().isString().isLength({ min: 1, max: 200 }),
-  body('url').optional().isURL({ protocols: ['http', 'https'] }),
+  body('url')
+    .optional()
+    .isURL({ protocols: ['http', 'https'] }),
   body('category').optional().isString().isLength({ min: 1, max: 50 }),
   body('description').optional().isString().isLength({ max: 1000 }),
   body('query_string').optional().isString().isLength({ min: 1, max: 200 }),
+  /**
+   * Validates the request and returns validation errors if any
+   * @param {express.Request} req - Express request object
+   * @param {express.Response} res - Express response object
+   * @param {express.NextFunction} next - Express next middleware function
+   * @returns {void|express.Response} Returns error response if validation fails
+   */
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ 
-        error: 'Validation failed', 
+      return res.status(400).json({
+        error: 'Validation failed',
         details: errors.array().map(err => ({ field: err.path, message: err.msg })),
       });
     }
@@ -142,7 +181,7 @@ app.use((err, req, res, _next) => {
 
 /**
  * Starts the NASA System 6 Portal server
- * 
+ *
  * @event
  * @listens PORT
  * @callback

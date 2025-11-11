@@ -1,8 +1,32 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import { motion } from 'framer-motion';
 import { useApps } from '../../contexts/AppContext';
 
-export default function Window({ children, title, windowId, zIndex, x = 100, y = 100, width = 500, height = 400 }) {
+/**
+ * Window component that represents a draggable application window
+ * @component
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Content to render inside the window
+ * @param {string} props.title - Window title displayed in title bar
+ * @param {string} props.windowId - Unique identifier for the window
+ * @param {number} props.zIndex - Z-index for window layering
+ * @param {number} [props.x=100] - Initial X position
+ * @param {number} [props.y=100] - Initial Y position
+ * @param {number} [props.width=500] - Window width
+ * @param {number} [props.height=400] - Window height
+ * @returns {JSX.Element} A draggable application window
+ */
+export default function Window({
+  children,
+  title,
+  windowId,
+  zIndex,
+  x = 100,
+  y = 100,
+  width = 500,
+  height = 400,
+}) {
   const { closeApp, focusApp, activeWindow } = useApps();
   const [position, setPosition] = useState({ x, y });
   const [isDragging, setIsDragging] = useState(false);
@@ -19,7 +43,7 @@ export default function Window({ children, title, windowId, zIndex, x = 100, y =
     }
   }, [isActive]);
 
-  const handleMouseDown = (e) => {
+  const handleMouseDown = e => {
     focusApp(windowId);
 
     // Only enable dragging from title bar
@@ -34,17 +58,20 @@ export default function Window({ children, title, windowId, zIndex, x = 100, y =
     }
   };
 
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging) return;
+  const handleMouseMove = useCallback(
+    e => {
+      if (!isDragging) return;
 
-    const deltaX = e.clientX - dragStartPos.current.x;
-    const deltaY = e.clientY - dragStartPos.current.y;
+      const deltaX = e.clientX - dragStartPos.current.x;
+      const deltaY = e.clientY - dragStartPos.current.y;
 
-    const newX = Math.max(0, windowStartPos.current.x + deltaX);
-    const newY = Math.max(0, windowStartPos.current.y + deltaY);
+      const newX = Math.max(0, windowStartPos.current.x + deltaX);
+      const newY = Math.max(0, windowStartPos.current.y + deltaY);
 
-    setPosition({ x: newX, y: newY });
-  }, [isDragging]);
+      setPosition({ x: newX, y: newY });
+    },
+    [isDragging],
+  );
 
   const handleMouseUp = useCallback(() => {
     if (isDragging) {
@@ -89,23 +116,36 @@ export default function Window({ children, title, windowId, zIndex, x = 100, y =
         <button
           aria-label="Close"
           className="close"
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
             closeApp(windowId);
           }}
         />
         <h1 className="title font-chicago">{title}</h1>
-        <button
-          aria-label="Resize"
-          className="resize"
-        />
+        <button aria-label="Resize" className="resize" />
       </div>
       <div className="separator"></div>
 
       {/* Window Content */}
-      <div className="window-pane nasa-window-content">
-        {children}
-      </div>
+      <div className="window-pane nasa-window-content">{children}</div>
     </motion.div>
   );
 }
+
+Window.propTypes = {
+  children: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
+  windowId: PropTypes.string.isRequired,
+  zIndex: PropTypes.number.isRequired,
+  x: PropTypes.number,
+  y: PropTypes.number,
+  width: PropTypes.number,
+  height: PropTypes.number,
+};
+
+Window.defaultProps = {
+  x: 100,
+  y: 100,
+  width: 500,
+  height: 400,
+};

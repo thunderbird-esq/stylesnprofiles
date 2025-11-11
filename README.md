@@ -11,12 +11,14 @@ A nostalgic web application that brings NASA's vast collection of space data to 
 ## 🚀 Features
 
 ### Core NASA Integrations
+
 - **🖼️ Astronomy Picture of the Day (APOD)**: Daily stunning space imagery with detailed explanations
 - **☄️ Near Earth Object Tracking**: Real-time monitoring of asteroids and comets approaching Earth
 - **📊 Resource Navigator**: Comprehensive catalog of NASA software, datasets, and research tools
 - **🔍 Advanced Search**: Intelligent search across all NASA resources with filters and sorting
 
 ### Authentic System 6 Experience
+
 - **🪟 Classic Window Management**: Draggable windows with proper title bars and controls
 - **🎨 Retro Design System**: Faithful recreation of System 6's monochrome interface using System.css
 - **⚡ Smooth Animations**: Modern performance powered by Framer Motion
@@ -24,6 +26,7 @@ A nostalgic web application that brings NASA's vast collection of space data to 
 - **🔤 Authentic Typography**: Chicago 12pt and Geneva 9pt fonts recreated by Giles Booth
 
 ### Technical Features
+
 - **🔒 Secure API Integration**: Proxy server prevents NASA API key exposure
 - **💾 Data Persistence**: PostgreSQL database for saved items and search history
 - **⚡ Performance Optimized**: Intelligent caching and bundle optimization
@@ -34,23 +37,26 @@ A nostalgic web application that brings NASA's vast collection of space data to 
 ### Technology Stack
 
 #### Frontend (React + System.css)
-React 18.2+              # Modern UI framework with hooks
-System.css              # Authentic Apple System 6 design system
-Framer Motion           # Smooth animations and gestures
-Axios                   # HTTP client for API calls
-D3.js                   # Data visualization
+
+React 18.2+ # Modern UI framework with hooks
+System.css # Authentic Apple System 6 design system
+Framer Motion # Smooth animations and gestures
+Axios # HTTP client for API calls
+D3.js # Data visualization
 
 #### Backend (Node.js)
-Express.js              # Web framework and API server
-Axios                   # NASA/JPL API integration
-PostgreSQL (pg)         # Database connection
-CORS                    # Cross-origin resource sharing
-dotenv                  # Environment management
+
+Express.js # Web framework and API server
+Axios # NASA/JPL API integration
+PostgreSQL (pg) # Database connection
+CORS # Cross-origin resource sharing
+dotenv # Environment management
 
 #### Database
-PostgreSQL              # Primary data store
-Connection Pooling      # Efficient connection management
-Migrations              # Database schema versioning
+
+PostgreSQL # Primary data store
+Connection Pooling # Efficient connection management
+Migrations # Database schema versioning
 
 ### Project Structure
 
@@ -99,16 +105,19 @@ nasa_system6_portal/
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
+
 - **Node.js** version 14.0 or higher
 - **PostgreSQL** version 12.0 or higher
 - **npm** or **yarn** package manager
 
 ### 1. Obtain NASA API Key
+
 1. Visit [api.nasa.gov](https://api.nasa.gov)
 2. Sign up for a free API key
 3. Keep your API key secure and never commit it to version control
 
 ### 2. Database Setup
+
 ```bash
 # Create PostgreSQL database
 createdb nasa_system6_portal
@@ -117,6 +126,7 @@ createdb nasa_system6_portal
 ```
 
 ### 3. Environment Configuration
+
 ```bash
 # Navigate to server directory
 cd server
@@ -126,6 +136,7 @@ cp .env.example .env
 ```
 
 Edit `server/.env` with your configuration:
+
 ```env
 # NASA API Configuration
 NASA_API_KEY=your_nasa_api_key_here
@@ -144,18 +155,21 @@ DB_PORT=5432
 ### 4. Install Dependencies
 
 #### Backend Dependencies
+
 ```bash
 cd server
 npm install
 ```
 
 #### Frontend Dependencies
+
 ```bash
 cd ../client
 npm install
 ```
 
 ### 5. Database Initialization
+
 ```bash
 cd ../server
 npm run db:init
@@ -166,23 +180,29 @@ This will create the necessary tables for saved items and search history.
 ## 🚀 Running the Application
 
 ### Development Mode
+
 Both frontend and backend must run simultaneously.
 
 #### Terminal 1: Backend Server
+
 ```bash
 cd server
 npm start
 ```
+
 Backend will start on http://localhost:3001
 
 #### Terminal 2: Frontend Development Server
+
 ```bash
 cd client
 npm start
 ```
+
 Frontend will start on http://localhost:3000 and open in your browser
 
 ### Production Build
+
 ```bash
 # Build frontend for production
 cd client
@@ -196,12 +216,14 @@ npm start
 ## 🔧 API Integration
 
 ### Available NASA Endpoints
+
 - **APOD**: `/api/nasa/planetary/apod` - Daily astronomy images
 - **NeoWS**: `/api/nasa/neo/rest/v1/feed` - Near Earth Object data
 - **Mars Rover**: `/api/nasa/mars-photos/api/v1/rovers` - Mars exploration images
 - **EPIC**: `/api/nasa/EPIC/api/natural/images` - Earth imagery
 
 ### Proxy Server Architecture
+
 ```
 Client Request → Express Server → NASA APIs → Response
      (Port 3000)     (Port 3001)     (External)    (Client)
@@ -209,6 +231,7 @@ Client Request → Express Server → NASA APIs → Response
 ```
 
 This proxy approach ensures:
+
 - **Security**: NASA API keys never exposed to client
 - **Rate Limiting**: Centralized request management
 - **Caching**: Improved performance through intelligent caching
@@ -217,6 +240,7 @@ This proxy approach ensures:
 ## 🎨 System 6 UI Implementation
 
 ### Design System (System.css)
+
 Based on the gold standard System.css library by Sakun Acharige, this implementation provides:
 
 - **Authentic Typography**: Chicago_12 and Geneva_9 fonts by Giles Booth
@@ -225,12 +249,14 @@ Based on the gold standard System.css library by Sakun Acharige, this implementa
 - **Accurate Interactions**: Scrollbars, buttons, and form elements
 
 ### Key Features
+
 - **Authentic Windows**: Draggable windows with proper title bars
 - **Classic Controls**: Close, resize, and minimize buttons
 - **System 6 Forms**: Proper field rows and input styling
 - **Retro Scrolling**: Custom scrollbars matching System 6
 
 ### Components
+
 - **Desktop**: Main workspace with window management
 - **Window**: System 6 styled application containers
 - **MenuBar**: Classic Apple menu bar
@@ -263,6 +289,7 @@ CREATE TABLE saved_searches (
 ## 🧪 Testing
 
 ### Running Tests
+
 ```bash
 # Frontend tests
 cd client
@@ -274,6 +301,7 @@ npm test
 ```
 
 ### Testing Coverage Goals
+
 - **Unit Tests**: React components and utility functions
 - **Integration Tests**: API endpoints and database operations
 - **E2E Tests**: Complete user workflows
@@ -282,16 +310,19 @@ npm test
 ## 🚀 Deployment
 
 ### Frontend Deployment Options
+
 - **Vercel**: Recommended for React applications
 - **Netlify**: Static hosting with CI/CD
 - **AWS S3 + CloudFront**: Scalable static hosting
 
 ### Backend Deployment Options
+
 - **Heroku**: Easy Node.js deployment
 - **AWS Elastic Beanstalk**: Scalable hosting
 - **DigitalOcean**: Affordable cloud hosting
 
 ### Database Hosting
+
 - **Heroku Postgres**: Managed PostgreSQL
 - **AWS RDS**: Relational database service
 - **Neon**: Modern PostgreSQL platform
@@ -299,6 +330,7 @@ npm test
 ## 🔒 Security Considerations
 
 ### Implemented Security Measures
+
 - **API Key Protection**: Server-side key management
 - **Input Validation**: All user inputs sanitized
 - **CORS Configuration**: Proper cross-origin policies
@@ -306,6 +338,7 @@ npm test
 - **HTTPS Enforcement**: SSL/TLS for all communications
 
 ### Security Best Practices
+
 - Regular dependency updates
 - Environment variable protection
 - Error message sanitization
@@ -315,6 +348,7 @@ npm test
 ## 🤝 Contributing
 
 ### Development Workflow
+
 1. Fork the repository
 2. Create feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit changes (`git commit -m 'Add amazing feature'`)
@@ -322,12 +356,14 @@ npm test
 5. Open Pull Request
 
 ### Code Style Guidelines
+
 - **ESLint**: JavaScript/React linting
 - **Prettier**: Code formatting
 - **Conventional Commits**: Standardized commit messages
 - **Component Documentation**: JSDoc for all components
 
 ### Pull Request Requirements
+
 - [ ] Tests pass for all changes
 - [ ] Code follows project style guidelines
 - [ ] Documentation updated for new features
@@ -337,12 +373,14 @@ npm test
 ## 📈 Performance Optimization
 
 ### Frontend Optimization
+
 - **Code Splitting**: Lazy loading for large components
 - **Bundle Analysis**: Regular bundle size monitoring
 - **Image Optimization**: WebP format with fallbacks
 - **Caching Strategy**: Service worker implementation
 
 ### Backend Optimization
+
 - **API Caching**: Intelligent response caching
 - **Database Indexing**: Optimized query performance
 - **Connection Pooling**: Efficient database connections
@@ -351,6 +389,7 @@ npm test
 ## 🗺️ Roadmap
 
 ### Phase 1: Core Enhancement (Current)
+
 - [x] System.css integration
 - [x] Basic NASA API integration
 - [x] System 6 UI framework
@@ -360,6 +399,7 @@ npm test
 - [ ] Mobile responsiveness
 
 ### Phase 2: Advanced Features
+
 - [ ] User authentication system
 - [ ] Real-time data updates
 - [ ] Data export capabilities
@@ -367,6 +407,7 @@ npm test
 - [ ] Enhanced UI components
 
 ### Phase 3: Platform Expansion
+
 - [ ] Multi-language support
 - [ ] Educational content integration
 - [ ] Community features
@@ -389,9 +430,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 📞 Support
 
 For questions, issues, or contributions:
+
 - **Issues**: GitHub Issues
 - **Discussions**: GitHub Discussions
 
 ---
 
-*Built with authentic System 6 design standards and Claude Code* 🚀
+_Built with authentic System 6 design standards and Claude Code_ 🚀
