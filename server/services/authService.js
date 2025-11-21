@@ -10,7 +10,7 @@ const REFRESH_TOKEN_EXPIRES_IN = '7d';
 class AuthService {
   /**
      * Register a new user
-     * @param {string} email
+     * @param {string} email - Optional email
      * @param {string} username
      * @param {string} password
      * @returns {Promise<Object>} Created user object (without password)
@@ -18,11 +18,13 @@ class AuthService {
   async registerUser(email, username, password) {
     const client = await pool.connect();
     try {
-      // Check if user exists
-      const userCheck = await client.query(
-        'SELECT id FROM users WHERE email = $1 OR username = $2',
-        [email, username],
-      );
+      // Check if user exists (by username, and email if provided)
+      const checkQuery = email
+        ? 'SELECT id FROM users WHERE email = $1 OR username = $2'
+        : 'SELECT id FROM users WHERE username = $1';
+      const checkParams = email ? [email, username] : [username];
+
+      const userCheck = await client.query(checkQuery, checkParams);
 
       if (userCheck.rows.length > 0) {
         throw new Error('User with this email or username already exists');
@@ -36,7 +38,7 @@ class AuthService {
         `INSERT INTO users (email, username, password_hash)
          VALUES ($1, $2, $3)
          RETURNING id, email, username, role, created_at`,
-        [email, username, passwordHash],
+        [email || null, username, passwordHash],
       );
 
       return result.rows[0];
@@ -47,17 +49,17 @@ class AuthService {
 
   /**
      * Login user
-     * @param {string} email
+     * @param {string} emailOrUsername - Email or username
      * @param {string} password
      * @returns {Promise<Object>} { user, token, refreshToken }
      */
-  async loginUser(email, password) {
+  async loginUser(emailOrUsername, password) {
     const client = await pool.connect();
     try {
-      // Find user
+      // Find user by email OR username
       const result = await client.query(
-        'SELECT * FROM users WHERE email = $1',
-        [email],
+        'SELECT * FROM users WHERE email = $1 OR username = $1',
+        [emailOrUsername],
       );
 
       const user = result.rows[0];

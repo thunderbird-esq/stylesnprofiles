@@ -11,8 +11,15 @@ import PropTypes from 'prop-types';
  * @returns {JSX.Element} A clickable desktop icon
  */
 export default function DesktopIcon({ label, icon, onDoubleClick }) {
+  const handleDoubleClick = () => {
+    console.log(`DesktopIcon double-clicked: ${label}`);
+    if (onDoubleClick) {
+      onDoubleClick();
+    }
+  };
+
   return (
-    <div className="desktop-icon" onDoubleClick={onDoubleClick}>
+    <div className="desktop-icon" onDoubleClick={handleDoubleClick}>
       <span style={{ fontSize: '32px' }}>{icon}</span>
       <div className="desktop-icon-text">{label}</div>
     </div>

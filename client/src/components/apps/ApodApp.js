@@ -20,8 +20,8 @@ export default function ApodApp({ windowId: _windowId }) {
     const fetchApod = async () => {
       setLoading(true);
       try {
-        const data = await getApod(date);
-        setApodData(data);
+        const response = await getApod({ date });
+        setApodData(response.data);
         setError(null);
       } catch (err) {
         setError(err.message);
@@ -34,6 +34,10 @@ export default function ApodApp({ windowId: _windowId }) {
   }, [date]);
 
 
+
+  if (loading) return <div className="nasa-loading">Loading APOD...</div>;
+  if (error) return <div className="nasa-error">Error: {error}</div>;
+  if (!apodData) return null;
 
   return (
     <div className="nasa-app-content">

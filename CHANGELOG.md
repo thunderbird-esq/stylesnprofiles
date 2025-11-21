@@ -46,6 +46,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **API Examples**: Detailed request/response examples for all endpoints
 - **Middleware Documentation**: Comprehensive documentation for all middleware components
 
+### Authentication & App Launch (2025-11-21)
+- **Removed Authentication Requirements**: Simplified to local-only mode without server authentication
+- **Fixed APOD Viewer**: Corrected data fetching and axios response handling
+- **Fixed App Launching**: Resolved issues preventing Favorites and Collections from opening
+- **Local User Mode**: Device ID-based user identification for data persistence
+- **Removed Email/Username Requirements**: Aligned with NASA API-only approach
+- **Window Management**: Fixed close button and window interaction bugs
+
 ### Previous Features
 - Intelligent Test Automation Orchestrator with parallel execution and resource management
 - Comprehensive Architecture Documentation with C4 model and ADRs

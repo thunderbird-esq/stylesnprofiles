@@ -18,26 +18,25 @@ Connect the React frontend to the newly implemented backend services (Auth, Favo
   - Attach JWT token to requests
   - Handle 401 errors (auto-logout or refresh)
 
-### 2. Authentication UI (Estimated: 6-8 hours) ✅ COMPLETE
-- [x] **Login Window**: Created `client/src/components/system6/auth/LoginWindow.js`
-  - System 6 styled form
-  - Error handling
-- [ ] **Register Window**: Create `client/src/components/system6/auth/RegisterWindow.js`
-- [ ] **User Menu**: Update `MenuBar.js` to show User status/Logout
+### 2. Authentication UI (Estimated: 6-8 hours) ✅ REFACTORED
+- [x] **Simplified Authentication**: Removed server-based auth, using local-only mode
+- [x] **Device ID System**: Automatic user identification without login
+- [x] **Window Management**: Fixed close button and app launching
+- [ ] **User Menu**: Update `MenuBar.js` to show User status (optional)
 
-### 3. Favorites Integration (Estimated: 4-6 hours) - READY
-- [x] **Favorites Service**: Create `client/src/services/favoritesService.js`
-- [ ] **Save Button**: Create reusable `SaveButton` component
-- [ ] **APOD Integration**: Add Save button to `ApodApp.js`
-- [ ] **Favorites App**: Create `client/src/components/apps/FavoritesApp.js`
-  - List view of saved items
-  - Filtering/Sorting
+### 3. Favorites Integration (Estimated: 4-6 hours) - IN PROGRESS 🔄
+- [x] **Favorites Service**: Created `client/src/services/favoritesService.js`
+- [x] **Save Button**: Reusable `SaveButton` component integrated
+- [x] **APOD Integration**: Save button added to `ApodApp.js`
+- [x] **Favorites App**: Created `client/src/components/favorites/FavoritesApp.js`
+- [ ] **Fix Favorites Loading**: Resolve "failed to fetch favorites" error
+- [ ] **Verify Save Functionality**: Ensure APOD items save correctly
 
-### 4. Collections Integration (Estimated: 6-8 hours) - READY
-- [x] **Collections Service**: Create `client/src/services/collectionsService.js`
-- [ ] **Collections App**: Create `client/src/components/apps/CollectionsApp.js`
-  - Create/Edit collections
-  - Drag & Drop items (if possible)
+### 4. Collections Integration (Estimated: 6-8 hours) - IN PROGRESS 🔄
+- [x] **Collections Service**: Created `client/src/services/collectionsService.js`
+- [x] **Collections App**: Created `client/src/components/apps/CollectionsApp.js`
+- [ ] **Fix Collection Creation**: Resolve error when creating collections
+- [ ] **Styling Fixes**: Clean up UI styling issues
 
 ## 🚀 Execution Strategy
 1.  Start with **Auth Infrastructure** (Context + Service).

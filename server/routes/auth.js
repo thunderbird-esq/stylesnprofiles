@@ -6,13 +6,15 @@ const router = express.Router();
 
 // Validation middleware
 const registerValidation = [
-  body('email').isEmail().withMessage('Please provide a valid email'),
+  body('email').optional().isEmail().withMessage('Please provide a valid email'),
   body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters long'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
 ];
 
+
 const loginValidation = [
-  body('email').isEmail().withMessage('Please provide a valid email'),
+  body('email').optional().isEmail().withMessage('Please provide a valid email'),
+  body('username').optional().isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
   body('password').exists().withMessage('Password is required'),
 ];
 

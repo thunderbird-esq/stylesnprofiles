@@ -52,7 +52,6 @@ const APPS = {
     component: props => <FavoritesApp {...props} />,
     defaultWidth: 800,
     defaultHeight: 600,
-    requiresAuth: true,
   },
   collections: {
     id: 'collections',
@@ -61,7 +60,6 @@ const APPS = {
     component: props => <CollectionsApp {...props} />,
     defaultWidth: 700,
     defaultHeight: 500,
-    requiresAuth: true,
   },
 };
 
@@ -69,15 +67,21 @@ export const AppProvider = ({ children }) => {
   const [windows, setWindows] = useState([]);
   const [nextZIndex, setNextZIndex] = useState(10);
   const [activeWindow, setActiveWindow] = useState(null);
-  const { isAuthenticated } = useAuth();
+  const auth = useAuth();
 
   const openApp = useCallback(
     appId => {
       const app = APPS[appId];
       if (!app) return;
 
+      // Check auth inside callback when actually needed
+      const isAuthenticated = auth?.isAuthenticated || false;
+
+      console.log(`Opening app: ${appId}, requiresAuth: ${app.requiresAuth}, isAuthenticated: ${isAuthenticated}`);
+
       // Check if app requires authentication
-      if (app.requiresAuth && !isAuthenticated()) {
+      if (app.requiresAuth && !isAuthenticated) {
+        console.log('Auth required but user not authenticated');
         alert('Please log in to access this application.');
         return;
       }
@@ -97,7 +101,7 @@ export const AppProvider = ({ children }) => {
       setNextZIndex(newZIndex);
       setActiveWindow(newWindowId);
     },
-    [nextZIndex, isAuthenticated],
+    [nextZIndex, auth],
   );
 
   const closeApp = useCallback(
