@@ -1,0 +1,57 @@
+{
+  "name": "nasa-system6-test-orchestrator",
+  "version": "1.0.0",
+  "description": "Intelligent test automation orchestrator for NASA System 6 Portal",
+  "main": "index.js",
+  "bin": {
+    "test-orchestrator": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js run --strategy=fastFeedback",
+    "test:comprehensive": "node index.js run --strategy=comprehensive",
+    "test:smoke": "node index.js run --strategy=smokeTest",
+    "test:performance": "node index.js run --strategy=performance",
+    "discover": "node index.js discover",
+    "monitor": "node index.js monitor",
+    "report": "node index.js report",
+    "optimize": "node index.js optimize",
+    "full": "node index.js full",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "testing",
+    "automation",
+    "orchestration",
+    "parallel",
+    "performance",
+    "monitoring",
+    "nasa",
+    "system6",
+    "react",
+    "nodejs"
+  ],
+  "author": "NASA System 6 Portal Team",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "glob": "^10.3.0",
+    "jest": "^29.5.0",
+    "fs-extra": "^11.1.1",
+    "yaml": "^2.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/nasa-system6-portal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/nasa-system6-portal/issues"
+  },
+  "homepage": "https://github.com/your-org/nasa-system6-portal#readme"
+}

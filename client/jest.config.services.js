@@ -1,0 +1,45 @@
+module.exports = {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: [
+    '<rootDir>/src/setupIntegrationTests.js',
+    '@testing-library/jest-dom'
+  ],
+  testMatch: [
+    '<rootDir>/src/services/__tests__/**/*.test.js'
+  ],
+  collectCoverageFrom: [
+    "src/services/favoritesService.js",
+    "src/services/collectionsService.js",
+    "src/services/apiClient.js",
+    "!src/services/__tests__/**",
+    "!src/**/__tests__/**",
+    "!src/**/__integration__/**"
+  ],
+  coverageThreshold: {
+    "global": {
+      "branches": 85,
+      "functions": 85,
+      "lines": 85,
+      "statements": 85
+    }
+  },
+  coverageReporters: [
+    "text",
+    "lcov",
+    "html",
+    "json-summary"
+  ],
+  coverageDirectory: "coverage",
+  transformIgnorePatterns: [
+    "node_modules/(?!(axios|@babel)/)"
+  ],
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  testTimeout: 30000,
+  verbose: true,
+  collectCoverage: true,
+  transform: {
+    "^.+\\.(js|jsx)$": "babel-jest"
+  }
+};

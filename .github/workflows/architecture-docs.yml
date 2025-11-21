@@ -1,0 +1,225 @@
+name: Architecture Documentation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'client/src/**'
+      - 'server/**'
+      - '.github/workflows/architecture-docs.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'client/src/**'
+      - 'server/**'
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        cd docs/architecture/automation
+        npm install
+
+    - name: Generate architecture documentation
+      run: |
+        cd docs/architecture/automation
+        npm run generate
+
+    - name: Validate documentation
+      run: |
+        cd docs/architecture/automation
+        npm run validate
+
+    - name: Check for changes
+      id: verify-changed-files
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Commit documentation changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/architecture/generated/
+        git add docs/architecture/diagrams/
+        git commit -m "📚 Update architecture documentation
+
+        🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+        Co-Authored-By: Claude <noreply@anthropic.com>"
+
+    - name: Push changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: architecture-docs
+        path: docs/architecture/
+        retention-days: 30
+
+    - name: Create documentation PR
+      if: github.ref == 'refs/heads/main' && steps.verify-changed-files.outputs.changed == 'true'
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "📚 Update architecture documentation"
+        title: "📚 Automated Architecture Documentation Update"
+        body: |
+          ## Summary
+
+          This PR contains automated updates to the architecture documentation based on recent code changes.
+
+          ## Changes
+
+          - Updated component documentation
+          - Refreshed API endpoint documentation
+          - Updated database schema documentation
+          - Regenerated architecture diagrams
+
+          ## Validation
+
+          - ✅ Documentation generation completed successfully
+          - ✅ All documentation files validated
+          - ✅ No broken links or missing content
+
+          This PR was created automatically by the Architecture Documentation workflow.
+
+          🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+          Co-Authored-By: Claude <noreply@anthropic.com>
+        branch: docs/architecture-updates
+        delete-branch: true
+        labels: documentation, automated, architecture
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: generate-docs
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install client dependencies
+      run: |
+        cd client
+        npm ci
+
+    - name: Install server dependencies
+      run: |
+        cd server
+        npm ci
+
+    - name: Run security audit
+      run: |
+        echo "# Security Audit Results" > security-report.md
+        echo "" >> security-report.md
+
+        echo "## Client Dependencies" >> security-report.md
+        cd client
+        npm audit --audit-level=moderate >> ../security-report.md || true
+        cd ..
+
+        echo "" >> security-report.md
+        echo "## Server Dependencies" >> security-report.md
+        cd server
+        npm audit --audit-level=moderate >> ../security-report.md || true
+        cd ..
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-report
+        path: security-report.md
+
+  performance-analysis:
+    runs-on: ubuntu-latest
+    needs: generate-docs
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install client dependencies
+      run: |
+        cd client
+        npm ci
+
+    - name: Build application
+      run: |
+        cd client
+        npm run build
+
+    - name: Analyze bundle size
+      run: |
+        echo "# Bundle Size Analysis" > bundle-report.md
+        echo "" >> bundle-report.md
+
+        if [ -d "client/build/static" ]; then
+          echo "## Bundle Files" >> bundle-report.md
+          cd client/build/static/js
+          for file in *.js; do
+            size=$(stat -c%s "$file")
+            echo "- $file: $((size/1024))KB" >> ../../../../bundle-report.md
+          done
+          cd ../../../../
+        fi
+
+    - name: Upload bundle report
+      uses: actions/upload-artifact@v3
+      with:
+        name: bundle-report
+        path: bundle-report.md
+
+  notify-team:
+    runs-on: ubuntu-latest
+    needs: [generate-docs, security-scan, performance-analysis]
+    if: always()
+
+    steps:
+    - name: Notify on success
+      if: needs.generate-docs.result == 'success'
+      run: |
+        echo "✅ Architecture documentation updated successfully!"
+
+    - name: Notify on failure
+      if: needs.generate-docs.result == 'failure'
+      run: |
+        echo "❌ Architecture documentation generation failed!"
+        exit 1

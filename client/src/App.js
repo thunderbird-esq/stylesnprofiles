@@ -1,4 +1,6 @@
 import React from 'react';
+import { AuthProvider } from './contexts/AuthContext';
+import { AppProvider } from './contexts/AppContext';
 import Desktop from './components/system6/Desktop';
 import MenuBar from './components/system6/MenuBar';
 
@@ -9,10 +11,16 @@ import MenuBar from './components/system6/MenuBar';
  */
 function App() {
   return (
-    <div className="nasa-desktop">
-      <MenuBar />
-      <Desktop />
-    </div>
+    <AuthProvider>
+      <AppProvider>
+        <div className="nasa-desktop">
+          {/* System 6 Menu Bar */}
+          <MenuBar />
+          {/* Desktop Area */}
+          <Desktop />
+        </div>
+      </AppProvider>
+    </AuthProvider>
   );
 }
 

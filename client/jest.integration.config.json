@@ -1,0 +1,13 @@
+{
+  "testEnvironment": "jsdom",
+  "setupFilesAfterEnv": [
+    "<rootDir>/src/setupIntegrationTests.js",
+    "@testing-library/jest-dom"
+  ],
+  "transformIgnorePatterns": [
+    "node_modules/(?!(axios|@babel)/)"
+  ],
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  }
+}

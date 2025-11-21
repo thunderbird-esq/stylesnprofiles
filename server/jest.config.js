@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: 'node',
 
   // Setup files
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/__tests__/helpers.js'],
 
   // Module name mapping
   moduleNameMapper: {
@@ -23,6 +23,7 @@ module.exports = {
     'services/**/*.js',
     '!*.config.js',
     '!jest.setup.js',
+    '!__tests__/helpers.js',
     '!**/*.test.js',
     '!**/*.spec.js',
     '!node_modules/**',
@@ -38,7 +39,7 @@ module.exports = {
   },
 
   // Test match patterns
-  testMatch: ['<rootDir>/**/__tests__/**/*.js', '<rootDir>/**/*.{test,spec}.js'],
+  testMatch: ['<rootDir>/**/__tests__/**/*.test.js', '<rootDir>/**/*.{test,spec}.js'],
 
   // Module file extensions
   moduleFileExtensions: ['js', 'json'],

@@ -15,8 +15,14 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:unit": "react-scripts test --testPathPattern=__tests__ --testPathIgnorePatterns=integration",
+    "test:integration": "react-scripts test --testPathPattern=integration --testTimeout=30000",
     "test:coverage": "react-scripts test --coverage --watchAll=false",
     "test:watch": "react-scripts test --watchAll",
+    "test:user-resources": "node src/__tests__/testRunner.js all",
+    "test:user-resources:unit": "node src/__tests__/testRunner.js unit",
+    "test:user-resources:integration": "node src/__tests__/testRunner.js integration",
+    "test:user-resources:coverage": "node src/__tests__/testRunner.js coverage",
     "eject": "react-scripts eject",
     "lint": "eslint src --config eslint.config.js",
     "lint:fix": "eslint src --config eslint.config.js --fix",
@@ -60,7 +66,6 @@
   },
   "overrides": {
     "nth-check": "^2.1.1",
-    "postcss": "^8.4.31",
-    "webpack-dev-server": "^5.2.0"
+    "postcss": "^8.4.31"
   }
 }

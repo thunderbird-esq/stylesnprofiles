@@ -30,6 +30,10 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const apiProxyRouter = require('./routes/apiProxy');
 const resourceNavigatorRouter = require('./routes/resourceNavigator');
+const authRouter = require('./routes/auth');
+const favoritesRouter = require('./routes/favorites');
+const collectionsRouter = require('./routes/collections');
+const { authenticateToken } = require('./middleware/auth');
 require('./db'); // Import db to ensure pool is created
 
 /**
@@ -136,7 +140,7 @@ const validateResourceInput = [
     if (!errors.isEmpty()) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: errors.array().map(err => ({ field: err.path, message: err.msg })),
+        details: errors.array().map(err => ({ field: err.param, message: err.msg })),
       });
     }
     next();
@@ -148,6 +152,12 @@ const validateResourceInput = [
 app.use('/api/nasa', validateApiProxy, apiProxyRouter);
 // Path 2: The database API for saved items/searches
 app.use('/api/resources', validateResourceInput, resourceNavigatorRouter);
+// Path 3: Authentication routes
+// Path 3: Authentication routes
+app.use('/api/v1/auth', authRouter);
+// Path 4: User resources (protected)
+app.use('/api/v1/users/favorites', authenticateToken, favoritesRouter);
+app.use('/api/v1/users/collections', authenticateToken, collectionsRouter);
 
 /**
  * Health check endpoint

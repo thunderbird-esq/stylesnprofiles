@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getApod } from '../../services/nasaApi';
+import { SaveButton } from '../favorites';
 
 /**
  * Astronomy Picture of the Day (APOD) application component
@@ -11,35 +12,56 @@ import { getApod } from '../../services/nasaApi';
  */
 export default function ApodApp({ windowId: _windowId }) {
   const [apodData, setApodData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const date = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    setLoading(true);
-    getApod()
-      .then(res => {
-        setApodData(res.data);
+    const fetchApod = async () => {
+      setLoading(true);
+      try {
+        const data = await getApod(date);
+        setApodData(data);
         setError(null);
-      })
-      .catch(err => {
-        console.error('Failed to fetch APOD:', err);
+      } catch (err) {
         setError(err.message);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
-  }, []);
+      }
+    };
 
-  if (loading) return <div className="nasa-loading">Loading today's astronomy picture...</div>;
-  if (error) return <div className="nasa-error">Error: {error}</div>;
-  if (!apodData) return null;
+    fetchApod();
+  }, [date]);
+
+
 
   return (
-    <div className="nasa-data-section">
-      <div className="nasa-data-title">{apodData.title}</div>
-
-      <div className="mb-1">
+    <div className="nasa-app-content">
+      <div
+        className="mb-1"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <small>Date: {apodData.date}</small>
+        <SaveButton
+          itemId={`apod-${apodData.date}`}
+          itemType="APOD"
+          itemDate={apodData.date}
+          itemData={{
+            title: apodData.title,
+            url: apodData.url,
+            hd_url: apodData.hdurl,
+            media_type: apodData.media_type,
+            description: apodData.explanation,
+            copyright: apodData.copyright,
+            date: apodData.date,
+          }}
+          size="small"
+          onError={(msg) => console.error(msg)}
+        />
       </div>
 
       {apodData.media_type === 'image' ? (

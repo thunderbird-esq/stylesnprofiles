@@ -1,8 +1,12 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { useAuth } from './AuthContext';
 import ApodApp from '../components/apps/ApodApp';
 import NeoWsApp from '../components/apps/NeoWsApp';
 import ResourceNavigatorApp from '../components/apps/ResourceNavigatorApp';
+import ProfileApp from '../components/apps/ProfileApp';
+import FavoritesApp from '../components/favorites/FavoritesApp';
+import CollectionsApp from '../components/apps/CollectionsApp';
 
 const AppContext = createContext();
 
@@ -32,17 +36,51 @@ const APPS = {
     defaultWidth: 500,
     defaultHeight: 400,
   },
+  profile: {
+    id: 'profile',
+    title: 'My Profile',
+    icon: '👤', // Will be replaced with proper System 6 icon
+    component: props => <ProfileApp {...props} />,
+    defaultWidth: 400,
+    defaultHeight: 300,
+    requiresAuth: true,
+  },
+  favorites: {
+    id: 'favorites',
+    title: 'Favorites & Collections',
+    icon: '⭐', // Will be replaced with proper System 6 icon
+    component: props => <FavoritesApp {...props} />,
+    defaultWidth: 800,
+    defaultHeight: 600,
+    requiresAuth: true,
+  },
+  collections: {
+    id: 'collections',
+    title: 'My Collections',
+    icon: '📁', // Will be replaced with proper System 6 icon
+    component: props => <CollectionsApp {...props} />,
+    defaultWidth: 700,
+    defaultHeight: 500,
+    requiresAuth: true,
+  },
 };
 
 export const AppProvider = ({ children }) => {
   const [windows, setWindows] = useState([]);
   const [nextZIndex, setNextZIndex] = useState(10);
   const [activeWindow, setActiveWindow] = useState(null);
+  const { isAuthenticated } = useAuth();
 
   const openApp = useCallback(
     appId => {
       const app = APPS[appId];
       if (!app) return;
+
+      // Check if app requires authentication
+      if (app.requiresAuth && !isAuthenticated()) {
+        alert('Please log in to access this application.');
+        return;
+      }
 
       const newWindowId = `${appId}-${Date.now()}`;
       const newZIndex = nextZIndex + 1;
@@ -59,7 +97,7 @@ export const AppProvider = ({ children }) => {
       setNextZIndex(newZIndex);
       setActiveWindow(newWindowId);
     },
-    [nextZIndex],
+    [nextZIndex, isAuthenticated],
   );
 
   const closeApp = useCallback(

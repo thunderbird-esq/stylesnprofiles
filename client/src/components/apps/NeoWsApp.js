@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getNeoFeed } from '../../services/nasaApi';
+import { SaveButton } from '../favorites';
+import '../favorites/favorites.css';
 
 /**
  * Formats a date object into YYYY-MM-DD format
@@ -22,6 +24,7 @@ export default function NeoWsApp({ windowId: _windowId }) {
   const [neoData, setNeoData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
 
   useEffect(() => {
     const today = new Date();
@@ -70,7 +73,27 @@ export default function NeoWsApp({ windowId: _windowId }) {
                 marginBottom: '8px',
               }}
             >
-              <div className="nasa-data-title">{neo.name}</div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                }}
+              >
+                <div className="nasa-data-title" style={{ flex: 1 }}>{neo.name}</div>
+                <div className="asteroid-actions">
+                  <button className="nasa-btn" onClick={() => console.log('View details', neo)}>
+                    View Details
+                  </button>
+                  <SaveButton
+                    itemType="NEO"
+                    itemId={neo.id}
+                    itemDate={neo.close_approach_data[0]?.close_approach_date}
+                    itemData={neo}
+                    size="small"
+                  />
+                </div>
+              </div>
               <div className="nasa-data-content">
                 <div>
                   <strong>Potentially Hazardous:</strong>{' '}

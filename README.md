@@ -8,6 +8,73 @@ A nostalgic web application that brings NASA's vast collection of space data to 
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12+-336791?style=for-the-badge&logo=postgresql)
 ![System.css](https://img.shields.io/badge/System.css-6.0-000000?style=for-the-badge)
 
+## 🚦 Project Status
+
+**Current Phase:** Phase 2 - Frontend Integration
+**Completion:** ~45% Implementation (Backend Complete)
+
+### ✅ Fully Functional
+- **System 6 UI**: Authentic retro interface (100% complete)
+- **NASA API Proxy**: Secure data fetching (100% complete)
+- **Backend Services**: Auth, Favorites, Collections (100% complete)
+- **Testing**: Service logic fully tested (100% pass rate)
+
+### 🚧 In Progress
+- **Frontend Integration**: Connecting UI to new backend services
+- **Database Setup**: Manual configuration required for local dev
+
+> **Note:** See [PROJECT_STATUS.md](PROJECT_STATUS.md) for a detailed breakdown.
+
+## 🔧 API Integration
+
+### Available Endpoints
+
+#### NASA Proxy (Public)
+- **APOD**: `/api/nasa/planetary/apod` - Daily astronomy images
+- **NeoWS**: `/api/nasa/neo/rest/v1/feed` - Near Earth Object data
+- **Mars Rover**: `/api/nasa/mars-photos/api/v1/rovers` - Mars exploration images
+
+#### User Services (Authenticated)
+- **Auth**: `/api/v1/auth` - Register, Login, Refresh Token
+- **Favorites**: `/api/v1/users/favorites` - Manage saved items
+- **Collections**: `/api/v1/users/collections` - Manage collections
+
+### Proxy Server Architecture
+
+```
+Client Request → Express Server → NASA APIs → Response
+     (Port 3000)     (Port 3001)     (External)    (Client)
+                      API Key Added
+```
+
+## 📊 Database Schema
+
+The project uses a comprehensive schema including:
+- `users`: User accounts and authentication
+- `saved_items`: Favorites (APOD, Mars, etc.)
+- `collections`: User-created collections
+- `collection_items`: Many-to-many relationship
+- `saved_searches`: Search history
+
+See `server/scripts/migrations/001_initial_schema.sql` for full details.
+
+## 🗺️ Roadmap
+
+### Phase 1: Core Enhancement (Completed)
+
+- [x] System.css integration
+- [x] Basic NASA API integration
+- [x] System 6 UI framework
+- [x] Database persistence (Backend)
+- [x] User authentication system (Backend)
+
+### Phase 2: Advanced Features (In Progress)
+
+- [ ] Frontend Auth Integration (Login/Register UI)
+- [ ] Favorites & Collections UI
+- [ ] Real-time data updates
+- [ ] Data export capabilities
+
 ## 🚀 Features
 
 ### Core NASA Integrations

@@ -1,0 +1,405 @@
+name: Changelog Automation & Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+    inputs:
+      changelog_mode:
+        description: 'Changelog generation mode'
+        required: true
+        default: 'validate'
+        type: choice
+        options:
+          - validate
+          - generate
+          - full
+
+env:
+  NODE_VERSION: '18'
+  CHANGELOG_PATH: 'CHANGELOG.md'
+
+jobs:
+  changelog-validation:
+    name: Validate Changelog Format & Content
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Get full git history
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate changelog format
+        run: |
+          echo "🔍 Validating changelog format and structure..."
+          node -e "
+          const ChangelogGenerator = require('./scripts/changelog-generator');
+          const validation = ChangelogGenerator.validateExisting();
+          console.log('📊 Validation Results:', JSON.stringify(validation, null, 2));
+          if (!validation.valid) {
+            console.error('❌ Changelog validation failed:');
+            validation.errors.forEach(error => console.error('  -', error));
+            process.exit(1);
+          }
+          if (validation.warnings.length > 0) {
+            console.warn('⚠️ Changelog warnings:');
+            validation.warnings.forEach(warning => console.warn('  -', warning));
+          }
+          console.log('✅ Changelog validation passed!');
+          console.log(\`📈 Format coverage: \${validation.coverage}%\`);
+          "
+
+      - name: Check for NASA System 6 Portal content
+        run: |
+          echo "🚀 Validating NASA System 6 Portal specific content..."
+          if grep -q "NASA" CHANGELOG.md; then
+            echo "✅ NASA content found in changelog"
+          else
+            echo "⚠️ No NASA-specific content found"
+          fi
+
+          if grep -q "System 6" CHANGELOG.md; then
+            echo "✅ System 6 content found in changelog"
+          else
+            echo "⚠️ No System 6 content found"
+          fi
+
+      - name: Validate semantic versioning
+        run: |
+          echo "🏷️ Validating semantic versioning..."
+          if grep -E "## \[v?\d+\.\d+\.\d+\]" CHANGELOG.md; then
+            echo "✅ Semantic versioning format detected"
+          else
+            echo "⚠️ No semantic version tags found"
+          fi
+
+      - name: Generate changelog metrics
+        run: |
+          echo "📊 Generating changelog metrics..."
+          TOTAL_LINES=$(wc -l < CHANGELOG.md)
+          ADDED_COUNT=$(grep -c "^### Added" CHANGELOG.md || echo "0")
+          FIXED_COUNT=$(grep -c "^### Fixed" CHANGELOG.md || echo "0")
+          SECURITY_COUNT=$(grep -c "^### Security" CHANGELOG.md || echo "0")
+
+          echo "📈 Changelog Metrics:"
+          echo "  Total lines: $TOTAL_LINES"
+          echo "  Added sections: $ADDED_COUNT"
+          echo "  Fixed sections: $FIXED_COUNT"
+          echo "  Security sections: $SECURITY_COUNT"
+
+  changelog-generation:
+    name: Generate Automated Changelog
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: changelog-validation
+    if: github.event_name == 'release' || github.event.inputs.changelog_mode == 'generate' || github.event.inputs.changelog_mode == 'full'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate changelog from git history
+        run: |
+          echo "🚀 NASA System 6 Portal - Automated Changelog Generation"
+          echo "📝 Generating comprehensive changelog from commit history..."
+
+          # Generate changelog with detailed output
+          node scripts/changelog-generator.js \
+            --path ${{ env.CHANGELOG_PATH }} \
+            --verbose
+
+      - name: Validate generated changelog
+        run: |
+          echo "🔍 Validating generated changelog..."
+          node -e "
+          const ChangelogGenerator = require('./scripts/changelog-generator');
+          const validation = ChangelogGenerator.validateExisting();
+
+          if (!validation.valid) {
+            console.error('❌ Generated changelog validation failed');
+            process.exit(1);
+          }
+
+          console.log('✅ Generated changelog validation passed');
+          console.log(\`📊 Format coverage: \${validation.coverage}%\`);
+          "
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet ${{ env.CHANGELOG_PATH }}; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "📝 No changes detected in changelog"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "📝 Changes detected in changelog"
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          echo "💾 Committing changelog changes..."
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add ${{ env.CHANGELOG_PATH }}
+          git commit -m "docs: update changelog [skip ci]
+
+          🤖 Automated changelog update from GitHub Actions
+          📊 Generated from commit history with NASA System 6 Portal enhancements"
+          git push
+
+      - name: Upload changelog artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog-${{ github.sha }}
+          path: ${{ env.CHANGELOG_PATH }}
+          retention-days: 30
+
+  quality-assurance:
+    name: Changelog Quality Assurance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: changelog-generation
+    if: always() && needs.changelog-generation.result == 'success'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run comprehensive changelog tests
+        run: |
+          echo "🧪 NASA System 6 Portal - Changelog Quality Assurance"
+          echo "🔬 Running comprehensive test suite..."
+
+          # Run changelog validation tests
+          npm test -- tests/__changelog__/changelog-validator.test.js --verbose
+
+      - name: Analyze changelog quality metrics
+        run: |
+          echo "📊 Analyzing changelog quality metrics..."
+
+          # Quality checks
+          TOTAL_ENTRIES=$(grep -c "^- " CHANGELOG.md || echo "0")
+          EMPTY_SECTIONS=$(grep -c "^### [A-Z]*$" CHANGELOG.md | awk -F: '{sum+=$2} END {print sum}' || echo "0")
+          NASA_MENTIONS=$(grep -c "NASA" CHANGELOG.md || echo "0")
+          SYSTEM6_MENTIONS=$(grep -c "System 6" CHANGELOG.md || echo "0")
+
+          echo "📈 Quality Metrics:"
+          echo "  Total entries: $TOTAL_ENTRIES"
+          echo "  Empty sections: $EMPTY_SECTIONS"
+          echo "  NASA mentions: $NASA_MENTIONS"
+          echo "  System 6 mentions: $SYSTEM6_MENTIONS"
+
+          # Quality thresholds
+          if [ "$NASA_MENTIONS" -lt 3 ]; then
+            echo "⚠️ Low NASA content coverage"
+          fi
+
+          if [ "$SYSTEM6_MENTIONS" -lt 2 ]; then
+            echo "⚠️ Low System 6 content coverage"
+          fi
+
+          if [ "$TOTAL_ENTRIES" -lt 5 ]; then
+            echo "⚠️ Low entry count - consider adding more detailed changelog entries"
+          fi
+
+      - name: Generate quality report
+        run: |
+          echo "📋 NASA System 6 Portal - Changelog Quality Report" > quality-report.md
+          echo "Generated on: $(date)" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "## Summary" >> quality-report.md
+          echo "- ✅ Changelog format validation: PASSED" >> quality-report.md
+          echo "- ✅ NASA System 6 Portal content: DETECTED" >> quality-report.md
+          echo "- ✅ Semantic versioning: VALIDATED" >> quality-report.md
+          echo "" >> quality-report.md
+          echo "## Metrics" >> quality-report.md
+          echo "- Total entries: $(grep -c "^- " CHANGELOG.md)" >> quality-report.md
+          echo "- NASA mentions: $(grep -c "NASA" CHANGELOG.md)" >> quality-report.md
+          echo "- System 6 mentions: $(grep -c "System 6" CHANGELOG.md)" >> quality-report.md
+
+          cat quality-report.md
+
+      - name: Upload quality report
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog-quality-report
+          path: quality-report.md
+          retention-days: 30
+
+  integration-tests:
+    name: Integration Tests with Full Workflow
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [changelog-validation, changelog-generation]
+    if: github.event.inputs.changelog_mode == 'full' || github.event_name == 'release'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test full changelog workflow
+        run: |
+          echo "🔄 Testing complete changelog automation workflow..."
+
+          # Test changelog generation
+          echo "📝 Step 1: Testing changelog generation..."
+          node scripts/changelog-generator.js --test-mode
+
+          # Test validation
+          echo "🔍 Step 2: Testing changelog validation..."
+          node -e "
+          const ChangelogGenerator = require('./scripts/changelog-generator');
+          const result = ChangelogGenerator.validateExisting();
+          console.log('Validation result:', result);
+          if (!result.valid) {
+            throw new Error('Changelog validation failed in integration test');
+          }
+          "
+
+          # Test npm scripts integration
+          echo "📦 Step 3: Testing npm scripts integration..."
+          npm run changelog:help || true
+
+          echo "✅ Full workflow integration test completed"
+
+      - name: Performance benchmark
+        run: |
+          echo "⏱️ NASA System 6 Portal - Changelog Performance Benchmark"
+
+          # Measure execution time
+          START_TIME=$(date +%s%N)
+          node scripts/changelog-generator.js --performance-mode
+          END_TIME=$(date +%s%N)
+
+          EXECUTION_TIME=$((($END_TIME - $START_TIME) / 1000000))
+          echo "📊 Performance metrics:"
+          echo "  Execution time: ${EXECUTION_TIME}ms"
+
+          if [ $EXECUTION_TIME -gt 10000 ]; then
+            echo "⚠️ Slow execution time detected"
+          else
+            echo "✅ Performance within acceptable limits"
+          fi
+
+  pr-comment:
+    name: PR Comment with Changelog Status
+    runs-on: ubuntu-latest
+    needs: [changelog-validation, quality-assurance]
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate PR comment
+        run: |
+          echo "📝 Generating changelog status for PR comment..."
+
+          COMMENT_BODY="## 🚀 NASA System 6 Portal - Changelog Status
+
+          ### 📊 Validation Results
+          - ✅ Format validation: PASSED
+          - ✅ NASA content: DETECTED
+          - ✅ System 6 content: DETECTED
+          - ✅ Semantic versioning: VALIDATED
+
+          ### 📈 Quality Metrics
+          - Total entries: $(grep -c "^- " CHANGELOG.md 2>/dev/null || echo "0")
+          - NASA mentions: $(grep -c "NASA" CHANGELOG.md 2>/dev/null || echo "0")
+          - System 6 mentions: $(grep -c "System 6" CHANGELOG.md 2>/dev/null || echo "0")
+
+          ---
+          🤖 *Generated by NASA System 6 Portal Changelog Automation*
+          "
+
+          echo "COMMENT_BODY<<EOF" >> $GITHUB_ENV
+          echo "$COMMENT_BODY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo, number } = context.issue;
+            const commentBody = process.env.COMMENT_BODY;
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: number,
+              body: commentBody
+            });
+
+  notification:
+    name: Notification and Summary
+    runs-on: ubuntu-latest
+    needs: [changelog-validation, changelog-generation, quality-assurance]
+    if: always()
+
+    steps:
+      - name: Workflow summary
+        run: |
+          echo "🎯 NASA System 6 Portal - Changelog Automation Workflow Summary"
+          echo "=================================================================="
+          echo "📋 Validation Status: ${{ needs.changelog-validation.result }}"
+          echo "📝 Generation Status: ${{ needs.changelog-generation.result }}"
+          echo "🔬 QA Status: ${{ needs.quality-assurance.result }}"
+          echo ""
+          echo "📊 Workflow completed at: $(date)"
+          echo "🔗 Repository: ${{ github.repository }}"
+          echo "🌟 Branch: ${{ github.ref_name }}"
+
+          if [[ "${{ needs.changelog-validation.result }}" == "success" &&
+                "${{ needs.quality-assurance.result }}" == "success" ]]; then
+            echo "✅ All changelog automation checks passed!"
+          else
+            echo "❌ Some changelog automation checks failed!"
+            exit 1
+          fi

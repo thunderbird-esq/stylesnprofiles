@@ -31,6 +31,16 @@ export default function Desktop() {
           icon={APPS['resources'].icon}
           onDoubleClick={() => openApp('resources')}
         />
+        <DesktopIcon
+          label="Favorites"
+          icon={APPS['favorites'].icon}
+          onDoubleClick={() => openApp('favorites')}
+        />
+        <DesktopIcon
+          label="Collections"
+          icon={APPS['collections'].icon}
+          onDoubleClick={() => openApp('collections')}
+        />
       </div>
 
       {/* Render Open Windows */}

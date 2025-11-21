@@ -28,10 +28,30 @@ export default function Window({
   height = 400,
 }) {
   const { closeApp, focusApp, activeWindow } = useApps();
-  const [position, setPosition] = useState({ x, y });
+
+  // Handle center positioning
+  const getInitialPosition = () => {
+    if (x === 'center' || y === 'center') {
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      const menuBarHeight = 20; // Approximate menu bar height
+
+      return {
+        x: x === 'center' ? Math.max(16, (windowWidth - width) / 2) : x,
+        y: y === 'center' ? Math.max(menuBarHeight + 16, (windowHeight - height) / 2) : y,
+      };
+    }
+    return { x, y };
+  };
+
+  const [position, setPosition] = useState(getInitialPosition());
+  const [size, setSize] = useState({ width, height });
+  const [isMaximized, setIsMaximized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const windowStartPos = useRef({ x: 0, y: 0 });
+  const windowStartSize = useRef({ width: 0, height: 0 });
   const windowRef = useRef(null);
 
   const isActive = activeWindow === windowId;
@@ -43,11 +63,33 @@ export default function Window({
     }
   }, [isActive]);
 
+  const handleResizeClick = e => {
+    e.stopPropagation();
+
+    if (isMaximized) {
+      // Restore window to original size and position
+      setSize({ width, height });
+      setPosition({ x, y });
+      setIsMaximized(false);
+    } else {
+      // Store previous size and position before maximizing
+      windowStartSize.current = { ...size };
+      windowStartPos.current = { ...position };
+
+      // Maximize window with System 6 style margins
+      const maxWindowWidth = window.innerWidth - 32; // 16px margin on each side
+      const maxWindowHeight = window.innerHeight - 52; // 20px for menu bar + 16px bottom margin
+      setSize({ width: maxWindowWidth, height: maxWindowHeight });
+      setPosition({ x: 16, y: 36 }); // 16px left, 20px menu bar + 16px top margin
+      setIsMaximized(true);
+    }
+  };
+
   const handleMouseDown = e => {
     focusApp(windowId);
 
-    // Only enable dragging from title bar
-    if (e.target.closest('.title-bar')) {
+    // Only enable dragging from title bar when not maximized
+    if (e.target.closest('.title-bar') && !isMaximized) {
       setIsDragging(true);
       dragStartPos.current = { x: e.clientX, y: e.clientY };
       windowStartPos.current = { ...position };
@@ -60,29 +102,54 @@ export default function Window({
 
   const handleMouseMove = useCallback(
     e => {
-      if (!isDragging) return;
+      if (isDragging) {
+        const deltaX = e.clientX - dragStartPos.current.x;
+        const deltaY = e.clientY - dragStartPos.current.y;
 
-      const deltaX = e.clientX - dragStartPos.current.x;
-      const deltaY = e.clientY - dragStartPos.current.y;
+        const newX = Math.max(0, windowStartPos.current.x + deltaX);
+        const newY = Math.max(0, windowStartPos.current.y + deltaY);
 
-      const newX = Math.max(0, windowStartPos.current.x + deltaX);
-      const newY = Math.max(0, windowStartPos.current.y + deltaY);
+        setPosition({ x: newX, y: newY });
+      } else if (isResizing) {
+        const deltaX = e.clientX - dragStartPos.current.x;
+        const deltaY = e.clientY - dragStartPos.current.y;
 
-      setPosition({ x: newX, y: newY });
+        // Calculate new dimensions with constraints
+        const newWidth = Math.max(
+          300,
+          Math.min(window.innerWidth - 32, windowStartSize.current.width + deltaX),
+        );
+        const newHeight = Math.max(
+          200,
+          Math.min(window.innerHeight - 52, windowStartSize.current.height + deltaY),
+        );
+
+        // Ensure window stays within viewport
+        const newX = Math.min(position.x, window.innerWidth - newWidth - 16);
+        const newY = Math.min(position.y, window.innerHeight - newHeight - 16);
+
+        setSize({ width: newWidth, height: newHeight });
+
+        // Adjust position if window would go off-screen
+        if (newX !== position.x || newY !== position.y) {
+          setPosition({ x: newX, y: newY });
+        }
+      }
     },
-    [isDragging],
+    [isDragging, isResizing, position.x, position.y],
   );
 
   const handleMouseUp = useCallback(() => {
-    if (isDragging) {
+    if (isDragging || isResizing) {
       setIsDragging(false);
+      setIsResizing(false);
       document.body.style.userSelect = '';
     }
-  }, [isDragging]);
+  }, [isDragging, isResizing]);
 
-  // Global mouse event listeners for dragging
+  // Global mouse event listeners for dragging and resizing
   useEffect(() => {
-    if (isDragging) {
+    if (isDragging || isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
 
@@ -91,15 +158,15 @@ export default function Window({
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
   return (
     <motion.div
       ref={windowRef}
       className="window nasa-window"
       style={{
-        width: `${width}px`,
-        height: `${height}px`,
+        width: `${size.width}px`,
+        height: `${size.height}px`,
         left: `${position.x}px`,
         top: `${position.y}px`,
         zIndex,
@@ -122,12 +189,33 @@ export default function Window({
           }}
         />
         <h1 className="title font-chicago">{title}</h1>
-        <button aria-label="Resize" className="resize" />
+        <button
+          aria-label="Resize"
+          className="resize"
+          onClick={handleResizeClick}
+          title={isMaximized ? 'Restore' : 'Maximize'}
+        />
       </div>
       <div className="separator"></div>
 
       {/* Window Content */}
       <div className="window-pane nasa-window-content">{children}</div>
+
+      {/* System 6 Resize Handle */}
+      {!isMaximized && (
+        <div
+          className="nasa-window-resize-handle"
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            setIsResizing(true);
+            dragStartPos.current = { x: e.clientX, y: e.clientY };
+            windowStartPos.current = { ...position };
+            windowStartSize.current = { ...size };
+            document.body.style.userSelect = 'none';
+          }}
+          title="Drag to resize window"
+        />
+      )}
     </motion.div>
   );
 }

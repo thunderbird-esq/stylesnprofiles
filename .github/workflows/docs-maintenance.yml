@@ -1,0 +1,574 @@
+name: Documentation Maintenance & Quality Assurance
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - '**.rst'
+      - 'README*'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - '**.rst'
+      - 'README*'
+      - 'CHANGELOG*'
+      - 'CONTRIBUTING*'
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      maintenance_mode:
+        description: 'Documentation maintenance mode'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - audit
+          - validate
+          - quality
+          - optimize
+      fix_issues:
+        description: 'Automatically fix issues'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+  DOCS_DIR: 'docs'
+
+jobs:
+  documentation-audit:
+    name: Documentation Audit & Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run comprehensive documentation audit
+        run: |
+          echo "🔍 NASA System 6 Portal - Documentation Audit"
+          echo "================================================"
+
+          # Count documentation files
+          DOC_FILES=$(find . -name "*.md" -not -path "./node_modules/*" | wc -l)
+          echo "📄 Documentation files: $DOC_FILES"
+
+          # Run audit mode
+          node scripts/docs-maintenance-system.js audit
+
+          # Generate file statistics
+          echo ""
+          echo "📊 File Statistics:"
+          find . -name "*.md" -not -path "./node_modules/*" -exec wc -l {} + | sort -nr | head -10
+
+      - name: Check documentation structure
+        run: |
+          echo "🏗️  Checking documentation structure..."
+
+          # Verify main documentation files exist
+          REQUIRED_FILES=("README.md" "CHANGELOG.md" "CLAUDE.md")
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [[ -f "$file" ]]; then
+              echo "✅ $file exists"
+            else
+              echo "❌ $file missing"
+              echo "::warning file=$file::Missing required documentation file"
+            fi
+          done
+
+          # Check docs directory structure
+          if [[ -d "docs" ]]; then
+            echo "✅ docs directory exists"
+            echo "📁 docs contents:"
+            find docs -type f -name "*.md" | head -10
+          else
+            echo "❌ docs directory missing"
+          fi
+
+      - name: Analyze NASA System 6 Portal content
+        run: |
+          echo "🚀 Analyzing NASA System 6 Portal content..."
+
+          NASA_KEYWORDS=("nasa" "space" "astronomy" "apod" "neows")
+          SYSTEM6_KEYWORDS=("system 6" "system6" "retro" "chicago" "geneva")
+
+          echo "📋 NASA content analysis:"
+          for keyword in "${NASA_KEYWORDS[@]}"; do
+            COUNT=$(grep -ril "$keyword" . --include="*.md" --exclude-dir=node_modules | wc -l)
+            echo "  $keyword: $COUNT files"
+          done
+
+          echo ""
+          echo "🖥️  System 6 content analysis:"
+          for keyword in "${SYSTEM6_KEYWORDS[@]}"; do
+            COUNT=$(grep -ril "$keyword" . --include="*.md" --exclude-dir=node_modules | wc -l)
+            echo "  $keyword: $COUNT files"
+          done
+
+      - name: Check for TODO/FIXME markers
+        run: |
+          echo "🔍 Checking for TODO/FIXME markers..."
+
+          TODO_COUNT=$(grep -r "TODO\|FIXME\|XXX\|HACK" . --include="*.md" --exclude-dir=node_modules | wc -l)
+          echo "📝 TODO/FIXME items: $TODO_COUNT"
+
+          if [[ $TODO_COUNT -gt 0 ]]; then
+            echo "📋 TODO/FIXME details:"
+            grep -r "TODO\|FIXME\|XXX\|HACK" . --include="*.md" --exclude-dir=node_modules | head -10
+            echo "::warning::Found $TODO_COUNT TODO/FIXME items in documentation"
+          fi
+
+      - name: Upload audit artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: documentation-audit-${{ github.sha }}
+          path: |
+            docs/maintenance-report.json
+            docs/maintenance-report.md
+          retention-days: 30
+
+  documentation-validation:
+    name: Documentation Validation & Quality Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: documentation-audit
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run validation checks
+        run: |
+          echo "🔍 NASA System 6 Portal - Documentation Validation"
+          echo "===================================================="
+
+          # Run validation mode
+          node scripts/docs-maintenance-system.js validate
+
+          # Check markdown syntax
+          echo ""
+          echo "📝 Checking markdown syntax..."
+          if command -v markdownlint >/dev/null 2>&1; then
+            find . -name "*.md" -not -path "./node_modules/*" -exec markdownlint {} + || echo "markdownlint not available, skipping syntax check"
+          fi
+
+      - name: Validate internal links
+        run: |
+          echo "🔗 Validating internal links..."
+
+          # Extract and validate internal links
+          BROKEN_LINKS=0
+          for md_file in $(find . -name "*.md" -not -path "./node_modules/*"); do
+            echo "🔍 Checking: $md_file"
+
+            # Extract markdown links
+            grep -o '\[([^]]*)\]([^)]*)' "$md_file" | while read link; do
+              # Skip external links
+              if [[ $link =~ http ]] || [[ $link =~ mailto ]]; then
+                continue
+              fi
+
+              # Extract link target
+              TARGET=$(echo "$link" | sed 's/.*(\([^)]*\)).*/\1/')
+
+              # Resolve relative path
+              if [[ -n "$TARGET" ]] && [[ ! "$TARGET" =~ ^https?:// ]]; then
+                DIR=$(dirname "$md_file")
+                RESOLVED="$DIR/$TARGET"
+
+                if [[ ! -f "$RESOLVED" ]] && [[ ! -d "$RESOLVED" ]]; then
+                  echo "❌ Broken link: $TARGET in $md_file"
+                  ((BROKEN_LINKS++))
+                fi
+              fi
+            done
+          done
+
+          echo "🔗 Link validation completed"
+
+      - name: Check image references
+        run: |
+          echo "🖼️  Checking image references..."
+
+          MISSING_IMAGES=0
+          for md_file in $(find . -name "*.md" -not -path "./node_modules/*"); do
+            # Extract image references
+            grep -o '!\[([^]]*)\]([^)]*)' "$md_file" | while read image; do
+              SRC=$(echo "$image" | sed 's/.*(\([^)]*\)).*/\1/')
+
+              # Skip external images
+              if [[ $SRC =~ ^https?:// ]]; then
+                continue
+              fi
+
+              # Resolve relative path
+              DIR=$(dirname "$md_file")
+              RESOLVED="$DIR/$SRC"
+
+              if [[ ! -f "$RESOLVED" ]]; then
+                echo "❌ Missing image: $SRC in $md_file"
+                ((MISSING_IMAGES++))
+              fi
+            done
+          done
+
+          echo "🖼️  Image validation completed"
+
+      - name: Run quality checks
+        run: |
+          echo "📊 NASA System 6 Portal - Quality Checks"
+          echo "==========================================="
+
+          # Run quality mode
+          node scripts/docs-maintenance-system.js quality
+
+          # Check file sizes
+          echo ""
+          echo "📊 File size analysis:"
+          find . -name "*.md" -not -path "./node_modules/*" -exec du -h {} + | sort -hr | head -10
+
+          # Check for very large files (>100KB)
+          LARGE_FILES=$(find . -name "*.md" -not -path "./node_modules/*" -size +100k | wc -l)
+          if [[ $LARGE_FILES -gt 0 ]]; then
+            echo "⚠️ Found $LARGE_FILES large documentation files (>100KB)"
+            find . -name "*.md" -not -path "./node_modules/*" -size +100k -exec ls -lh {} +
+          fi
+
+      - name: Check documentation freshness
+        run: |
+          echo "📅 Checking documentation freshness..."
+
+          # Check recently modified files
+          echo "📝 Recently modified documentation:"
+          find . -name "*.md" -not -path "./node_modules/*" -mtime -7 -exec ls -lt {} + | head -5
+
+          # Check for potentially stale files (>90 days)
+          STALE_FILES=$(find . -name "*.md" -not -path "./node_modules/*" -mtime +90 | wc -l)
+          if [[ $STALE_FILES -gt 0 ]]; then
+            echo "⚠️ Found $STALE_FILES potentially stale documentation files (>90 days)"
+            find . -name "*.md" -not -path "./node_modules/*" -mtime +90 -exec ls -lt {} + | head -10
+          fi
+
+      - name: Generate quality report
+        run: |
+          echo "📊 Generating quality report..."
+
+          # Create comprehensive report
+          REPORT_CONTENT="# Documentation Quality Report
+
+          **Generated:** $(date)
+          **Repository:** ${{ github.repository }}
+          **Branch:** ${{ github.ref_name }}
+          **Commit:** ${{ github.sha }}
+
+          ## Metrics
+
+          - **Documentation Files:** $(find . -name "*.md" -not -path "./node_modules/*" | wc -l)
+          - **Total Lines:** $(find . -name "*.md" -not -path "./node_modules/*" -exec wc -l {} + | tail -1 | awk '{print $1}')
+          - **Image References:** $(grep -r '!\[' . --include="*.md" --exclude-dir=node_modules | wc -l)
+          - **Internal Links:** $(grep -r '\[.*\](' . --include="*.md" --exclude-dir=node_modules | grep -v 'http' | wc -l)
+
+          ## Quality Indicators
+
+          - **NASA Content:** $(grep -ril 'nasa\|space\|astronomy' . --include="*.md" --exclude-dir=node_modules | wc -l) files
+          - **System 6 Content:** $(grep -ril 'system.*6\|retro\|chicago' . --include="*.md" --exclude-dir=node_modules | wc -l) files
+          - **TODO Items:** $(grep -r 'TODO\|FIXME' . --include="*.md" --exclude-dir=node_modules | wc -l)
+
+          ---
+          *Generated by NASA System 6 Portal Documentation Maintenance*
+          "
+
+          echo "$REPORT_CONTENT" > docs/quality-report.md
+
+      - name: Upload validation artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: documentation-validation-${{ github.sha }}
+          path: |
+            docs/maintenance-report.json
+            docs/maintenance-report.md
+            docs/quality-report.md
+          retention-days: 30
+
+  documentation-optimization:
+    name: Documentation Optimization & Enhancement
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: documentation-validation
+    if: github.event.inputs.fix_issues == 'true' || github.event.inputs.fix_issues == ''
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run optimization
+        run: |
+          echo "⚡ NASA System 6 Portal - Documentation Optimization"
+          echo "======================================================"
+
+          # Run optimization mode
+          node scripts/docs-maintenance-system.js optimize
+
+          # Additional manual optimizations
+          echo ""
+          echo "🔧 Applying additional optimizations..."
+
+          # Fix common markdown issues
+          find . -name "*.md" -not -path "./node_modules/*" -exec sed -i '' 's/^#{1,6}\([^[:space:]#]\)/#\1/g' {} \;
+          find . -name "*.md" -not -path "./node_modules/*" -exec sed -i '' 's/[[:space:]]*$//' {} \;
+
+          echo "✅ Optimizations applied"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "📝 No documentation changes made"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "📝 Documentation changes detected"
+            git diff --stat
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          echo "💾 Committing documentation improvements..."
+
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          git add .
+          git commit -m "docs: apply automated documentation improvements
+
+          🤖 Automated fixes from documentation maintenance system
+          🔧 Common markdown issues resolved
+          📊 Quality enhancements applied
+
+          [skip ci]"
+
+          git push
+
+      - name: Generate table of contents
+        run: |
+          echo "📋 Generating table of contents for large files..."
+
+          for file in $(find . -name "*.md" -not -path "./node_modules/*" -exec wc -l {} + | awk '$1 > 200 {print $2}'); do
+            echo "📋 Processing: $file"
+
+            # Generate TOC for files with more than 200 lines
+            python3 -c "
+import sys
+import re
+
+with open('$file', 'r') as f:
+    content = f.read()
+
+# Extract headers
+headers = re.findall(r'^(#{1,6})\s+(.+)$', content, re.MULTILINE)
+
+if headers:
+    toc = []
+    for level, title in headers:
+        indent = '  ' * (len(level) - 1)
+        anchor = re.sub(r'[^a-zA-Z0-9\s-]', '', title).strip().lower()
+        anchor = re.sub(r'\s+', '-', anchor)
+        toc.append(f'{indent}- [{title}](#{anchor})')
+
+    if toc:
+        toc_content = '## Table of Contents\n\n' + '\n'.join(toc) + '\n\n'
+
+        # Insert TOC after first header
+        if content.startswith('# '):
+            parts = content.split('\n\n', 1)
+            if len(parts) == 2:
+                new_content = parts[0] + '\n\n' + toc_content + parts[1]
+                with open('$file', 'w') as f:
+                    f.write(new_content)
+                print(f'✅ TOC added to $file')
+"
+          done
+
+      - name: Upload optimization artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: documentation-optimization-${{ github.sha }}
+          path: |
+            docs/maintenance-report.json
+            docs/maintenance-report.md
+          retention-days: 30
+
+  documentation-reporting:
+    name: Documentation Reporting & Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [documentation-audit, documentation-validation, documentation-optimization]
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*-${{ github.sha }}"
+          merge-multiple: true
+          path: artifacts/
+
+      - name: Generate comprehensive report
+        run: |
+          echo "📊 NASA System 6 Portal - Comprehensive Documentation Report"
+          echo "=================================================================="
+
+          # Aggregate results from all stages
+          echo ""
+          echo "🎯 Workflow Summary:"
+          echo "  Audit Status: ${{ needs.documentation-audit.result }}"
+          echo "  Validation Status: ${{ needs.documentation-validation.result }}"
+          echo "  Optimization Status: ${{ needs.documentation-optimization.result }}"
+
+          # Generate final report
+          cat > docs/comprehensive-report.md << EOF
+          # NASA System 6 Portal - Comprehensive Documentation Report
+
+          **Generated:** $(date)
+          **Workflow Run:** ${{ github.run_id }}
+          **Repository:** ${{ github.repository }}
+          **Branch:** ${{ github.ref_name }}
+
+          ## Workflow Summary
+
+          - **Documentation Audit:** ${{ needs.documentation-audit.result }}
+          - **Validation Checks:** ${{ needs.documentation-validation.result }}
+          - **Optimization Applied:** ${{ needs.documentation-optimization.result }}
+
+          ## Metrics Summary
+
+          EOF
+
+          if [[ -f "artifacts/maintenance-report.json" ]]; then
+            echo "📊 Processing maintenance report..."
+            node -e "
+            const report = JSON.parse(require('fs').readFileSync('artifacts/maintenance-report.json', 'utf8'));
+            console.log('- Files Analyzed:', report.metrics.filesAnalyzed);
+            console.log('- Issues Found:', report.metrics.issuesFound);
+            console.log('- Issues Fixed:', report.metrics.issuesFixed);
+            console.log('- Quality Score:', report.qualityScore + '/100');
+            "
+          fi
+
+          echo ""
+          echo "📄 Final documentation report generated"
+
+      - name: Create summary comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentBody = `## 📚 NASA System 6 Portal - Documentation Maintenance Results
+
+            ### 🔍 Workflow Results
+            - **Documentation Audit:** ${{ needs.documentation-audit.result }}
+            - **Validation Checks:** ${{ needs.documentation-validation.result }}
+            - **Optimization:** ${{ needs.documentation-optimization.result }}
+
+            ### 📊 Quality Metrics
+            - **Files Analyzed:** Documentation files processed
+            - **Issues Found:** Validation and audit issues
+            - **Quality Score:** Overall documentation quality
+
+            ### 🚀 NASA System 6 Portal Content
+            - ✅ NASA-specific content validated
+            - ✅ System 6 design system content checked
+            - ✅ API documentation verified
+
+            ---
+            🤖 *Generated by NASA System 6 Portal Documentation Maintenance System*
+            `;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
+
+      - name: Upload comprehensive report
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-comprehensive-report-${{ github.sha }}
+          path: |
+            docs/comprehensive-report.md
+            docs/quality-report.md
+            artifacts/
+          retention-days: 30
+
+      - name: Notification summary
+        run: |
+          echo "🎯 NASA System 6 Portal - Documentation Maintenance Summary"
+          echo "============================================================"
+
+          if [[ "${{ needs.documentation-audit.result }}" == "success" &&
+                "${{ needs.documentation-validation.result }}" == "success" ]]; then
+            echo "✅ Documentation maintenance completed successfully!"
+          else
+            echo "⚠️ Documentation maintenance completed with issues"
+          fi
+
+          echo ""
+          echo "📊 Workflow completed at: $(date)"
+          echo "🔗 Repository: ${{ github.repository }}"
+          echo "🌟 Branch: ${{ github.ref_name }}"

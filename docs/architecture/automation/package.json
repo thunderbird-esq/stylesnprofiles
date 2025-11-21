@@ -1,0 +1,36 @@
+{
+  "name": "nasa-system6-architecture-docs",
+  "version": "1.0.0",
+  "description": "Automated architecture documentation generator for NASA System 6 Portal",
+  "main": "documentation-generator.js",
+  "scripts": {
+    "generate": "node documentation-generator.js",
+    "validate": "node documentation-validator.js",
+    "diagrams": "node diagram-generator.js",
+    "docs:watch": "nodemon --watch '../../../src' --exec 'npm run generate'",
+    "docs:serve": "http-server . -p 8080 -c-1"
+  },
+  "keywords": [
+    "architecture",
+    "documentation",
+    "generation",
+    "automation",
+    "nasa",
+    "system6"
+  ],
+  "author": "NASA System 6 Portal Team",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^10.3.0",
+    "mermaid": "^10.3.0",
+    "fs-extra": "^11.1.1",
+    "yaml": "^2.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,0 +1,101 @@
+.save-button-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save-button {
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.save-button.saved {
+  background-color: var(--secondary);
+  color: var(--primary);
+  border-style: inset;
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px;
+}
+
+.favorite-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid var(--secondary);
+  background-color: var(--primary);
+  cursor: pointer;
+}
+
+.favorite-item:hover {
+  background-color: rgba(var(--secondary-rgb), 0.1);
+}
+
+.favorite-thumbnail {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border: 1px solid var(--secondary);
+  background-color: #000;
+}
+
+.favorite-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.favorite-title {
+  font-family: 'Chicago_12', sans-serif;
+  font-size: 12px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.favorite-meta {
+  font-family: 'Geneva_9', sans-serif;
+  font-size: 9px;
+  color: var(--tertiary);
+  display: flex;
+  gap: 8px;
+}
+
+.favorite-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.favorite-action-btn {
+  padding: 4px 8px;
+  font-family: 'Chicago_12', sans-serif;
+  font-size: 10px;
+  background: var(--primary);
+  border: 1px solid var(--secondary);
+  cursor: pointer;
+}
+
+.favorite-action-btn:hover {
+  background: var(--secondary);
+  color: var(--primary);
+}
+
+.favorites-empty {
+  text-align: center;
+  padding: 32px;
+  color: var(--tertiary);
+  font-style: italic;
+}
+
+.favorites-loading {
+  text-align: center;
+  padding: 20px;
+}

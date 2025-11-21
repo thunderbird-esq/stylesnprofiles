@@ -116,43 +116,107 @@
 }
 
 ::-webkit-scrollbar-button:vertical:start {
-  background-repeat: no-repeat;
-  height: 23.38px;
-  background-image: svg-load('./icon/scrollbar-up.svg');
+  background: var(--primary);
+  height: 22px;
+  border: 2px solid var(--secondary);
+  border-bottom: none;
+  position: relative;
 }
+
+::-webkit-scrollbar-button:vertical:start::after {
+  content: '▲';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: var(--secondary);
+}
+
 ::-webkit-scrollbar-button:vertical:start:active {
-  background-repeat: no-repeat;
-  height: 23.38px;
-  background-image: svg-load('./icon/scrollbar-up-active.svg');
+  background: var(--secondary);
 }
+
+::-webkit-scrollbar-button:vertical:start:active::after {
+  color: var(--primary);
+}
+
 ::-webkit-scrollbar-button:vertical:end {
-  height: 23.38px;
-  background-image: svg-load('./icon/scrollbar-down.svg');
+  background: var(--primary);
+  height: 22px;
+  border: 2px solid var(--secondary);
+  border-top: none;
+  position: relative;
 }
+
+::-webkit-scrollbar-button:vertical:end::after {
+  content: '▼';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: var(--secondary);
+}
+
 ::-webkit-scrollbar-button:vertical:end:active {
-  background-repeat: no-repeat;
-  height: 23.38px;
-  background-image: svg-load('./icon/scrollbar-down-active.svg');
+  background: var(--secondary);
+}
+
+::-webkit-scrollbar-button:vertical:end:active::after {
+  color: var(--primary);
 }
 
 ::-webkit-scrollbar-button:horizontal:start {
-  background-repeat: no-repeat;
-  height: 23.38px;
-  background-image: svg-load('./icon/scrollbar-left.svg');
+  background: var(--primary);
+  width: 22px;
+  border: 2px solid var(--secondary);
+  border-right: none;
+  position: relative;
 }
+
+::-webkit-scrollbar-button:horizontal:start::after {
+  content: '◄';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: var(--secondary);
+}
+
 ::-webkit-scrollbar-button:horizontal:start:active {
-  background-repeat: no-repeat;
-  height: 23.38px;
-  background-image: svg-load('./icon/scrollbar-left-active.svg');
+  background: var(--secondary);
 }
+
+::-webkit-scrollbar-button:horizontal:start:active::after {
+  color: var(--primary);
+}
+
 ::-webkit-scrollbar-button:horizontal:end {
-  height: 23.38px;
-  background-image: svg-load('./icon/scrollbar-right.svg');
+  background: var(--primary);
+  width: 22px;
+  border: 2px solid var(--secondary);
+  border-left: none;
+  position: relative;
 }
+
+::-webkit-scrollbar-button:horizontal:end::after {
+  content: '►';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10px;
+  color: var(--secondary);
+}
+
 ::-webkit-scrollbar-button:horizontal:end:active {
-  background-repeat: no-repeat;
-  height: 23.38px;
-  background-image: svg-load('./icon/scrollbar-right-active.svg');
+  background: var(--secondary);
+}
+
+::-webkit-scrollbar-button:horizontal:end:active::after {
+  color: var(--primary);
 }
 
 body {

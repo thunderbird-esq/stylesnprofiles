@@ -1,0 +1,1620 @@
+openapi: 3.0.3
+info:
+  title: NASA System 6 Portal API
+  version: 1.0.0
+  description: |
+    A nostalgic web application that brings NASA's vast collection of space data to life
+    through an authentic Apple System 6 interface. This API provides comprehensive access to
+    NASA data services, resource management, and search functionality.
+
+    ## Features
+    - 🚀 NASA API integration (APOD, NeoWS, Mars Rover photos via proxy)
+    - 📚 Resource Navigator for saved items and search history
+    - 🔍 Search query tracking and analytics
+    - 📊 Usage analytics and rate limiting
+    - 🔒 Enterprise-grade security with comprehensive error handling
+    - ⚡ Redis caching for improved performance
+    - 🛡️ Circuit breaker patterns for external service resilience
+
+  contact:
+    name: NASA System 6 Portal Team
+    email: support@nasa-system6-portal.com
+    url: https://github.com/nasa-system6-portal
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3001/api/v1
+    description: Development server
+  - url: https://api.nasa-system6-portal.com/v1
+    description: Production server
+  - url: http://localhost:3001/api
+    description: Legacy API endpoints
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization operations (Coming Soon)
+  - name: NASA Data
+    description: NASA API services and data access
+  - name: Resources
+    description: Resource Navigator - saved items and search management
+  - name: User Management
+    description: User profiles, collections, and favorites (Coming Soon)
+  - name: Search
+    description: Search and discovery functionality
+  - name: System
+    description: System information and health checks
+
+paths:
+  # Authentication endpoints (Coming Soon - return 501)
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register a new user
+      description: |
+        Create a new user account with email and password.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: User login
+      description: |
+        Authenticate user and return JWT tokens.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+  /auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Refresh access token
+      description: |
+        Get new access token using refresh token.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+  /auth/logout:
+    post:
+      tags: [Authentication]
+      summary: User logout
+      description: |
+        Logout user and invalidate tokens.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      responses:
+        '200':
+          description: Logout successful
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+  # NASA Data endpoints (Version 1 API)
+  /nasa/apod:
+    get:
+      tags: [NASA Data]
+      summary: Get Astronomy Picture of the Day
+      description: Retrieve today's APOD or APOD for specific date from NASA API
+      parameters:
+        - name: date
+          in: query
+          description: Date for APOD (YYYY-MM-DD format)
+          schema:
+            type: string
+            format: date
+            example: "2024-01-01"
+        - name: thumbs
+          in: query
+          description: Return thumbnail of image
+          schema:
+            type: boolean
+            default: false
+      security:
+        - bearerAuth: []
+        - {}:  # Allow anonymous access with lower rate limits
+      responses:
+        '200':
+          description: APOD data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APODResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '503':
+          $ref: '#/components/responses/NasaApiError'
+        '504':
+          $ref: '#/components/responses/TimeoutError'
+
+  /nasa/neo/browse:
+    get:
+      tags: [NASA Data]
+      summary: Browse Near Earth Objects
+      description: Browse the NASA Near Earth Object database
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: Number of NEOs per page
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 20
+            default: 20
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: NEO data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NEOBrowseResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '503':
+          $ref: '#/components/responses/NasaApiError'
+        '504':
+          $ref: '#/components/responses/TimeoutError'
+
+  /nasa/mars/photos/{rover}:
+    get:
+      tags: [NASA Data]
+      summary: Get Mars Rover photos
+      description: Retrieve photos from Mars rovers (Curiosity, Opportunity, Spirit)
+      parameters:
+        - name: rover
+          in: path
+          required: true
+          description: Mars rover name
+          schema:
+            type: string
+            enum: [curiosity, opportunity, spirit]
+        - name: sol
+          in: query
+          description: Sol (Martian solar day)
+          schema:
+            type: integer
+            minimum: 0
+        - name: camera
+          in: query
+          description: Camera name
+          schema:
+            type: string
+            enum: [FHAZ, RHAZ, MAST, CHEMCAM, MAHLI, MARDI, NAVCAM, PANCAM, MINITES]
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Mars photos retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarsPhotosResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '503':
+          $ref: '#/components/responses/NasaApiError'
+        '504':
+          $ref: '#/components/responses/TimeoutError'
+
+  # Resource Navigator endpoints
+  /resources/saved:
+    get:
+      tags: [Resources]
+      summary: Get all saved items
+      description: Retrieve all saved NASA resources with optional filtering and pagination
+      parameters:
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: Number of items to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: type
+          in: query
+          description: Filter by item type
+          schema:
+            type: string
+            enum: [APOD, NEO, MARS, IMAGES]
+        - name: category
+          in: query
+          description: Filter by category
+          schema:
+            type: string
+            maxLength: 50
+      responses:
+        '200':
+          description: Saved items retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedItemsResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '503':
+          $ref: '#/components/responses/DatabaseError'
+
+    post:
+      tags: [Resources]
+      summary: Save a new item
+      description: Create a new saved item with the provided details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedItemCreate'
+      responses:
+        '201':
+          description: Item saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedItemResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Item with this ID already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/ConflictError'
+        '503':
+          $ref: '#/components/responses/DatabaseError'
+
+  /resources/search:
+    post:
+      tags: [Resources]
+      summary: Save a search query
+      description: Log a search query to the database for analytics and search history tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchQueryCreate'
+      responses:
+        '201':
+          description: Search query saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchQueryResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '503':
+          $ref: '#/components/responses/DatabaseError'
+
+  # User Management endpoints (Coming Soon - return 501)
+  /users/profile:
+    get:
+      tags: [User Management]
+      summary: Get user profile
+      description: |
+        Retrieve current user's profile information.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+    put:
+      tags: [User Management]
+      summary: Update user profile
+      description: |
+        Update current user's profile information.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdate'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+  /users/favorites:
+    get:
+      tags: [User Management]
+      summary: Get user favorites
+      description: |
+        Retrieve user's favorite NASA items.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Favorites retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+    post:
+      tags: [User Management]
+      summary: Add item to favorites
+      description: |
+        Add a NASA item to user's favorites.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FavoriteItem'
+      responses:
+        '201':
+          description: Item added to favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoriteItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+  /users/favorites/{id}:
+    delete:
+      tags: [User Management]
+      summary: Remove item from favorites
+      description: |
+        Remove a NASA item from user's favorites.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Favorite item ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Item removed from favorites
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+  /users/collections:
+    get:
+      tags: [User Management]
+      summary: Get user collections
+      description: |
+        Retrieve user's item collections.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Collections retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectionsResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+    post:
+      tags: [User Management]
+      summary: Create collection
+      description: |
+        Create a new collection for organizing items.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollectionCreate'
+      responses:
+        '201':
+          description: Collection created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+  # Search endpoints
+  /search:
+    get:
+      tags: [Search]
+      summary: Global search
+      description: |
+        Search across all NASA data sources.
+
+        **Note:** This feature is coming soon. Currently returns 501 (Not Implemented).
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+        - name: sources
+          in: query
+          description: Data sources to search
+          schema:
+            type: string
+            enum: [all, apod, neo, mars, media]
+            default: all
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Results per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      security:
+        - bearerAuth: []
+        - {}:  # Allow anonymous search with limited results
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '501':
+          $ref: '#/components/responses/NotImplementedError'
+
+  # System endpoints
+  /health:
+    get:
+      tags: [System]
+      summary: Health check
+      description: Check API health status
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /status:
+    get:
+      tags: [System]
+      summary: System status
+      description: Get detailed system status and metrics (Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: System status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatus'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  # Legacy NASA API Proxy endpoints
+  /nasa/{endpoint}:
+    get:
+      tags: [NASA Data]
+      summary: Generic NASA API proxy
+      description: |
+        Generic proxy for all NASA API endpoints. Forwards requests to NASA API with authentication.
+
+        This endpoint supports any NASA API path and automatically adds the required API key.
+        Common paths include:
+        - /planetary/apod - Astronomy Picture of the Day
+        - /neo/rest/v1/feed - Near Earth Object feed
+        - /neo/rest/v1/neo/browse - Browse Near Earth Objects
+        - /mars-photos/api/v1/rovers/{rover}/photos - Mars Rover Photos
+        - /EPIC/archive/natural/{date}/png/{image}.png - EPIC images
+      parameters:
+        - name: endpoint
+          in: path
+          required: true
+          description: NASA API endpoint path
+          schema:
+            type: string
+            example: "planetary/apod"
+        - name: *
+          in: query
+          description: Any query parameters supported by the NASA API endpoint
+          schema:
+            type: string
+      responses:
+        '200':
+          description: NASA API response
+          content:
+            application/json:
+              schema:
+                description: Response varies based on the NASA API endpoint being called
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '503':
+          $ref: '#/components/responses/NasaApiError'
+        '504':
+          $ref: '#/components/responses/TimeoutError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token (optional for some endpoints)
+
+  schemas:
+    # Authentication schemas
+    UserRegistration:
+      type: object
+      required: [email, password, username]
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "user@example.com"
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+          description: Password (min 8 chars, uppercase, lowercase, number, special char)
+          example: "SecurePass123!"
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          pattern: '^[a-zA-Z0-9_-]+$'
+          description: Unique username (alphanumeric, underscore, hyphen)
+          example: "space_explorer"
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Display name for profile
+          example: "Space Explorer"
+
+    UserLogin:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "user@example.com"
+        password:
+          type: string
+          description: User password
+          example: "SecurePass123!"
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/UserProfile'
+            tokens:
+              $ref: '#/components/schemas/TokenPair'
+
+    TokenPair:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+        refreshToken:
+          type: string
+          description: JWT refresh token
+        expiresIn:
+          type: integer
+          description: Access token expiration time (seconds)
+          example: 3600
+
+    TokenRefreshRequest:
+      type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+          description: Valid refresh token
+
+    TokenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            accessToken:
+              type: string
+            expiresIn:
+              type: integer
+
+    # User schemas
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User ID
+        email:
+          type: string
+          format: email
+          description: User email
+        username:
+          type: string
+          description: Unique username
+        displayName:
+          type: string
+          description: Display name
+        role:
+          type: string
+          enum: [guest, user, premium, admin, moderator]
+          description: User role
+        avatar:
+          type: string
+          format: uri
+          description: Profile picture URL
+        bio:
+          type: string
+          maxLength: 500
+          description: User biography
+        preferences:
+          $ref: '#/components/schemas/UserPreferences'
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation date
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: Last login date
+
+    UserPreferences:
+      type: object
+      properties:
+        theme:
+          type: string
+          enum: [system6, system6-dark, modern]
+          default: system6
+          description: UI theme preference
+        notifications:
+          type: object
+          properties:
+            email:
+              type: boolean
+              default: true
+            push:
+              type: boolean
+              default: false
+        privacy:
+          type: object
+          properties:
+            profilePublic:
+              type: boolean
+              default: false
+            collectionsPublic:
+              type: boolean
+              default: false
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        avatar:
+          type: string
+          format: uri
+        bio:
+          type: string
+          maxLength: 500
+        preferences:
+          $ref: '#/components/schemas/UserPreferences'
+
+    # NASA Data schemas
+    APODResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date
+              description: Date of the APOD
+              example: "2024-01-01"
+            title:
+              type: string
+              description: Title of the image
+              example: "Andromeda Galaxy"
+            explanation:
+              type: string
+              description: Explanation of the image
+            url:
+              type: string
+              format: uri
+              description: URL to the image
+            hdurl:
+              type: string
+              format: uri
+              description: URL to the high-definition image
+            media_type:
+              type: string
+              enum: [image, video]
+              description: Type of media
+            copyright:
+              type: string
+              description: Copyright holder
+
+    NEOBrowseResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            page:
+              type: object
+              properties:
+                size:
+                  type: integer
+                total_elements:
+                  type: integer
+                total_pages:
+                  type: integer
+                number:
+                  type: integer
+            near_earth_objects:
+              type: array
+              items:
+                $ref: '#/components/schemas/NearEarthObject'
+
+    NearEarthObject:
+      type: object
+      properties:
+        id:
+          type: string
+        neo_reference_id:
+          type: string
+        name:
+          type: string
+        absolute_magnitude_h:
+          type: number
+        estimated_diameter:
+          $ref: '#/components/schemas/EstimatedDiameter'
+        is_potentially_hazardous_asteroid:
+          type: boolean
+        close_approach_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CloseApproachData'
+
+    EstimatedDiameter:
+      type: object
+      properties:
+        kilometers:
+          type: object
+          properties:
+            estimated_diameter_min:
+              type: number
+            estimated_diameter_max:
+              type: number
+
+    CloseApproachData:
+      type: object
+      properties:
+        close_approach_date:
+          type: string
+          format: date
+        relative_velocity:
+          type: object
+          properties:
+            kilometers_per_second:
+              type: number
+        miss_distance:
+          type: object
+          properties:
+            kilometers:
+              type: number
+
+    MarsPhotosResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            photos:
+              type: array
+              items:
+                $ref: '#/components/schemas/MarsPhoto'
+
+    MarsPhoto:
+      type: object
+      properties:
+        id:
+          type: integer
+        sol:
+          type: integer
+          description: Martian solar day
+        camera:
+          $ref: '#/components/schemas/Camera'
+        img_src:
+          type: string
+          format: uri
+          description: Image URL
+        earth_date:
+          type: string
+          format: date
+        rover:
+          $ref: '#/components/schemas/Rover'
+
+    Camera:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        full_name:
+          type: string
+        rover_id:
+          type: integer
+
+    Rover:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        landing_date:
+          type: string
+          format: date
+        launch_date:
+          type: string
+          format: date
+        status:
+          type: string
+
+    # Resource Navigator schemas
+    SavedItemCreate:
+      type: object
+      required: [id, type, title]
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Unique identifier for the item
+          example: "apod-2024-01-01"
+        type:
+          type: string
+          enum: [APOD, NEO, MARS, IMAGES]
+          description: Type of NASA resource
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Title of the resource
+          example: "Andromeda Galaxy"
+        url:
+          type: string
+          format: uri
+          description: URL to the resource
+          example: "https://apod.nasa.gov/apod/image/2401/ngc1234.jpg"
+        category:
+          type: string
+          maxLength: 50
+          description: Category classification
+          example: "astronomy"
+        description:
+          type: string
+          maxLength: 1000
+          description: Item description
+          example: "A beautiful spiral galaxy in the constellation"
+
+    SavedItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/SavedItem'
+
+    SavedItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Item ID
+        type:
+          type: string
+          enum: [APOD, NEO, MARS, IMAGES]
+          description: Item type
+        title:
+          type: string
+          description: Item title
+        url:
+          type: string
+          format: uri
+          description: Item URL
+        category:
+          type: string
+          description: Item category
+        description:
+          type: string
+          description: Item description
+        saved_at:
+          type: string
+          format: date-time
+          description: When item was saved
+        created_at:
+          type: string
+          format: date-time
+          description: When item was created
+        updated_at:
+          type: string
+          format: date-time
+          description: When item was last updated
+
+    SavedItemsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/SavedItem'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    SearchQueryCreate:
+      type: object
+      required: [query_string]
+      properties:
+        query_string:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: The search query string
+          example: "mars rover photos"
+
+    SearchQueryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Search query ID
+            query_string:
+              type: string
+              description: The search query
+            search_time:
+              type: string
+              format: date-time
+              description: When the search was performed
+            created_at:
+              type: string
+              format: date-time
+              description: Record creation time
+
+    # Favorites and Collections
+    FavoriteItem:
+      type: object
+      required: [type, itemId, title, url]
+      properties:
+        type:
+          type: string
+          enum: [APOD, NEO, MARS, MEDIA]
+          description: Type of NASA content
+        itemId:
+          type: string
+          description: Unique identifier for the item
+        title:
+          type: string
+          maxLength: 200
+          description: Item title
+        url:
+          type: string
+          format: uri
+          description: Item URL
+        date:
+          type: string
+          format: date
+          description: Item date (if applicable)
+        description:
+          type: string
+          maxLength: 1000
+          description: Item description
+        thumbnail:
+          type: string
+          format: uri
+          description: Thumbnail URL
+        metadata:
+          type: object
+          description: Additional item metadata
+
+    FavoritesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            favorites:
+              type: array
+              items:
+                $ref: '#/components/schemas/FavoriteItem'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    CollectionCreate:
+      type: object
+      required: [name, description]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Collection name
+        description:
+          type: string
+          maxLength: 500
+          description: Collection description
+        isPublic:
+          type: boolean
+          default: false
+          description: Whether collection is public
+        tags:
+          type: array
+          items:
+            type: string
+            maxLength: 50
+          description: Collection tags
+
+    Collection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        isPublic:
+          type: boolean
+        itemCount:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CollectionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            collections:
+              type: array
+              items:
+                $ref: '#/components/schemas/Collection'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    # Search schemas
+    SearchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            query:
+              type: string
+              description: Original search query
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/SearchResult'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+            facets:
+              type: object
+              description: Search facets and filters
+            took:
+              type: integer
+              description: Search time in milliseconds
+
+    SearchResult:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [APOD, NEO, MARS, MEDIA]
+          description: Result type
+        id:
+          type: string
+          description: Result ID
+        title:
+          type: string
+          description: Result title
+        description:
+          type: string
+          description: Result description
+        url:
+          type: string
+          format: uri
+          description: Result URL
+        thumbnail:
+          type: string
+          format: uri
+          description: Thumbnail URL
+        date:
+          type: string
+          format: date
+          description: Result date
+        score:
+          type: number
+          description: Search relevance score
+        highlights:
+          type: array
+          items:
+            type: string
+          description: Search highlights
+
+    # Pagination schema
+    Pagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: Items per page
+          example: 20
+        offset:
+          type: integer
+          description: Number of items skipped
+          example: 0
+        total:
+          type: integer
+          description: Total number of items
+          example: 100
+        hasMore:
+          type: boolean
+          description: Whether there are more items
+          example: true
+
+    # System schemas
+    HealthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [ok, degraded, error]
+              description: Overall health status
+            timestamp:
+              type: string
+              format: date-time
+              description: Health check timestamp
+            version:
+              type: string
+              description: API version
+            uptime:
+              type: number
+              description: Server uptime in seconds
+            cache:
+              type: string
+              enum: [connected, disconnected]
+              description: Cache connection status
+
+    SystemStatus:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+            services:
+              type: object
+              properties:
+                database:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    responseTime:
+                      type: number
+                nasa_api:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    responseTime:
+                      type: number
+                cache:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    responseTime:
+                      type: number
+            metrics:
+              type: object
+              properties:
+                activeUsers:
+                  type: integer
+                requestsPerMinute:
+                  type: integer
+                averageResponseTime:
+                  type: number
+                errorRate:
+                  type: number
+
+    # Error schemas
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code
+              example: "VALIDATION_ERROR"
+            message:
+              type: string
+              description: Error message
+              example: "Request validation failed"
+            requestId:
+              type: string
+              description: Unique request identifier for debugging
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
+              description: Error details for validation errors
+
+  responses:
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              requestId: "req_123456"
+              details:
+                - field: email
+                  message: Invalid email format
+
+    UnauthorizedError:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: UNAUTHORIZED
+              message: Authentication required
+              requestId: "req_123456"
+
+    ForbiddenError:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: FORBIDDEN
+              message: Insufficient permissions
+              requestId: "req_123456"
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: NOT_FOUND
+              message: Resource not found
+              requestId: "req_123456"
+
+    ConflictError:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: ITEM_ALREADY_EXISTS
+              message: An item with this ID already exists
+              requestId: "req_123456"
+
+    RateLimitError:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: RATE_LIMIT_EXCEEDED
+              message: Too many requests, please try again later
+              requestId: "req_123456"
+
+    NasaApiError:
+      description: NASA API service error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: EXTERNAL_SERVICE_ERROR
+              message: NASA API service temporarily unavailable
+              requestId: "req_123456"
+
+    TimeoutError:
+      description: Request timeout
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: TIMEOUT
+              message: NASA API request timeout. Please try again later.
+              requestId: "req_123456"
+
+    DatabaseError:
+      description: Database service error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: DATABASE_UNAVAILABLE
+              message: Unable to access database at this time
+              requestId: "req_123456"
+
+    NotImplementedError:
+      description: Feature not implemented
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: NOT_IMPLEMENTED
+              message: This feature is coming soon. Currently, the app operates without authentication.
+              requestId: "req_123456"
+
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: INTERNAL_ERROR
+              message: Something went wrong
+              requestId: "req_123456"

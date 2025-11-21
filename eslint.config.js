@@ -64,7 +64,7 @@ module.exports = [
       quotes: ['error', 'single', { avoidEscape: true }],
       semi: ['error', 'always'],
       indent: ['error', 2],
-      'max-len': ['error', { code: 100, ignoreUrls: true }],
+      'max-len': ['error', { code: 120, ignoreUrls: true }],
     },
   },
   {

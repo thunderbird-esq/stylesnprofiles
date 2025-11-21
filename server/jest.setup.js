@@ -1,14 +1,19 @@
 // Setup file for Jest tests
+const path = require('path');
+const dotenv = require('dotenv');
 
-// Mock environment variables
+// Load test environment variables
+dotenv.config({ path: path.resolve(__dirname, '.env.test') });
+
+// Mock environment variables (defaults if not in .env.test)
 process.env.NODE_ENV = 'test';
-process.env.PORT = '3001';
-process.env.DB_USER = 'test_user';
-process.env.DB_HOST = 'localhost';
-process.env.DB_DATABASE = 'test_db';
-process.env.DB_PASSWORD = 'test_password';
-process.env.DB_PORT = '5432';
-process.env.NASA_API_KEY = 'test_nasa_api_key';
+process.env.PORT = process.env.PORT || '3001';
+process.env.DB_USER = process.env.DB_USER || 'test_user';
+process.env.DB_HOST = process.env.DB_HOST || 'localhost';
+process.env.DB_DATABASE = process.env.DB_DATABASE || 'test_db';
+process.env.DB_PASSWORD = process.env.DB_PASSWORD || 'test_password';
+process.env.DB_PORT = process.env.DB_PORT || '5432';
+process.env.NASA_API_KEY = process.env.NASA_API_KEY || 'test_nasa_api_key';
 
 // Mock console methods to reduce noise during tests
 const originalConsoleLog = console.log;

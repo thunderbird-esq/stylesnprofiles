@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "plugins": {
+    "browser-automation@browser-tools": {
+      "version": "unknown",
+      "installedAt": "2025-11-07T04:15:34.333Z",
+      "lastUpdated": "2025-11-07T04:15:34.333Z",
+      "installPath": "/Users/edsaga/.claude/plugins/marketplaces/browser-tools/",
+      "gitCommitSha": "9696b2a55076c3fb824acf0bb7452202c802d287",
+      "isLocal": true
+    }
+  }
+}

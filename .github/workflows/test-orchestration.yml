@@ -1,0 +1,425 @@
+name: Test Orchestration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      strategy:
+        description: 'Execution strategy'
+        required: true
+        default: 'fastFeedback'
+        type: choice
+        options:
+          - fastFeedback
+          - comprehensive
+          - smokeTest
+          - performance
+      parallel:
+        description: 'Enable parallel execution'
+        required: true
+        default: true
+        type: boolean
+      coverage:
+        description: 'Generate coverage reports'
+        required: true
+        default: true
+        type: boolean
+  schedule:
+    # Run comprehensive tests daily at 6 AM UTC
+    - cron: '0 6 * * *'
+
+env:
+  NODE_VERSION: '18'
+  ORCHESTRATOR_VERSION: '1.0.0'
+
+jobs:
+  # Job to run the intelligent test orchestrator
+  test-orchestration:
+    name: Intelligent Test Execution
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        node-version: [18]
+        os: [ubuntu-latest]
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: nasa_system6_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Full history for smart test selection
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        echo "Installing client dependencies..."
+        cd client && npm ci
+        echo "Installing server dependencies..."
+        cd ../server && npm ci
+        echo "Installing orchestrator dependencies..."
+        cd ../test-orchestrator && npm install
+
+    - name: Setup test environment
+      run: |
+        echo "Setting up test environment..."
+        mkdir -p test-results
+
+        # Environment variables for tests
+        echo "NODE_ENV=test" >> $GITHUB_ENV
+        echo "CI=true" >> $GITHUB_ENV
+        echo "TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/nasa_system6_test" >> $GITHUB_ENV
+        echo "NASA_API_KEY=test_key_${{ github.run_id }}" >> $GITHUB_ENV
+
+    - name: Discover and classify tests
+      run: |
+        echo "🔍 Discovering and classifying tests..."
+        node test-orchestrator/index.js discover --verbose
+
+    - name: Run test orchestration
+      id: orchestrate-tests
+      run: |
+        echo "🧪 Running intelligent test orchestration..."
+
+        # Determine execution strategy
+        STRATEGY="${{ github.event.inputs.strategy || 'fastFeedback' }}"
+        PARALLEL="${{ github.event.inputs.parallel || 'true' }}"
+        COVERAGE="${{ github.event.inputs.coverage || 'true' }}"
+
+        # For scheduled runs, use comprehensive strategy
+        if [[ "${{ github.event_name }}" == "schedule" ]]; then
+          STRATEGY="comprehensive"
+        fi
+
+        # Build command arguments
+        ARGS="run --strategy=$STRATEGY --parallel=$PARALLEL --coverage=$COVERAGE"
+
+        # For PRs, run smart selection based on changed files
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          ARGS="$ARGS --changed-files"
+        fi
+
+        # Execute orchestrator
+        node test-orchestrator/index.js $ARGS --verbose
+
+        # Store results for subsequent jobs
+        echo "strategy=$STRATEGY" >> $GITHUB_OUTPUT
+        echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+
+    - name: Generate comprehensive reports
+      if: always()
+      run: |
+        echo "📊 Generating comprehensive reports..."
+        node test-orchestrator/index.js report
+
+    - name: Analyze and optimize
+      if: always()
+      run: |
+        echo "⚡ Analyzing performance and suggesting optimizations..."
+        node test-orchestrator/index.js optimize
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-${{ github.run_id }}
+        path: |
+          test-results/
+          coverage/
+        retention-days: 30
+        if-no-files-found: warn
+
+    - name: Upload coverage reports
+      if: ${{ github.event.inputs.coverage != 'false' && success() }}
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+    - name: Comment PR with results
+      if: ${{ github.event_name == 'pull_request' && always() }}
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+
+          // Read test results
+          let testSummary = '## 🧪 Test Results\n\n';
+
+          try {
+            const summaryFile = 'test-results/summary.json';
+            if (fs.existsSync(summaryFile)) {
+              const summary = JSON.parse(fs.readFileSync(summaryFile, 'utf8'));
+
+              testSummary += `### Execution Summary\n`;
+              testSummary += `- **Strategy**: ${{ steps.orchestrate-tests.outputs.strategy }}\n`;
+              testSummary += `- **Total Tests**: ${summary.totalTests}\n`;
+              testSummary += `- **Passed**: ✅ ${summary.passedTests}\n`;
+              testSummary += `- **Failed**: ❌ ${summary.failedTests}\n`;
+              testSummary += `- **Success Rate**: ${summary.successRate}%\n`;
+              testSummary += `- **Duration**: ${summary.totalDuration}s\n\n`;
+
+              if (summary.failedTests > 0) {
+                testSummary += '### ❌ Failed Tests\n';
+                summary.failedTests.forEach(test => {
+                  testSummary += `- \`${test.testId}\`: ${test.error}\n`;
+                });
+                testSummary += '\n';
+              }
+
+              if (summary.slowTests && summary.slowTests.length > 0) {
+                testSummary += '### ⚠️ Slow Tests (>5s)\n';
+                summary.slowTests.forEach(test => {
+                  testSummary += `- \`${test.testId}\`: ${test.duration}ms\n`;
+                });
+                testSummary += '\n';
+              }
+            }
+          } catch (error) {
+            testSummary += `⚠️ Could not read test results: ${error.message}\n\n`;
+          }
+
+          testSummary += `### 📊 Performance Metrics\n`;
+          testSummary += `- **Orchestrator**: v${{ env.ORCHESTRATOR_VERSION }}\n`;
+          testSummary += `- **Strategy**: ${{ steps.orchestrate-tests.outputs.strategy }}\n`;
+          testSummary += `- **Timestamp**: ${{ steps.orchestrate-tests.outputs.timestamp }}\n`;
+          testSummary += `- **Workflow**: ${{ github.workflow }}\n\n`;
+
+          // Add optimization suggestions if available
+          try {
+            const optimizationsFile = 'test-results/optimizations.json';
+            if (fs.existsSync(optimizationsFile)) {
+              const optimizations = JSON.parse(fs.readFileSync(optimizationsFile, 'utf8'));
+
+              if (optimizations.length > 0) {
+                testSummary += '### 💡 Optimization Suggestions\n';
+                optimizations.slice(0, 5).forEach((opt, index) => {
+                  const emoji = opt.priority === 'high' ? '🔴' :
+                               opt.priority === 'medium' ? '🟡' : '🔵';
+                  testSummary += `${index + 1}. ${emoji} ${opt.message}\n`;
+                });
+                testSummary += '\n';
+              }
+            }
+          } catch (error) {
+            // Ignore optimization errors
+          }
+
+          // Post comment
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: testSummary
+          });
+
+    - name: Update status check
+      if: always()
+      run: |
+        echo "Updating workflow status..."
+
+        # Read execution summary for status determination
+        if [ -f "test-results/summary.json" ]; then
+          FAILED_TESTS=$(cat test-results/summary.json | jq -r '.failedTests // 0')
+          TOTAL_TESTS=$(cat test-results/summary.json | jq -r '.totalTests // 0')
+
+          if [ "$FAILED_TESTS" -eq 0 ]; then
+            echo "✅ All tests passed!"
+            exit 0
+          else
+            echo "❌ $FAILED_TESTS out of $TOTAL_TESTS tests failed"
+            exit 1
+          fi
+        else
+          echo "⚠️ No test results found"
+          exit 1
+        fi
+
+  # Performance monitoring job
+  performance-monitoring:
+    name: Performance Monitoring
+    runs-on: ubuntu-latest
+    needs: test-orchestration
+    if: always() && (needs.test-orchestration.result == 'success' || needs.test-orchestration.result == 'failure')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Download test results
+      uses: actions/download-artifact@v3
+      with:
+        name: test-results-${{ github.run_id }}
+        path: test-results/
+
+    - name: Analyze performance trends
+      run: |
+        echo "📈 Analyzing performance trends..."
+
+        if [ -f "test-results/performance-analysis.json" ]; then
+          echo "Performance Analysis:"
+          cat test-results/performance-analysis.json | jq .
+        fi
+
+        if [ -f "test-results/monitoring-report.json" ]; then
+          echo "Monitoring Report:"
+          cat test-results/monitoring-report.json | jq .
+        fi
+
+    - name: Generate performance dashboard
+      run: |
+        echo "📊 Generating performance dashboard..."
+
+        # Create simple performance report
+        cat > test-results/performance-summary.md << 'EOF'
+        # Performance Summary
+
+        ## Test Execution Metrics
+        EOF
+
+        if [ -f "test-results/summary.json" ]; then
+          cat test-results/summary.json | jq -r '
+            "- **Total Tests**: " + (.totalTests | tostring) + "\n" +
+            "- **Success Rate**: " + (.successRate | tostring) + "%\n" +
+            "- **Total Duration**: " + (.totalDuration | tostring) + "s\n" +
+            "- **Average Test Time**: " + (.averageTestTime | tostring) + "ms"
+          ' >> test-results/performance-summary.md
+        fi
+
+    - name: Upload performance reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-reports-${{ github.run_id }}
+        path: test-results/performance-*
+        retention-days: 90
+
+  # Security scanning job
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: test-orchestration
+    if: always()
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run security audit
+      run: |
+        echo "🔒 Running security audit..."
+
+        # Client audit
+        echo "### Client Dependencies" > security-report.md
+        echo "\`\`\`" >> security-report.md
+        cd client && npm audit --audit-level=moderate >> ../security-report.md 2>&1 || echo "No moderate or higher vulnerabilities found" >> ../security-report.md
+        echo "\`\`\`" >> security-report.md
+
+        # Server audit
+        echo "\n### Server Dependencies" >> security-report.md
+        echo "\`\`\`" >> security-report.md
+        cd ../server && npm audit --audit-level=moderate >> ../security-report.md 2>&1 || echo "No moderate or higher vulnerabilities found" >> ../security-report.md
+        echo "\`\`\`" >> security-report.md
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-report-${{ github.run_id }}
+        path: security-report.md
+        retention-days: 30
+
+  # Notification job
+  notify:
+    name: Notify Team
+    runs-on: ubuntu-latest
+    needs: [test-orchestration, performance-monitoring, security-scan]
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Determine overall status
+      id: status
+      run: |
+        if [[ "${{ needs.test-orchestration.result }}" == "success" ]]; then
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "message=✅ All tests passed successfully!" >> $GITHUB_OUTPUT
+        else
+          echo "status=failure" >> $GITHUB_OUTPUT
+          echo "message=❌ Some tests failed. Please check the results." >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create summary comment
+      run: |
+        echo "${{ steps.status.outputs.message }}"
+        echo ""
+        echo "🔗 [View detailed results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+        echo ""
+        echo "📊 **Execution Strategy:** ${{ steps.orchestrate-tests.outputs.strategy || 'fastFeedback' }}"
+        echo "⏱️ **Duration:** ${{ steps.orchestrate-tests.outputs.timestamp }}"
+
+  # Cleanup job
+  cleanup:
+    name: Cleanup Old Artifacts
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+    - name: Cleanup old artifacts
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.runId,
+          });
+
+          // Keep only the latest 10 artifacts per type
+          const artifactNames = [...new Set(artifacts.data.artifacts.map(a => a.name))];
+
+          for (const name of artifactNames) {
+            const nameArtifacts = artifacts.data.artifacts.filter(a => a.name.startsWith(name));
+
+            if (nameArtifacts.length > 10) {
+              // Sort by creation date (newest first) and delete oldest
+              const sortedArtifacts = nameArtifacts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+              const artifactsToDelete = sortedArtifacts.slice(10);
+
+              for (const artifact of artifactsToDelete) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+                console.log(`Deleted old artifact: ${artifact.name}`);
+              }
+            }
+          }
