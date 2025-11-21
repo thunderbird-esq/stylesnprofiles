@@ -1,100 +1,85 @@
 /**
- * Authentication Context
+ * AuthContext.js
  * Provides authentication state and methods throughout the app
  */
 
-import React, {
-  createContext, useState, useContext, useEffect, useCallback,
-} from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as authService from '../services/authService';
 
 const AuthContext = createContext(null);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setTokenState] = useState(null);
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const checkAuth = useCallback(() => {
+  // Check authentication on mount
+  const checkAuth = useCallback(async () => {
     setLoading(true);
-    const storedToken = authService.getToken();
-    const storedUser = authService.getCurrentUser();
+    try {
+      const storedToken = authService.getToken();
+      const storedUser = authService.getCurrentUser();
 
-    if (storedToken && storedUser) {
-      // Check if token is expired
-      if (authService.isTokenExpired(storedToken)) {
-        // Token expired, clear storage
-        authService.logout();
-        setUser(null);
-        setTokenState(null);
-      } else {
-        setTokenState(storedToken);
-        setUser(storedUser);
+      if (storedToken && storedUser) {
+        // Verify token is still valid
+        if (!authService.isTokenExpired(storedToken)) {
+          setToken(storedToken);
+          setUser(storedUser);
+        } else {
+          // Token expired - clear auth
+          authService.logout();
+        }
       }
+    } catch (err) {
+      console.error('Auth check error:', err);
+      authService.logout();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
-  // Check authentication status on mount
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     setLoading(true);
     setError(null);
-
     try {
-      const {
-        user: loggedInUser,
-        token: authToken,
-      } = await authService.login(email, password);
-      setUser(loggedInUser);
-      setTokenState(authToken);
-      setLoading(false);
-      return { user: loggedInUser, token: authToken };
+      const data = await authService.login(email, password);
+      setUser(data.user);
+      setToken(data.token);
+      return data;
     } catch (err) {
       setError(err.message);
-      setLoading(false);
       throw err;
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const register = async (email, username, password) => {
+  const register = useCallback(async (email, username, password) => {
     setLoading(true);
     setError(null);
-
     try {
-      const {
-        user: newUser,
-        token: authToken,
-      } = await authService.register(email, username, password);
-      setUser(newUser);
-      setTokenState(authToken);
-      setLoading(false);
-      return { user: newUser, token: authToken };
+      const data = await authService.register(email, username, password);
+      setUser(data.user);
+      setToken(data.token);
+      return data;
     } catch (err) {
       setError(err.message);
-      setLoading(false);
       throw err;
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
   const logout = useCallback(() => {
     authService.logout();
     setUser(null);
-    setTokenState(null);
-    setError(null);
+    setToken(null);
   }, []);
 
   const value = {
@@ -105,19 +90,23 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    isAuthenticated: !!user && !!token,
     checkAuth,
+    isAuthenticated: !!user && !!token,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
 
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
 
 export default AuthContext;
