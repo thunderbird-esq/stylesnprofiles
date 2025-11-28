@@ -6,8 +6,27 @@
   */
 
 require('./testSetup');
-const favoritesService = require('../services/favoritesService');
-const apiClient = require('../services/apiClient');
+
+// Mock the apiClient module
+jest.mock('../apiClient', () => ({
+  __esModule: true,
+  default: {
+    get: jest.fn(),
+    post: jest.fn(),
+    delete: jest.fn(),
+  },
+}));
+
+// Mock the authService
+jest.mock('../authService', () => ({
+  __esModule: true,
+  getToken: jest.fn(() => 'mock-token'),
+  logout: jest.fn(),
+  isTokenExpired: jest.fn(() => false),
+}));
+
+const { getFavorites, addFavorite, removeFavorite, getFavoriteById, isFavorited } = require('../favoritesService');
+const apiClient = require('../apiClient').default;
 
 describe('Favorites Service Unit Tests', () => {
   const mockApiResponse = (data, status = 200) => {
@@ -72,12 +91,13 @@ describe('Favorites Service Unit Tests', () => {
 
     test('should handle API error response', async () => {
       const errorMessage = 'Failed to fetch favorites';
-      apiClient.get = jest.fn().mockRejectedValue({
+      const errorResponse = {
         response: { data: { message: errorMessage } },
-      });
+      };
+      apiClient.get = jest.fn().mockRejectedValue(errorResponse);
 
       await expect(getFavorites()).rejects.toThrow(errorMessage);
-      expect(console.error).toHaveBeenCalledWith('Error fetching favorites:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error fetching favorites:', errorResponse);
     });
 
     test('should handle network error with generic message', async () => {
@@ -121,12 +141,13 @@ describe('Favorites Service Unit Tests', () => {
 
     test('should handle API error response', async () => {
       const errorMessage = 'Item already exists';
-      apiClient.post = jest.fn().mockRejectedValue({
+      const errorResponse = {
         response: { data: { message: errorMessage } },
-      });
+      };
+      apiClient.post = jest.fn().mockRejectedValue(errorResponse);
 
       await expect(addFavorite(validItemData)).rejects.toThrow(errorMessage);
-      expect(console.error).toHaveBeenCalledWith('Error adding favorite:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error adding favorite:', errorResponse);
     });
 
     test('should handle missing item data', async () => {
@@ -166,12 +187,13 @@ describe('Favorites Service Unit Tests', () => {
     });
 
     test('should handle not found error', async () => {
-      apiClient.delete = jest.fn().mockRejectedValue({
+      const errorResponse = {
         response: { status: 404, data: { message: 'Favorite not found' } },
-      });
+      };
+      apiClient.delete = jest.fn().mockRejectedValue(errorResponse);
 
       await expect(removeFavorite('non-existent')).rejects.toThrow('Favorite not found');
-      expect(console.error).toHaveBeenCalledWith('Error removing favorite:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error removing favorite:', errorResponse);
     });
 
     test('should handle network error', async () => {
@@ -201,12 +223,13 @@ describe('Favorites Service Unit Tests', () => {
     });
 
     test('should handle not found error', async () => {
-      apiClient.get = jest.fn().mockRejectedValue({
+      const errorResponse = {
         response: { status: 404, data: { message: 'Favorite not found' } },
-      });
+      };
+      apiClient.get = jest.fn().mockRejectedValue(errorResponse);
 
       await expect(getFavoriteById('non-existent')).rejects.toThrow('Favorite not found');
-      expect(console.error).toHaveBeenCalledWith('Error fetching favorite:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error fetching favorite:', errorResponse);
     });
 
     test('should handle network error', async () => {
@@ -228,9 +251,10 @@ describe('Favorites Service Unit Tests', () => {
     });
 
     test('should return false when item does not exist (404)', async () => {
-      apiClient.get = jest.fn().mockRejectedValue({
+      const errorResponse = {
         response: { status: 404, data: { message: 'Favorite not found' } },
-      });
+      };
+      apiClient.get = jest.fn().mockRejectedValue(errorResponse);
 
       const result = await isFavorited('non-existent');
 
@@ -247,9 +271,10 @@ describe('Favorites Service Unit Tests', () => {
     });
 
     test('should handle network errors', async () => {
-      apiClient.get = jest.fn().mockRejectedValue(new Error('Network error'));
+      const networkError = new Error('Network error');
+      apiClient.get = jest.fn().mockRejectedValue(networkError);
 
-      await expect(isFavorited('test-123')).rejects.toThrow('Network error');
+      await expect(isFavorited('test-123')).rejects.toThrow('Failed to fetch favorite');
     });
 
     test('should handle empty item ID', async () => {

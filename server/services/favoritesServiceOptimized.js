@@ -75,7 +75,7 @@ class FavoritesServiceOptimized {
       options.type || 'all',
       options.archived ? 'archived' : 'active',
       options.tags ? JSON.stringify(options.tags.sort()) : 'none',
-      options.sortBy || 'saved_at'
+      options.sortBy || 'saved_at',
     ];
     return this.cache.key('favorites', ...keyParts);
   }
@@ -90,7 +90,7 @@ class FavoritesServiceOptimized {
       options.page || 1,
       options.limit || 20,
       options.types ? JSON.stringify(options.types.sort()) : 'all',
-      options.tags ? JSON.stringify(options.tags.sort()) : 'none'
+      options.tags ? JSON.stringify(options.tags.sort()) : 'none',
     ];
     return this.cache.key('search', ...keyParts);
   }
@@ -111,7 +111,10 @@ class FavoritesServiceOptimized {
   /**
    * Get favorites using optimized query with caching
    */
-  async getFavorites(userId, { page = 1, limit = 20, type = null, archived = false, tags = null, sortBy = 'saved_at' } = {}) {
+  async getFavorites(
+    userId,
+    { page = 1, limit = 20, type = null, archived = false, tags = null, sortBy = 'saved_at' } = {},
+  ) {
     // Validate input
     if (limit < 1 || limit > 100) {
       throw new Error('Limit must be between 1 and 100');
@@ -179,7 +182,7 @@ class FavoritesServiceOptimized {
           is_favorite: row.is_favorite,
           collection_count: parseInt(row.collection_count) || 0,
           collection_names: row.collection_names || [],
-          relevance_score: parseFloat(row.relevance_score) || 0
+          relevance_score: parseFloat(row.relevance_score) || 0,
         })),
         pagination: {
           total: totalCount,
@@ -242,7 +245,7 @@ class FavoritesServiceOptimized {
       const favorite = {
         ...row,
         collection_count: parseInt(row.collection_count) || 0,
-        collection_names: row.collection_names || []
+        collection_names: row.collection_names || [],
       };
 
       // Cache the result
@@ -275,7 +278,7 @@ class FavoritesServiceOptimized {
       // Check if already exists with optimized index
       const checkResult = await client.query(
         'SELECT id, is_archived FROM saved_items WHERE user_id = $1 AND id = $2',
-        [userId, itemId]
+        [userId, itemId],
       );
 
       if (checkResult.rows.length > 0) {
@@ -310,7 +313,7 @@ class FavoritesServiceOptimized {
         category,
         description,
         copyright,
-        metadata = {}
+        metadata = {},
       } = data || {};
 
       const query = `
@@ -335,7 +338,7 @@ class FavoritesServiceOptimized {
         description,
         copyright,
         itemDate,
-        JSON.stringify(metadata)
+        JSON.stringify(metadata),
       ];
 
       const result = await client.query(query, values);
@@ -364,7 +367,7 @@ class FavoritesServiceOptimized {
       // Optimized existence check with index
       const existsResult = await client.query(
         'SELECT id FROM saved_items WHERE user_id = $1 AND id = $2 AND is_archived = false',
-        [userId, favoriteId]
+        [userId, favoriteId],
       );
 
       if (!existsResult.rows[0]) {
@@ -399,7 +402,7 @@ class FavoritesServiceOptimized {
         throw new Error('No valid update fields provided');
       }
 
-      updates.push(`updated_at = CURRENT_TIMESTAMP`);
+      updates.push('updated_at = CURRENT_TIMESTAMP');
 
       const query = `
         UPDATE saved_items
@@ -517,7 +520,7 @@ class FavoritesServiceOptimized {
           saved_at: row.saved_at,
           relevance_score: parseFloat(row.relevance_score) || 0,
           collection_count: parseInt(row.collection_count) || 0,
-          collection_names: row.collection_names || []
+          collection_names: row.collection_names || [],
         })),
         pagination: {
           total: totalCount,
@@ -589,8 +592,9 @@ class FavoritesServiceOptimized {
         notedCount: parseInt(stats.noted_count) || 0,
         recentCount: parseInt(stats.recent_count) || 0,
         engagementRate: stats.total_favorites > 0
-          ? ((parseInt(stats.marked_favorites) + parseInt(stats.tagged_count)) / parseInt(stats.total_favorites) * 100).toFixed(2)
-          : 0
+          ? ((parseInt(stats.marked_favorites) + parseInt(stats.tagged_count)) /
+             parseInt(stats.total_favorites) * 100).toFixed(2)
+          : 0,
       };
 
       // Cache stats with moderate TTL
@@ -638,7 +642,7 @@ class FavoritesServiceOptimized {
       return {
         successful: results,
         failed: errors,
-        total: items.length
+        total: items.length,
       };
     } catch (error) {
       await client.query('ROLLBACK');
@@ -691,7 +695,7 @@ class FavoritesServiceOptimized {
           row.saved_at,
           row.user_note || '',
           row.user_tags ? row.user_tags.join(';') : '',
-          row.is_favorite
+          row.is_favorite,
         ]);
 
         return [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');

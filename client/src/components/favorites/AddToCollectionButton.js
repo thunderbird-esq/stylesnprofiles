@@ -154,8 +154,8 @@ export default function AddToCollectionButton({
       {/* Main Button */}
       <button
         className={`btn add-to-collection-btn ${isSpecificCollection ? 'specific-collection-btn' : 'dropdown-btn'
-          } ${itemCollections.length > 0 && !isSpecificCollection ? 'has-collections' : ''
-          }`}
+        } ${itemCollections.length > 0 && !isSpecificCollection ? 'has-collections' : ''
+        }`}
         onClick={handleButtonClick}
         disabled={loading}
         title={

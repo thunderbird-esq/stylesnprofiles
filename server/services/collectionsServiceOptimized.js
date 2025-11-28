@@ -72,7 +72,7 @@ class CollectionsServiceOptimized {
       userId,
       options.page || 1,
       options.limit || 20,
-      options.includePublic ? 'include_public' : 'private_only'
+      options.includePublic ? 'include_public' : 'private_only',
     ];
     return this.cache.key('collections', ...keyParts);
   }
@@ -85,7 +85,7 @@ class CollectionsServiceOptimized {
       collectionId,
       options.page || 1,
       options.limit || 20,
-      options.sortBy || 'position'
+      options.sortBy || 'position',
     ];
     return this.cache.key('collection_items', ...keyParts);
   }
@@ -126,7 +126,7 @@ class CollectionsServiceOptimized {
       // Optimized query using the existing efficient structure
       let whereClause = 'WHERE c.user_id = $1';
       const queryParams = [userId];
-      let paramIndex = 2;
+      const paramIndex = 2;
 
       if (includePublic) {
         whereClause += ' OR (c.is_public = true AND c.user_id != $1)';
@@ -141,7 +141,10 @@ class CollectionsServiceOptimized {
           CASE WHEN c.user_id = $1 THEN true ELSE false END as is_owner,
           -- Pre-calculate additional metadata for performance
           (SELECT MAX(ci.added_at) FROM collection_items ci WHERE ci.collection_id = c.id) as last_item_added,
-          (SELECT COUNT(DISTINCT si.type) FROM collection_items ci JOIN saved_items si ON ci.item_id = si.id WHERE ci.collection_id = c.id) as unique_item_types
+          (SELECT COUNT(DISTINCT si.type)
+             FROM collection_items ci
+             JOIN saved_items si ON ci.item_id = si.id
+             WHERE ci.collection_id = c.id) as unique_item_types
         FROM collections c
         LEFT JOIN collection_items ci ON c.id = ci.collection_id
         LEFT JOIN users u ON c.user_id = u.id
@@ -175,7 +178,7 @@ class CollectionsServiceOptimized {
           item_count: parseInt(row.item_count) || 0,
           is_owner: row.is_owner,
           unique_item_types: parseInt(row.unique_item_types) || 0,
-          last_item_added: row.last_item_added
+          last_item_added: row.last_item_added,
         })),
         pagination: {
           total: totalItems,
@@ -217,7 +220,10 @@ class CollectionsServiceOptimized {
           u.display_name as owner_display_name,
           CASE WHEN c.user_id = $1 THEN true ELSE false END as is_owner,
           (SELECT MAX(ci.added_at) FROM collection_items ci WHERE ci.collection_id = c.id) as last_item_added,
-          (SELECT COUNT(DISTINCT si.type) FROM collection_items ci JOIN saved_items si ON ci.item_id = si.id WHERE ci.collection_id = c.id) as unique_item_types
+          (SELECT COUNT(DISTINCT si.type)
+             FROM collection_items ci
+             JOIN saved_items si ON ci.item_id = si.id
+             WHERE ci.collection_id = c.id) as unique_item_types
         FROM collections c
         LEFT JOIN collection_items ci ON c.id = ci.collection_id
         LEFT JOIN users u ON c.user_id = u.id
@@ -237,7 +243,7 @@ class CollectionsServiceOptimized {
         item_count: parseInt(row.item_count) || 0,
         is_owner: row.is_owner,
         unique_item_types: parseInt(row.unique_item_types) || 0,
-        last_item_added: row.last_item_added
+        last_item_added: row.last_item_added,
       };
 
       // Cache the result
@@ -271,7 +277,7 @@ class CollectionsServiceOptimized {
       // Check if user already has a collection with this name
       const existingResult = await client.query(
         'SELECT id FROM collections WHERE user_id = $1 AND name = $2',
-        [userId, name.trim()]
+        [userId, name.trim()],
       );
 
       if (existingResult.rows.length > 0) {
@@ -289,7 +295,7 @@ class CollectionsServiceOptimized {
         userId,
         name.trim(),
         description?.trim() || null,
-        isPublic || false
+        isPublic || false,
       ];
 
       const result = await client.query(query, values);
@@ -300,7 +306,7 @@ class CollectionsServiceOptimized {
         item_count: 0,
         is_owner: true,
         unique_item_types: 0,
-        last_item_added: null
+        last_item_added: null,
       };
 
       // Invalidate cache
@@ -326,7 +332,7 @@ class CollectionsServiceOptimized {
       // Verify ownership
       const ownershipResult = await client.query(
         'SELECT id, name FROM collections WHERE id = $1 AND user_id = $2',
-        [collectionId, userId]
+        [collectionId, userId],
       );
 
       if (!ownershipResult.rows[0]) {
@@ -350,7 +356,7 @@ class CollectionsServiceOptimized {
         // Check for name conflicts
         const conflictResult = await client.query(
           'SELECT id FROM collections WHERE user_id = $1 AND name = $2 AND id != $3',
-          [userId, name.trim(), collectionId]
+          [userId, name.trim(), collectionId],
         );
 
         if (conflictResult.rows.length > 0) {
@@ -383,7 +389,7 @@ class CollectionsServiceOptimized {
         throw new Error('No valid update fields provided');
       }
 
-      updates.push(`updated_at = CURRENT_TIMESTAMP`);
+      updates.push('updated_at = CURRENT_TIMESTAMP');
 
       const query = `
         UPDATE collections
@@ -401,13 +407,13 @@ class CollectionsServiceOptimized {
       // Get updated item count
       const countResult = await client.query(
         'SELECT COUNT(*) as count FROM collection_items WHERE collection_id = $1',
-        [collectionId]
+        [collectionId],
       );
 
       return {
         ...result.rows[0],
         item_count: parseInt(countResult.rows[0].count) || 0,
-        is_owner: true
+        is_owner: true,
       };
     } catch (error) {
       await client.query('ROLLBACK');
@@ -425,7 +431,7 @@ class CollectionsServiceOptimized {
     try {
       const result = await client.query(
         'DELETE FROM collections WHERE id = $1 AND user_id = $2 RETURNING id, name',
-        [collectionId, userId]
+        [collectionId, userId],
       );
 
       if (result.rowCount > 0) {
@@ -450,7 +456,7 @@ class CollectionsServiceOptimized {
       // Verify collection exists (more efficient query)
       const collectionResult = await client.query(
         'SELECT user_id, is_public FROM collections WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 
       if (!collectionResult.rows[0]) {
@@ -460,7 +466,7 @@ class CollectionsServiceOptimized {
       // Verify item exists (optimized query with index)
       const itemResult = await client.query(
         'SELECT user_id, title FROM saved_items WHERE id = $1 AND is_archived = false',
-        [favoriteId]
+        [favoriteId],
       );
 
       if (!itemResult.rows[0]) {
@@ -470,7 +476,7 @@ class CollectionsServiceOptimized {
       // Check for duplicates (optimized query)
       const existingResult = await client.query(
         'SELECT id FROM collection_items WHERE collection_id = $1 AND item_id = $2',
-        [collectionId, favoriteId]
+        [collectionId, favoriteId],
       );
 
       if (existingResult.rows.length > 0) {
@@ -482,7 +488,7 @@ class CollectionsServiceOptimized {
       if (finalPosition === null) {
         const positionResult = await client.query(
           'SELECT COALESCE(MAX(position), 0) as max_position FROM collection_items WHERE collection_id = $1',
-          [collectionId]
+          [collectionId],
         );
         finalPosition = parseInt(positionResult.rows[0].max_position) + 1;
       }
@@ -498,13 +504,13 @@ class CollectionsServiceOptimized {
         collectionId,
         favoriteId,
         finalPosition,
-        notes
+        notes,
       ]);
 
       // Update collection timestamp
       await client.query(
         'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 
       await client.query('COMMIT');
@@ -517,12 +523,12 @@ class CollectionsServiceOptimized {
         collection: {
           id: collectionId,
           user_id: collectionResult.rows[0].user_id,
-          is_public: collectionResult.rows[0].is_public
+          is_public: collectionResult.rows[0].is_public,
         },
         item: {
           id: favoriteId,
-          title: itemResult.rows[0].title
-        }
+          title: itemResult.rows[0].title,
+        },
       };
 
     } catch (error) {
@@ -544,7 +550,7 @@ class CollectionsServiceOptimized {
       // Get collection owner before removing for cache invalidation
       const ownerResult = await client.query(
         'SELECT user_id FROM collections WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 
       if (!ownerResult.rows[0]) {
@@ -557,7 +563,7 @@ class CollectionsServiceOptimized {
       // Remove the item and get the position for reordering
       const deleteResult = await client.query(
         'DELETE FROM collection_items WHERE collection_id = $1 AND item_id = $2 RETURNING id, position',
-        [collectionId, favoriteId]
+        [collectionId, favoriteId],
       );
 
       if (deleteResult.rowCount === 0) {
@@ -582,7 +588,7 @@ class CollectionsServiceOptimized {
       // Update collection timestamp
       await client.query(
         'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 
       await client.query('COMMIT');
@@ -647,8 +653,10 @@ class CollectionsServiceOptimized {
 
       if (!totalItems) {
         const countResult = await client.query(
-          'SELECT COUNT(*) as total FROM collection_items ci JOIN saved_items si ON ci.item_id = si.id WHERE ci.collection_id = $1 AND si.is_archived = false',
-          [collectionId]
+          'SELECT COUNT(*) as total FROM collection_items ci ' +
+          'JOIN saved_items si ON ci.item_id = si.id ' +
+          'WHERE ci.collection_id = $1 AND si.is_archived = false',
+          [collectionId],
         );
         totalItems = parseInt(countResult.rows[0].total);
         this.cache.set(countCacheKey, totalItems, this.defaultCacheTTL);
@@ -659,7 +667,7 @@ class CollectionsServiceOptimized {
       const response = {
         collection: {
           ...collectionResult.rows[0],
-          item_count: totalItems
+          item_count: totalItems,
         },
         items: itemsResult.rows.map(row => ({
           id: row.item_id,
@@ -677,7 +685,7 @@ class CollectionsServiceOptimized {
           is_favorite: row.is_favorite,
           position: row.position,
           collection_notes: row.collection_notes,
-          added_to_collection_at: row.added_to_collection_at
+          added_to_collection_at: row.added_to_collection_at,
         })),
         pagination: {
           total: totalItems,
@@ -707,7 +715,7 @@ class CollectionsServiceOptimized {
       // Verify ownership
       const ownershipResult = await client.query(
         'SELECT id FROM collections WHERE id = $1 AND user_id = $2',
-        [collectionId, userId]
+        [collectionId, userId],
       );
 
       if (!ownershipResult.rows[0]) {
@@ -733,7 +741,7 @@ class CollectionsServiceOptimized {
         }
         await client.query(
           'INSERT INTO temp_reorders (item_id, new_position) VALUES ($1, $2)',
-          [itemId, position]
+          [itemId, position],
         );
       }
 
@@ -752,7 +760,7 @@ class CollectionsServiceOptimized {
       // Update collection timestamp
       await client.query(
         'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 
       await client.query('COMMIT');
@@ -797,7 +805,7 @@ class CollectionsServiceOptimized {
         // Additional derived metrics
         collectionDensity: stats.total_collections > 0
           ? (parseFloat(stats.avg_items_per_collection) || 0) / 10 * 100  // Percentage of "full" collections
-          : 0
+          : 0,
       };
 
       // Cache with moderate TTL
@@ -860,7 +868,10 @@ class CollectionsServiceOptimized {
             ELSE 1.0
           END as relevance_score,
           -- Additional metrics for better public browsing
-          (SELECT COUNT(DISTINCT si.type) FROM collection_items ci JOIN saved_items si ON ci.item_id = si.id WHERE ci.collection_id = c.id) as unique_item_types,
+          (SELECT COUNT(DISTINCT si.type)
+             FROM collection_items ci
+             JOIN saved_items si ON ci.item_id = si.id
+             WHERE ci.collection_id = c.id) as unique_item_types,
           (SELECT MAX(ci.added_at) FROM collection_items ci WHERE ci.collection_id = c.id) as last_item_added
         FROM collections c
         LEFT JOIN collection_items ci ON c.id = ci.collection_id
@@ -882,7 +893,7 @@ class CollectionsServiceOptimized {
 
       const [collectionsResult, countResult] = await Promise.all([
         client.query(query, queryParams),
-        client.query(countQuery, countParams)
+        client.query(countQuery, countParams),
       ]);
 
       const totalItems = parseInt(countResult.rows[0].total);
@@ -895,7 +906,7 @@ class CollectionsServiceOptimized {
           relevance_score: parseFloat(row.relevance_score) || 1.0,
           is_owner: false, // Always false for public collections
           unique_item_types: parseInt(row.unique_item_types) || 0,
-          last_item_added: row.last_item_added
+          last_item_added: row.last_item_added,
         })),
         pagination: {
           total: totalItems,
@@ -935,7 +946,7 @@ class CollectionsServiceOptimized {
       // Verify collection exists
       const collectionResult = await client.query(
         'SELECT user_id, is_public FROM collections WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 
       if (!collectionResult.rows[0]) {
@@ -945,7 +956,7 @@ class CollectionsServiceOptimized {
       // Verify all items exist and are not archived
       const itemsResult = await client.query(
         'SELECT id, title FROM saved_items WHERE id = ANY($1) AND is_archived = false',
-        [itemIds]
+        [itemIds],
       );
 
       if (itemsResult.rows.length !== itemIds.length) {
@@ -955,7 +966,7 @@ class CollectionsServiceOptimized {
       // Check for existing items
       const existingResult = await client.query(
         'SELECT item_id FROM collection_items WHERE collection_id = $1 AND item_id = ANY($2)',
-        [collectionId, itemIds]
+        [collectionId, itemIds],
       );
 
       if (existingResult.rows.length > 0) {
@@ -966,17 +977,17 @@ class CollectionsServiceOptimized {
       // Get next position for batch insert
       const positionResult = await client.query(
         'SELECT COALESCE(MAX(position), 0) as max_position FROM collection_items WHERE collection_id = $1',
-        [collectionId]
+        [collectionId],
       );
 
-      let currentPos = parseInt(positionResult.rows[0].max_position);
+      const currentPos = parseInt(positionResult.rows[0].max_position);
 
       // Insert all items
       const insertPromises = itemIds.map((itemId, index) => {
-        const item = itemsResult.rows.find(row => row.id === itemId);
+        // const item = itemsResult.rows.find(row => row.id === itemId);
         return client.query(
           'INSERT INTO collection_items (collection_id, item_id, position, notes) VALUES ($1, $2, $3, $4) RETURNING *',
-          [collectionId, itemId, currentPos + index + 1, options.notes]
+          [collectionId, itemId, currentPos + index + 1, options.notes],
         );
       });
 
@@ -985,7 +996,7 @@ class CollectionsServiceOptimized {
       // Update collection timestamp
       await client.query(
         'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 
       await client.query('COMMIT');
@@ -997,8 +1008,8 @@ class CollectionsServiceOptimized {
         added: results.length,
         items: results.map(result => ({
           id: result.rows[0].item_id,
-          position: result.rows[0].position
-        }))
+          position: result.rows[0].position,
+        })),
       };
 
     } catch (error) {

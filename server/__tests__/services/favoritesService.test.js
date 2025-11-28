@@ -64,7 +64,7 @@ describe('FavoritesService', () => {
       await favoritesService.getFavorites(userId, { type: 'MARS' });
 
       const queryCall = mockClient.query.mock.calls[0];
-      expect(queryCall[0]).toContain('AND type =');
+      expect(queryCall[0]).toContain('AND si.type =');
       expect(queryCall[1]).toContain('MARS');
     });
   });

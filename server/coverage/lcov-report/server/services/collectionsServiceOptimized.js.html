@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/330</span>
+                <span class='fraction'>0/328</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/31</span>
+                <span class='fraction'>0/30</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/326</span>
+                <span class='fraction'>0/325</span>
             </div>
         
             
@@ -1075,7 +1075,18 @@
 <a name='L1010'></a><a href='#L1010'>1010</a>
 <a name='L1011'></a><a href='#L1011'>1011</a>
 <a name='L1012'></a><a href='#L1012'>1012</a>
-<a name='L1013'></a><a href='#L1013'>1013</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L1013'></a><a href='#L1013'>1013</a>
+<a name='L1014'></a><a href='#L1014'>1014</a>
+<a name='L1015'></a><a href='#L1015'>1015</a>
+<a name='L1016'></a><a href='#L1016'>1016</a>
+<a name='L1017'></a><a href='#L1017'>1017</a>
+<a name='L1018'></a><a href='#L1018'>1018</a>
+<a name='L1019'></a><a href='#L1019'>1019</a>
+<a name='L1020'></a><a href='#L1020'>1020</a>
+<a name='L1021'></a><a href='#L1021'>1021</a>
+<a name='L1022'></a><a href='#L1022'>1022</a>
+<a name='L1023'></a><a href='#L1023'>1023</a>
+<a name='L1024'></a><a href='#L1024'>1024</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1229,6 +1240,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1287,6 +1301,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1727,6 +1744,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1923,6 +1942,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1948,6 +1968,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2050,7 +2072,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2161,7 +2183,7 @@ class CollectionsServiceOptimized {
       userId,
       options.page || 1,
       options.limit || 20,
-      options.includePublic ? 'include_public' : 'private_only'
+      options.includePublic ? 'include_public' : 'private_only',
     ];
 <span class="cstat-no" title="statement not covered" >    return this.cache.key('collections', ...keyParts);</span>
   }
@@ -2174,7 +2196,7 @@ class CollectionsServiceOptimized {
       collectionId,
       options.page || 1,
       options.limit || 20,
-      options.sortBy || 'position'
+      options.sortBy || 'position',
     ];
 <span class="cstat-no" title="statement not covered" >    return this.cache.key('collection_items', ...keyParts);</span>
   }
@@ -2215,7 +2237,7 @@ class CollectionsServiceOptimized {
       // Optimized query using the existing efficient structure
       let whereClause = <span class="cstat-no" title="statement not covered" >'WHERE c.user_id = $1';</span>
       const queryParams = <span class="cstat-no" title="statement not covered" >[userId];</span>
-      let paramIndex = <span class="cstat-no" title="statement not covered" >2;</span>
+      const paramIndex = <span class="cstat-no" title="statement not covered" >2;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (includePublic) {</span>
 <span class="cstat-no" title="statement not covered" >        whereClause += ' OR (c.is_public = true AND c.user_id != $1)';</span>
@@ -2230,7 +2252,10 @@ class CollectionsServiceOptimized {
           CASE WHEN c.user_id = $1 THEN true ELSE false END as is_owner,
           -- Pre-calculate additional metadata for performance
           (SELECT MAX(ci.added_at) FROM collection_items ci WHERE ci.collection_id = c.id) as last_item_added,
-          (SELECT COUNT(DISTINCT si.type) FROM collection_items ci JOIN saved_items si ON ci.item_id = si.id WHERE ci.collection_id = c.id) as unique_item_types
+          (SELECT COUNT(DISTINCT si.type)
+             FROM collection_items ci
+             JOIN saved_items si ON ci.item_id = si.id
+             WHERE ci.collection_id = c.id) as unique_item_types
         FROM collections c
         LEFT JOIN collection_items ci ON c.id = ci.collection_id
         LEFT JOIN users u ON c.user_id = u.id
@@ -2264,7 +2289,7 @@ class CollectionsServiceOptimized {
           item_count: parseInt(row.item_count) || 0,
           is_owner: row.is_owner,
           unique_item_types: parseInt(row.unique_item_types) || 0,
-          last_item_added: row.last_item_added
+          last_item_added: row.last_item_added,
         })),
         pagination: {
           total: totalItems,
@@ -2306,7 +2331,10 @@ class CollectionsServiceOptimized {
           u.display_name as owner_display_name,
           CASE WHEN c.user_id = $1 THEN true ELSE false END as is_owner,
           (SELECT MAX(ci.added_at) FROM collection_items ci WHERE ci.collection_id = c.id) as last_item_added,
-          (SELECT COUNT(DISTINCT si.type) FROM collection_items ci JOIN saved_items si ON ci.item_id = si.id WHERE ci.collection_id = c.id) as unique_item_types
+          (SELECT COUNT(DISTINCT si.type)
+             FROM collection_items ci
+             JOIN saved_items si ON ci.item_id = si.id
+             WHERE ci.collection_id = c.id) as unique_item_types
         FROM collections c
         LEFT JOIN collection_items ci ON c.id = ci.collection_id
         LEFT JOIN users u ON c.user_id = u.id
@@ -2326,7 +2354,7 @@ class CollectionsServiceOptimized {
         item_count: parseInt(row.item_count) || 0,
         is_owner: row.is_owner,
         unique_item_types: parseInt(row.unique_item_types) || 0,
-        last_item_added: row.last_item_added
+        last_item_added: row.last_item_added,
       };
 &nbsp;
       // Cache the result
@@ -2360,7 +2388,7 @@ class CollectionsServiceOptimized {
       // Check if user already has a collection with this name
       const existingResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT id FROM collections WHERE user_id = $1 AND name = $2',
-        [userId, name.trim()]
+        [userId, name.trim()],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (existingResult.rows.length &gt; 0) {</span>
@@ -2378,7 +2406,7 @@ class CollectionsServiceOptimized {
         userId,
         name.trim(),
         description?.trim() || null,
-        isPublic || false
+        isPublic || false,
       ];
 &nbsp;
       const result = <span class="cstat-no" title="statement not covered" >await client.query(query, values);</span>
@@ -2389,7 +2417,7 @@ class CollectionsServiceOptimized {
         item_count: 0,
         is_owner: true,
         unique_item_types: 0,
-        last_item_added: null
+        last_item_added: null,
       };
 &nbsp;
       // Invalidate cache
@@ -2415,7 +2443,7 @@ class CollectionsServiceOptimized {
       // Verify ownership
       const ownershipResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT id, name FROM collections WHERE id = $1 AND user_id = $2',
-        [collectionId, userId]
+        [collectionId, userId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (!ownershipResult.rows[0]) {</span>
@@ -2439,7 +2467,7 @@ class CollectionsServiceOptimized {
         // Check for name conflicts
         const conflictResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
           'SELECT id FROM collections WHERE user_id = $1 AND name = $2 AND id != $3',
-          [userId, name.trim(), collectionId]
+          [userId, name.trim(), collectionId],
         );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        if (conflictResult.rows.length &gt; 0) {</span>
@@ -2472,7 +2500,7 @@ class CollectionsServiceOptimized {
 <span class="cstat-no" title="statement not covered" >        throw new Error('No valid update fields provided');</span>
       }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      updates.push(`updated_at = CURRENT_TIMESTAMP`);</span>
+<span class="cstat-no" title="statement not covered" >      updates.push('updated_at = CURRENT_TIMESTAMP');</span>
 &nbsp;
       const query = <span class="cstat-no" title="statement not covered" >`</span>
         UPDATE collections
@@ -2490,13 +2518,13 @@ class CollectionsServiceOptimized {
       // Get updated item count
       const countResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT COUNT(*) as count FROM collection_items WHERE collection_id = $1',
-        [collectionId]
+        [collectionId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      return {</span>
         ...result.rows[0],
         item_count: parseInt(countResult.rows[0].count) || 0,
-        is_owner: true
+        is_owner: true,
       };
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      await client.query('ROLLBACK');</span>
@@ -2514,7 +2542,7 @@ class CollectionsServiceOptimized {
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const result = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'DELETE FROM collections WHERE id = $1 AND user_id = $2 RETURNING id, name',
-        [collectionId, userId]
+        [collectionId, userId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (result.rowCount &gt; 0) {</span>
@@ -2539,7 +2567,7 @@ class CollectionsServiceOptimized {
       // Verify collection exists (more efficient query)
       const collectionResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT user_id, is_public FROM collections WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (!collectionResult.rows[0]) {</span>
@@ -2549,7 +2577,7 @@ class CollectionsServiceOptimized {
       // Verify item exists (optimized query with index)
       const itemResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT user_id, title FROM saved_items WHERE id = $1 AND is_archived = false',
-        [favoriteId]
+        [favoriteId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (!itemResult.rows[0]) {</span>
@@ -2559,7 +2587,7 @@ class CollectionsServiceOptimized {
       // Check for duplicates (optimized query)
       const existingResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT id FROM collection_items WHERE collection_id = $1 AND item_id = $2',
-        [collectionId, favoriteId]
+        [collectionId, favoriteId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (existingResult.rows.length &gt; 0) {</span>
@@ -2571,7 +2599,7 @@ class CollectionsServiceOptimized {
 <span class="cstat-no" title="statement not covered" >      if (finalPosition === null) {</span>
         const positionResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
           'SELECT COALESCE(MAX(position), 0) as max_position FROM collection_items WHERE collection_id = $1',
-          [collectionId]
+          [collectionId],
         );
 <span class="cstat-no" title="statement not covered" >        finalPosition = parseInt(positionResult.rows[0].max_position) + 1;</span>
       }
@@ -2587,13 +2615,13 @@ class CollectionsServiceOptimized {
         collectionId,
         favoriteId,
         finalPosition,
-        notes
+        notes,
       ]);
 &nbsp;
       // Update collection timestamp
 <span class="cstat-no" title="statement not covered" >      await client.query(</span>
         'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      await client.query('COMMIT');</span>
@@ -2606,12 +2634,12 @@ class CollectionsServiceOptimized {
         collection: {
           id: collectionId,
           user_id: collectionResult.rows[0].user_id,
-          is_public: collectionResult.rows[0].is_public
+          is_public: collectionResult.rows[0].is_public,
         },
         item: {
           id: favoriteId,
-          title: itemResult.rows[0].title
-        }
+          title: itemResult.rows[0].title,
+        },
       };
 &nbsp;
     } catch (error) {
@@ -2633,7 +2661,7 @@ class CollectionsServiceOptimized {
       // Get collection owner before removing for cache invalidation
       const ownerResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT user_id FROM collections WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (!ownerResult.rows[0]) {</span>
@@ -2646,7 +2674,7 @@ class CollectionsServiceOptimized {
       // Remove the item and get the position for reordering
       const deleteResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'DELETE FROM collection_items WHERE collection_id = $1 AND item_id = $2 RETURNING id, position',
-        [collectionId, favoriteId]
+        [collectionId, favoriteId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (deleteResult.rowCount === 0) {</span>
@@ -2671,7 +2699,7 @@ class CollectionsServiceOptimized {
       // Update collection timestamp
 <span class="cstat-no" title="statement not covered" >      await client.query(</span>
         'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      await client.query('COMMIT');</span>
@@ -2736,8 +2764,10 @@ class CollectionsServiceOptimized {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (!totalItems) {</span>
         const countResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
-          'SELECT COUNT(*) as total FROM collection_items ci JOIN saved_items si ON ci.item_id = si.id WHERE ci.collection_id = $1 AND si.is_archived = false',
-          [collectionId]
+          'SELECT COUNT(*) as total FROM collection_items ci ' +
+          'JOIN saved_items si ON ci.item_id = si.id ' +
+          'WHERE ci.collection_id = $1 AND si.is_archived = false',
+          [collectionId],
         );
 <span class="cstat-no" title="statement not covered" >        totalItems = parseInt(countResult.rows[0].total);</span>
 <span class="cstat-no" title="statement not covered" >        this.cache.set(countCacheKey, totalItems, this.defaultCacheTTL);</span>
@@ -2748,7 +2778,7 @@ class CollectionsServiceOptimized {
       const response = <span class="cstat-no" title="statement not covered" >{</span>
         collection: {
           ...collectionResult.rows[0],
-          item_count: totalItems
+          item_count: totalItems,
         },
         items: itemsResult.rows.map(<span class="fstat-no" title="function not covered" >ro</span>w =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
           id: row.item_id,
@@ -2766,7 +2796,7 @@ class CollectionsServiceOptimized {
           is_favorite: row.is_favorite,
           position: row.position,
           collection_notes: row.collection_notes,
-          added_to_collection_at: row.added_to_collection_at
+          added_to_collection_at: row.added_to_collection_at,
         })),
         pagination: {
           total: totalItems,
@@ -2796,7 +2826,7 @@ class CollectionsServiceOptimized {
       // Verify ownership
       const ownershipResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT id FROM collections WHERE id = $1 AND user_id = $2',
-        [collectionId, userId]
+        [collectionId, userId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (!ownershipResult.rows[0]) {</span>
@@ -2822,7 +2852,7 @@ class CollectionsServiceOptimized {
         }
 <span class="cstat-no" title="statement not covered" >        await client.query(</span>
           'INSERT INTO temp_reorders (item_id, new_position) VALUES ($1, $2)',
-          [itemId, position]
+          [itemId, position],
         );
       }
 &nbsp;
@@ -2841,7 +2871,7 @@ class CollectionsServiceOptimized {
       // Update collection timestamp
 <span class="cstat-no" title="statement not covered" >      await client.query(</span>
         'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      await client.query('COMMIT');</span>
@@ -2886,7 +2916,7 @@ class CollectionsServiceOptimized {
         // Additional derived metrics
         collectionDensity: stats.total_collections &gt; 0
           ? (parseFloat(stats.avg_items_per_collection) || 0) / 10 * 100  // Percentage of "full" collections
-          : 0
+          : 0,
       };
 &nbsp;
       // Cache with moderate TTL
@@ -2949,7 +2979,10 @@ class CollectionsServiceOptimized {
             ELSE 1.0
           END as relevance_score,
           -- Additional metrics for better public browsing
-          (SELECT COUNT(DISTINCT si.type) FROM collection_items ci JOIN saved_items si ON ci.item_id = si.id WHERE ci.collection_id = c.id) as unique_item_types,
+          (SELECT COUNT(DISTINCT si.type)
+             FROM collection_items ci
+             JOIN saved_items si ON ci.item_id = si.id
+             WHERE ci.collection_id = c.id) as unique_item_types,
           (SELECT MAX(ci.added_at) FROM collection_items ci WHERE ci.collection_id = c.id) as last_item_added
         FROM collections c
         LEFT JOIN collection_items ci ON c.id = ci.collection_id
@@ -2971,7 +3004,7 @@ class CollectionsServiceOptimized {
 &nbsp;
       const [collectionsResult, countResult] = <span class="cstat-no" title="statement not covered" >await Promise.all([</span>
         client.query(query, queryParams),
-        client.query(countQuery, countParams)
+        client.query(countQuery, countParams),
       ]);
 &nbsp;
       const totalItems = <span class="cstat-no" title="statement not covered" >parseInt(countResult.rows[0].total);</span>
@@ -2984,7 +3017,7 @@ class CollectionsServiceOptimized {
           relevance_score: parseFloat(row.relevance_score) || 1.0,
           is_owner: false, // Always false for public collections
           unique_item_types: parseInt(row.unique_item_types) || 0,
-          last_item_added: row.last_item_added
+          last_item_added: row.last_item_added,
         })),
         pagination: {
           total: totalItems,
@@ -3024,7 +3057,7 @@ class CollectionsServiceOptimized {
       // Verify collection exists
       const collectionResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT user_id, is_public FROM collections WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (!collectionResult.rows[0]) {</span>
@@ -3034,7 +3067,7 @@ class CollectionsServiceOptimized {
       // Verify all items exist and are not archived
       const itemsResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT id, title FROM saved_items WHERE id = ANY($1) AND is_archived = false',
-        [itemIds]
+        [itemIds],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (itemsResult.rows.length !== itemIds.length) {</span>
@@ -3044,7 +3077,7 @@ class CollectionsServiceOptimized {
       // Check for existing items
       const existingResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT item_id FROM collection_items WHERE collection_id = $1 AND item_id = ANY($2)',
-        [collectionId, itemIds]
+        [collectionId, itemIds],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (existingResult.rows.length &gt; 0) {</span>
@@ -3055,17 +3088,17 @@ class CollectionsServiceOptimized {
       // Get next position for batch insert
       const positionResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT COALESCE(MAX(position), 0) as max_position FROM collection_items WHERE collection_id = $1',
-        [collectionId]
+        [collectionId],
       );
 &nbsp;
-      let currentPos = <span class="cstat-no" title="statement not covered" >parseInt(positionResult.rows[0].max_position);</span>
+      const currentPos = <span class="cstat-no" title="statement not covered" >parseInt(positionResult.rows[0].max_position);</span>
 &nbsp;
       // Insert all items
       const insertPromises = <span class="cstat-no" title="statement not covered" >itemIds.map(<span class="fstat-no" title="function not covered" >(i</span>temId, index) =&gt; {</span>
-        const item = <span class="cstat-no" title="statement not covered" >itemsResult.rows.find(<span class="fstat-no" title="function not covered" >ro</span>w =&gt; <span class="cstat-no" title="statement not covered" >row.id === itemId)</span>;</span>
+        // const item = itemsResult.rows.find(row =&gt; row.id === itemId);
 <span class="cstat-no" title="statement not covered" >        return client.query(</span>
           'INSERT INTO collection_items (collection_id, item_id, position, notes) VALUES ($1, $2, $3, $4) RETURNING *',
-          [collectionId, itemId, currentPos + index + 1, options.notes]
+          [collectionId, itemId, currentPos + index + 1, options.notes],
         );
       });
 &nbsp;
@@ -3074,7 +3107,7 @@ class CollectionsServiceOptimized {
       // Update collection timestamp
 <span class="cstat-no" title="statement not covered" >      await client.query(</span>
         'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [collectionId]
+        [collectionId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      await client.query('COMMIT');</span>
@@ -3086,8 +3119,8 @@ class CollectionsServiceOptimized {
         added: results.length,
         items: results.map(<span class="fstat-no" title="function not covered" >re</span>sult =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
           id: result.rows[0].item_id,
-          position: result.rows[0].position
-        }))
+          position: result.rows[0].position,
+        })),
       };
 &nbsp;
     } catch (error) {
@@ -3106,7 +3139,7 @@ class CollectionsServiceOptimized {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-21T08:54:02.403Z
+                at 2025-11-28T13:32:53.004Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

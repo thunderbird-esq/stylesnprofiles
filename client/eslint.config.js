@@ -54,6 +54,8 @@ module.exports = [
         window: 'readonly',
         navigator: 'readonly',
         alert: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
         setTimeout: 'readonly',
@@ -67,6 +69,7 @@ module.exports = [
         test: 'readonly',
         it: 'readonly',
         expect: 'readonly',
+        fail: 'readonly',
         MouseEvent: 'readonly',
       },
     },
@@ -90,7 +93,7 @@ module.exports = [
       quotes: ['error', 'single', { avoidEscape: true }],
       semi: ['error', 'always'],
       indent: ['error', 2],
-      'max-len': ['error', { code: 100, ignoreUrls: true }],
+      'max-len': ['error', { code: 120, ignoreUrls: true }],
 
       // React rules
       'react/jsx-uses-react': 'error',

@@ -33,7 +33,7 @@ const resourceNavigatorRouter = require('./routes/resourceNavigator');
 const authRouter = require('./routes/auth');
 const favoritesRouter = require('./routes/favorites');
 const collectionsRouter = require('./routes/collections');
-const { authenticateToken } = require('./middleware/auth');
+// const { authenticateToken } = require('./middleware/auth'); // Future use
 require('./db'); // Import db to ensure pool is created
 
 /**
@@ -41,6 +41,7 @@ require('./db'); // Import db to ensure pool is created
  * @constant {express.Application}
  */
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy
 
 /**
  * Server port number from environment or default
@@ -153,11 +154,25 @@ app.use('/api/nasa', validateApiProxy, apiProxyRouter);
 // Path 2: The database API for saved items/searches
 app.use('/api/resources', validateResourceInput, resourceNavigatorRouter);
 // Path 3: Authentication routes
-// Path 3: Authentication routes
 app.use('/api/v1/auth', authRouter);
-// Path 4: User resources (protected)
-app.use('/api/v1/users/favorites', authenticateToken, favoritesRouter);
-app.use('/api/v1/users/collections', authenticateToken, collectionsRouter);
+
+// Local user middleware for development (no auth required)
+const setLocalUser = (req, res, next) => {
+  // If no user is set (no JWT), use a default local user
+  if (!req.user) {
+    req.user = {
+      id: '00000000-0000-0000-0000-000000000001', // Fixed UUID for local user
+      username: 'local-user',
+      role: 'user',
+    };
+    console.log('🛠️ setLocalUser middleware applied, user ID:', req.user.id);
+  }
+  next();
+};
+
+// Path 4: User resources (local-only mode, no auth required)
+app.use('/api/v1/users/favorites', setLocalUser, favoritesRouter);
+app.use('/api/v1/users/collections', setLocalUser, collectionsRouter);
 
 /**
  * Health check endpoint

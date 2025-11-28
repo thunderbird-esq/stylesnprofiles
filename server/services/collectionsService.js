@@ -25,7 +25,7 @@ class CollectionsService {
 
       let whereClause = 'WHERE c.user_id = $1';
       const queryParams = [userId];
-      let paramIndex = 2;
+      const paramIndex = 2;
 
       if (includePublic) {
         whereClause += ' OR (c.is_public = true AND c.user_id != $1)';
@@ -70,7 +70,7 @@ class CollectionsService {
         collections: collectionsResult.rows.map(row => ({
           ...row,
           item_count: parseInt(row.item_count) || 0,
-          is_owner: row.is_owner
+          is_owner: row.is_owner,
         })),
         pagination: {
           total: totalItems,
@@ -119,7 +119,7 @@ class CollectionsService {
       return {
         ...row,
         item_count: parseInt(row.item_count) || 0,
-        is_owner: row.is_owner
+        is_owner: row.is_owner,
       };
     } finally {
       client.release();
@@ -136,6 +136,7 @@ class CollectionsService {
    * @returns {Promise<Object>} Created collection
    */
   async createCollection(userId, { name, description, isPublic }) {
+    console.log(`📁 createCollection called for user ${userId}`, { name, description, isPublic });
     const client = await pool.connect();
     try {
       // Validate input
@@ -152,7 +153,7 @@ class CollectionsService {
       // Check if user already has a collection with this name
       const existingResult = await client.query(
         'SELECT id FROM collections WHERE user_id = $1 AND name = $2',
-        [userId, name.trim()]
+        [userId, name.trim()],
       );
 
       if (existingResult.rows.length > 0) {
@@ -169,14 +170,14 @@ class CollectionsService {
         userId,
         name.trim(),
         description?.trim() || null,
-        isPublic || false
+        isPublic || false,
       ];
 
       const result = await client.query(query, values);
       return {
         ...result.rows[0],
         item_count: 0,
-        is_owner: true
+        is_owner: true,
       };
     } finally {
       client.release();
@@ -199,7 +200,7 @@ class CollectionsService {
       // First verify ownership
       const ownershipResult = await client.query(
         'SELECT id, name FROM collections WHERE id = $1 AND user_id = $2',
-        [collectionId, userId]
+        [collectionId, userId],
       );
 
       if (!ownershipResult.rows[0]) {
@@ -222,7 +223,7 @@ class CollectionsService {
         // Check if name conflicts with existing collection (excluding current one)
         const conflictResult = await client.query(
           'SELECT id FROM collections WHERE user_id = $1 AND name = $2 AND id != $3',
-          [userId, name.trim(), collectionId]
+          [userId, name.trim(), collectionId],
         );
 
         if (conflictResult.rows.length > 0) {
@@ -253,7 +254,7 @@ class CollectionsService {
         throw new Error('No valid update fields provided');
       }
 
-      updates.push(`updated_at = CURRENT_TIMESTAMP`);
+      updates.push('updated_at = CURRENT_TIMESTAMP');
 
       const query = `
         UPDATE collections
@@ -268,13 +269,13 @@ class CollectionsService {
       // Get item count for response
       const countResult = await client.query(
         'SELECT COUNT(*) as count FROM collection_items WHERE collection_id = $1',
-        [collectionId]
+        [collectionId],
       );
 
       return {
         ...updatedCollection,
         item_count: parseInt(countResult.rows[0].count) || 0,
-        is_owner: true
+        is_owner: true,
       };
     } finally {
       client.release();
@@ -292,7 +293,7 @@ class CollectionsService {
     try {
       const result = await client.query(
         'DELETE FROM collections WHERE id = $1 AND user_id = $2 RETURNING id, name',
-        [collectionId, userId]
+        [collectionId, userId],
       );
 
       return result.rowCount > 0;
@@ -320,7 +321,7 @@ class CollectionsService {
         // Verify collection exists
         const collectionResult = await client.query(
           'SELECT user_id, is_public FROM collections WHERE id = $1',
-          [collectionId]
+          [collectionId],
         );
 
         if (!collectionResult.rows[0]) {
@@ -332,7 +333,7 @@ class CollectionsService {
         // Verify item exists and is not archived
         const itemResult = await client.query(
           'SELECT user_id, title FROM saved_items WHERE id = $1 AND is_archived = false',
-          [favoriteId]
+          [favoriteId],
         );
 
         if (!itemResult.rows[0]) {
@@ -342,7 +343,7 @@ class CollectionsService {
         // Check if item already in collection
         const existingResult = await client.query(
           'SELECT id FROM collection_items WHERE collection_id = $1 AND item_id = $2',
-          [collectionId, favoriteId]
+          [collectionId, favoriteId],
         );
 
         if (existingResult.rows.length > 0) {
@@ -354,7 +355,7 @@ class CollectionsService {
         if (finalPosition === null) {
           const positionResult = await client.query(
             'SELECT MAX(position) as max_position FROM collection_items WHERE collection_id = $1',
-            [collectionId]
+            [collectionId],
           );
           finalPosition = (parseInt(positionResult.rows[0].max_position) || 0) + 1;
         }
@@ -370,13 +371,13 @@ class CollectionsService {
           collectionId,
           favoriteId,
           finalPosition,
-          notes
+          notes,
         ]);
 
         // Update collection timestamp
         await client.query(
           'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-          [collectionId]
+          [collectionId],
         );
 
         await client.query('COMMIT');
@@ -386,12 +387,12 @@ class CollectionsService {
           collection: {
             id: collectionId,
             user_id: collection.user_id,
-            is_public: collection.is_public
+            is_public: collection.is_public,
           },
           item: {
             id: favoriteId,
-            title: itemResult.rows[0].title
-          }
+            title: itemResult.rows[0].title,
+          },
         };
 
       } catch (error) {
@@ -419,7 +420,7 @@ class CollectionsService {
         // Remove the item
         const deleteResult = await client.query(
           'DELETE FROM collection_items WHERE collection_id = $1 AND item_id = $2 RETURNING id, position',
-          [collectionId, favoriteId]
+          [collectionId, favoriteId],
         );
 
         if (deleteResult.rowCount === 0) {
@@ -444,7 +445,7 @@ class CollectionsService {
         // Update collection timestamp
         await client.query(
           'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-          [collectionId]
+          [collectionId],
         );
 
         await client.query('COMMIT');
@@ -523,7 +524,7 @@ class CollectionsService {
 
       const [itemsResult, countResult] = await Promise.all([
         client.query(itemsQuery, [collectionId, limit, offset]),
-        client.query(countQuery, [collectionId])
+        client.query(countQuery, [collectionId]),
       ]);
 
       const totalItems = parseInt(countResult.rows[0].total);
@@ -532,7 +533,7 @@ class CollectionsService {
       return {
         collection: {
           ...collection,
-          item_count: totalItems
+          item_count: totalItems,
         },
         items: itemsResult.rows,
         pagination: {
@@ -562,7 +563,7 @@ class CollectionsService {
       // Verify ownership
       const ownershipResult = await client.query(
         'SELECT id FROM collections WHERE id = $1 AND user_id = $2',
-        [collectionId, userId]
+        [collectionId, userId],
       );
 
       if (!ownershipResult.rows[0]) {
@@ -586,14 +587,14 @@ class CollectionsService {
 
           await client.query(
             'UPDATE collection_items SET position = $1 WHERE collection_id = $2 AND item_id = $3',
-            [position, collectionId, itemId]
+            [position, collectionId, itemId],
           );
         }
 
         // Update collection timestamp
         await client.query(
           'UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
-          [collectionId]
+          [collectionId],
         );
 
         await client.query('COMMIT');
@@ -716,7 +717,7 @@ class CollectionsService {
 
       const [collectionsResult, countResult] = await Promise.all([
         client.query(query, queryParams),
-        client.query(countQuery, countParams)
+        client.query(countQuery, countParams),
       ]);
 
       const totalItems = parseInt(countResult.rows[0].total);
@@ -727,7 +728,7 @@ class CollectionsService {
           ...row,
           item_count: parseInt(row.item_count) || 0,
           relevance_score: parseFloat(row.relevance_score) || 1.0,
-          is_owner: false // Always false for public collections
+          is_owner: false, // Always false for public collections
         })),
         pagination: {
           total: totalItems,

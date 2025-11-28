@@ -2,7 +2,8 @@
  * Comprehensive Error Handling Middleware for NASA System 6 Portal
  * Provides centralized error handling, logging, and graceful degradation
  *
- * @fileoverview Comprehensive error handling with custom error classes, logging, circuit breaker, and service monitoring
+ * @fileoverview Comprehensive error handling with custom error classes,
+ *             logging, circuit breaker, and service monitoring
  * @author NASA System 6 Portal Team
  * @version 1.0.0
  * @since 2024-01-01
@@ -446,7 +447,6 @@ class ServiceHealthMonitor {
 
 const serviceMonitor = new ServiceHealthMonitor();
 
-/* globals setTimeout, setInterval, clearInterval */
 /**
  * Global Error Handler Middleware
  * Centralized error handling for all Express routes
@@ -461,7 +461,7 @@ const serviceMonitor = new ServiceHealthMonitor();
  * // In server.js
  * app.use(globalErrorHandler);
  */
-const globalErrorHandler = (err, req, res, next) => {
+const globalErrorHandler = (err, req, res, _next) => {
   let error = { ...err };
   error.message = err.message;
 

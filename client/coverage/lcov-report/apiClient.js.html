@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/20</span>
             </div>
         
             
@@ -120,7 +120,8 @@
 <a name='L55'></a><a href='#L55'>55</a>
 <a name='L56'></a><a href='#L56'>56</a>
 <a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -151,7 +152,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,6 +160,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -168,6 +169,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -205,7 +207,9 @@ const apiClient = <span class="cstat-no" title="statement not covered" >axios.cr
 <span class="cstat-no" title="statement not covered" >      if (isTokenExpired(token)) {</span>
         // Token expired, logout and redirect
 <span class="cstat-no" title="statement not covered" >        logout();</span>
-<span class="cstat-no" title="statement not covered" >        window.location.href = '/'; </span>// Redirect to home/login
+<span class="cstat-no" title="statement not covered" >        if (typeof window !== 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >          window.location.href = '/'; </span>// Redirect to home/login
+        }
 <span class="cstat-no" title="statement not covered" >        return Promise.reject(new Error('Token expired'));</span>
       }
 &nbsp;
@@ -214,9 +218,7 @@ const apiClient = <span class="cstat-no" title="statement not covered" >axios.cr
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return config;</span>
   },
-<span class="fstat-no" title="function not covered" >  (e</span>rror) =&gt; {
-<span class="cstat-no" title="statement not covered" >    return Promise.reject(error);</span>
-  },
+<span class="fstat-no" title="function not covered" >  (e</span>rror) =&gt; <span class="cstat-no" title="statement not covered" >Promise.reject(error),</span>
 );
 &nbsp;
 // Response interceptor - handle 401 errors
@@ -226,9 +228,10 @@ const apiClient = <span class="cstat-no" title="statement not covered" >axios.cr
 <span class="cstat-no" title="statement not covered" >    if (error.response?.status === 401) {</span>
       // Unauthorized - token invalid or expired
 <span class="cstat-no" title="statement not covered" >      logout();</span>
-<span class="cstat-no" title="statement not covered" >      window.location.href = '/'; </span>// Redirect to home/login
+<span class="cstat-no" title="statement not covered" >      if (typeof window !== 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >        window.location.href = '/'; </span>// Redirect to home/login
+      }
     }
-&nbsp;
 <span class="cstat-no" title="statement not covered" >    return Promise.reject(error);</span>
   },
 );
@@ -241,7 +244,7 @@ export default apiClient;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-21T08:22:29.141Z
+                at 2025-11-22T00:50:39.534Z
             </div>
         <script src="prettify.js"></script>
         <script>

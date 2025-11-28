@@ -12,6 +12,7 @@ class FavoritesService {
    * @returns {Promise<Object>} { favorites, pagination }
    */
   async getFavorites(userId, { page = 1, limit = 20, type = null, archived = false } = {}) {
+    console.log(`🔍 getFavorites called for user ${userId} with options:`, { page, limit, type, archived });
     const client = await pool.connect();
     try {
       // Validate input
@@ -24,19 +25,19 @@ class FavoritesService {
 
       const offset = (page - 1) * limit;
       const queryParams = [userId];
-      let whereClause = 'WHERE user_id = $1';
+      let whereClause = 'WHERE si.user_id = $1';
       let paramIndex = 2;
 
       // Add type filter if specified
       if (type) {
-        whereClause += ` AND type = $${paramIndex}`;
+        whereClause += ` AND si.type = $${paramIndex}`;
         queryParams.push(type);
         paramIndex++;
       }
 
       // Add archive filter if not archived (default behavior)
       if (!archived) {
-        whereClause += ` AND is_archived = false`;
+        whereClause += ' AND si.is_archived = false';
       }
 
       // Main query with JOIN to avoid N+1 queries
@@ -61,13 +62,20 @@ class FavoritesService {
         ${whereClause}
       `;
 
+      // Add pagination parameters
       queryParams.push(limit, offset);
-      const countParams = queryParams.slice(0, -2); // Remove limit and offset for count
+      const countParams = queryParams.slice(0, -2);
 
+      // Execute queries
       const [itemsResult, countResult] = await Promise.all([
         client.query(query, queryParams),
         client.query(countQuery, countParams),
       ]);
+
+      console.log('🔎 getFavorites query:', query.trim());
+      console.log('🔎 getFavorites params:', queryParams);
+      console.log('🔎 count query:', countQuery.trim());
+      console.log('🔎 count params:', countParams);
 
       const totalItems = parseInt(countResult.rows[0].total);
       const totalPages = Math.ceil(totalItems / limit);
@@ -76,7 +84,7 @@ class FavoritesService {
         favorites: itemsResult.rows.map(row => ({
           ...row,
           collection_count: parseInt(row.collection_count) || 0,
-          collection_names: row.collection_names.filter(Boolean) || []
+          collection_names: (row.collection_names || []).filter(Boolean),
         })),
         pagination: {
           total: totalItems,
@@ -123,7 +131,7 @@ class FavoritesService {
       return {
         ...row,
         collection_count: parseInt(row.collection_count) || 0,
-        collection_names: row.collection_names.filter(Boolean) || []
+        collection_names: row.collection_names.filter(Boolean) || [],
       };
     } finally {
       client.release();
@@ -141,6 +149,7 @@ class FavoritesService {
    * @returns {Promise<Object>} Created favorite item
    */
   async addFavorite(userId, { itemType, itemId, itemDate, data }) {
+    console.log(`➕ addFavorite called for user ${userId}`, { itemType, itemId });
     const client = await pool.connect();
     try {
       // Validate required fields
@@ -157,7 +166,7 @@ class FavoritesService {
       // Check if already exists (including archived items)
       const checkResult = await client.query(
         'SELECT id, is_archived FROM saved_items WHERE user_id = $1 AND id = $2',
-        [userId, itemId]
+        [userId, itemId],
       );
 
       if (checkResult.rows.length > 0) {
@@ -186,7 +195,7 @@ class FavoritesService {
         category,
         description,
         copyright,
-        metadata = {}
+        metadata = {},
       } = data || {};
 
       const query = `
@@ -211,7 +220,7 @@ class FavoritesService {
         description,
         copyright,
         itemDate,
-        JSON.stringify(metadata)
+        JSON.stringify(metadata),
       ];
 
       const result = await client.query(query, values);
@@ -237,7 +246,7 @@ class FavoritesService {
       // First check if item exists
       const existsResult = await client.query(
         'SELECT id FROM saved_items WHERE user_id = $1 AND id = $2 AND is_archived = false',
-        [userId, favoriteId]
+        [userId, favoriteId],
       );
 
       if (!existsResult.rows[0]) {
@@ -270,7 +279,7 @@ class FavoritesService {
         throw new Error('No valid update fields provided');
       }
 
-      updates.push(`updated_at = CURRENT_TIMESTAMP`);
+      updates.push('updated_at = CURRENT_TIMESTAMP');
 
       const query = `
         UPDATE saved_items
@@ -336,14 +345,20 @@ class FavoritesService {
 
       const offset = (page - 1) * limit;
       const queryParams = [userId];
-      let whereClause = 'WHERE user_id = $1 AND is_archived = false';
+      let whereClause = 'WHERE si.user_id = $1 AND si.is_archived = false';
       let paramIndex = 2;
 
       // Add full-text search using PostgreSQL's tsvector
       const searchTerms = searchQuery.trim().split(/\s+/).join(' & ');
 
       whereClause += ` AND (
-        to_tsvector('english', COALESCE(title, '') || ' ' || COALESCE(description, '') || ' ' || COALESCE(category, '') || ' ' || COALESCE(user_note, ''))
+        to_tsvector(
+            'english',
+            COALESCE(si.title, '') || ' ' ||
+            COALESCE(si.description, '') || ' ' ||
+            COALESCE(si.category, '') || ' ' ||
+            COALESCE(si.user_note, '')
+          )
         @@ to_tsquery('english', $${paramIndex})
       )`;
       queryParams.push(searchTerms);
@@ -351,14 +366,14 @@ class FavoritesService {
 
       // Add type filter if specified
       if (types && types.length > 0) {
-        whereClause += ` AND type = ANY($${paramIndex})`;
+        whereClause += ` AND si.type = ANY($${paramIndex})`;
         queryParams.push(types);
         paramIndex++;
       }
 
       // Add tags filter if specified
       if (tags && tags.length > 0) {
-        whereClause += ` AND user_tags && $${paramIndex}`;
+        whereClause += ` AND si.user_tags && $${paramIndex}`;
         queryParams.push(tags);
         paramIndex++;
       }
@@ -368,7 +383,13 @@ class FavoritesService {
         SELECT
           si.*,
           ts_rank(
-            to_tsvector('english', COALESCE(si.title, '') || ' ' || COALESCE(si.description, '') || ' ' || COALESCE(si.category, '') || ' ' || COALESCE(si.user_note, '')),
+            to_tsvector(
+            'english',
+            COALESCE(si.title, '') || ' ' ||
+            COALESCE(si.description, '') || ' ' ||
+            COALESCE(si.category, '') || ' ' ||
+            COALESCE(si.user_note, '')
+          ),
             to_tsquery('english', $2)
           ) as relevance_score,
           COUNT(ci.id) as collection_count,
@@ -405,7 +426,7 @@ class FavoritesService {
           ...row,
           relevance_score: parseFloat(row.relevance_score),
           collection_count: parseInt(row.collection_count) || 0,
-          collection_names: row.collection_names.filter(Boolean) || []
+          collection_names: row.collection_names.filter(Boolean) || [],
         })),
         pagination: {
           total: totalItems,

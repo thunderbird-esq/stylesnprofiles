@@ -16,6 +16,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:unit": "react-scripts test --testPathPattern=__tests__ --testPathIgnorePatterns=integration",
+    "test:services": "npx jest --config jest.config.services.js",
     "test:integration": "react-scripts test --testPathPattern=integration --testTimeout=30000",
     "test:coverage": "react-scripts test --coverage --watchAll=false",
     "test:watch": "react-scripts test --watchAll",

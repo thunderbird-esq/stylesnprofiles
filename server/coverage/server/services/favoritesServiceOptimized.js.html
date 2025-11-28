@@ -769,7 +769,11 @@
 <a name='L704'></a><a href='#L704'>704</a>
 <a name='L705'></a><a href='#L705'>705</a>
 <a name='L706'></a><a href='#L706'>706</a>
-<a name='L707'></a><a href='#L707'>707</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L707'></a><a href='#L707'>707</a>
+<a name='L708'></a><a href='#L708'>708</a>
+<a name='L709'></a><a href='#L709'>709</a>
+<a name='L710'></a><a href='#L710'>710</a>
+<a name='L711'></a><a href='#L711'>711</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -884,6 +888,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1348,6 +1355,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1552,7 +1560,7 @@ class FavoritesServiceOptimized {
       options.type || 'all',
       options.archived ? 'archived' : 'active',
       options.tags ? JSON.stringify(options.tags.sort()) : 'none',
-      options.sortBy || 'saved_at'
+      options.sortBy || 'saved_at',
     ];
 <span class="cstat-no" title="statement not covered" >    return this.cache.key('favorites', ...keyParts);</span>
   }
@@ -1567,7 +1575,7 @@ class FavoritesServiceOptimized {
       options.page || 1,
       options.limit || 20,
       options.types ? JSON.stringify(options.types.sort()) : 'all',
-      options.tags ? JSON.stringify(options.tags.sort()) : 'none'
+      options.tags ? JSON.stringify(options.tags.sort()) : 'none',
     ];
 <span class="cstat-no" title="statement not covered" >    return this.cache.key('search', ...keyParts);</span>
   }
@@ -1588,7 +1596,10 @@ class FavoritesServiceOptimized {
   /**
    * Get favorites using optimized query with caching
    */
-<span class="fstat-no" title="function not covered" >  as</span>ync getFavorites(userId, { page = <span class="branch-0 cbranch-no" title="branch not covered" >1,</span> limit = <span class="branch-0 cbranch-no" title="branch not covered" >20,</span> type = <span class="branch-0 cbranch-no" title="branch not covered" >null,</span> archived = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span> tags = <span class="branch-0 cbranch-no" title="branch not covered" >null,</span> sortBy = <span class="branch-0 cbranch-no" title="branch not covered" >'saved_at' </span>} = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
+<span class="fstat-no" title="function not covered" >  as</span>ync getFavorites(
+    userId,
+    { page = <span class="branch-0 cbranch-no" title="branch not covered" >1,</span> limit = <span class="branch-0 cbranch-no" title="branch not covered" >20,</span> type = <span class="branch-0 cbranch-no" title="branch not covered" >null,</span> archived = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span> tags = <span class="branch-0 cbranch-no" title="branch not covered" >null,</span> sortBy = <span class="branch-0 cbranch-no" title="branch not covered" >'saved_at' </span>} = <span class="branch-0 cbranch-no" title="branch not covered" >{},</span>
+  ) {
     // Validate input
 <span class="cstat-no" title="statement not covered" >    if (limit &lt; 1 || limit &gt; 100) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error('Limit must be between 1 and 100');</span>
@@ -1656,7 +1667,7 @@ class FavoritesServiceOptimized {
           is_favorite: row.is_favorite,
           collection_count: parseInt(row.collection_count) || 0,
           collection_names: row.collection_names || [],
-          relevance_score: parseFloat(row.relevance_score) || 0
+          relevance_score: parseFloat(row.relevance_score) || 0,
         })),
         pagination: {
           total: totalCount,
@@ -1719,7 +1730,7 @@ class FavoritesServiceOptimized {
       const favorite = <span class="cstat-no" title="statement not covered" >{</span>
         ...row,
         collection_count: parseInt(row.collection_count) || 0,
-        collection_names: row.collection_names || []
+        collection_names: row.collection_names || [],
       };
 &nbsp;
       // Cache the result
@@ -1752,7 +1763,7 @@ class FavoritesServiceOptimized {
       // Check if already exists with optimized index
       const checkResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT id, is_archived FROM saved_items WHERE user_id = $1 AND id = $2',
-        [userId, itemId]
+        [userId, itemId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (checkResult.rows.length &gt; 0) {</span>
@@ -1787,7 +1798,7 @@ class FavoritesServiceOptimized {
         category,
         description,
         copyright,
-        metadata = <span class="branch-0 cbranch-no" title="branch not covered" >{}</span>
+        metadata = <span class="branch-0 cbranch-no" title="branch not covered" >{},</span>
       } = <span class="cstat-no" title="statement not covered" >data || {};</span>
 &nbsp;
       const query = <span class="cstat-no" title="statement not covered" >`</span>
@@ -1812,7 +1823,7 @@ class FavoritesServiceOptimized {
         description,
         copyright,
         itemDate,
-        JSON.stringify(metadata)
+        JSON.stringify(metadata),
       ];
 &nbsp;
       const result = <span class="cstat-no" title="statement not covered" >await client.query(query, values);</span>
@@ -1841,7 +1852,7 @@ class FavoritesServiceOptimized {
       // Optimized existence check with index
       const existsResult = <span class="cstat-no" title="statement not covered" >await client.query(</span>
         'SELECT id FROM saved_items WHERE user_id = $1 AND id = $2 AND is_archived = false',
-        [userId, favoriteId]
+        [userId, favoriteId],
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      if (!existsResult.rows[0]) {</span>
@@ -1876,7 +1887,7 @@ class FavoritesServiceOptimized {
 <span class="cstat-no" title="statement not covered" >        throw new Error('No valid update fields provided');</span>
       }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      updates.push(`updated_at = CURRENT_TIMESTAMP`);</span>
+<span class="cstat-no" title="statement not covered" >      updates.push('updated_at = CURRENT_TIMESTAMP');</span>
 &nbsp;
       const query = <span class="cstat-no" title="statement not covered" >`</span>
         UPDATE saved_items
@@ -1994,7 +2005,7 @@ class FavoritesServiceOptimized {
           saved_at: row.saved_at,
           relevance_score: parseFloat(row.relevance_score) || 0,
           collection_count: parseInt(row.collection_count) || 0,
-          collection_names: row.collection_names || []
+          collection_names: row.collection_names || [],
         })),
         pagination: {
           total: totalCount,
@@ -2066,8 +2077,9 @@ class FavoritesServiceOptimized {
         notedCount: parseInt(stats.noted_count) || 0,
         recentCount: parseInt(stats.recent_count) || 0,
         engagementRate: stats.total_favorites &gt; 0
-          ? ((parseInt(stats.marked_favorites) + parseInt(stats.tagged_count)) / parseInt(stats.total_favorites) * 100).toFixed(2)
-          : 0
+          ? ((parseInt(stats.marked_favorites) + parseInt(stats.tagged_count)) /
+             parseInt(stats.total_favorites) * 100).toFixed(2)
+          : 0,
       };
 &nbsp;
       // Cache stats with moderate TTL
@@ -2115,7 +2127,7 @@ class FavoritesServiceOptimized {
 <span class="cstat-no" title="statement not covered" >      return {</span>
         successful: results,
         failed: errors,
-        total: items.length
+        total: items.length,
       };
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      await client.query('ROLLBACK');</span>
@@ -2168,7 +2180,7 @@ class FavoritesServiceOptimized {
           row.saved_at,
           row.user_note || '',
           row.user_tags ? row.user_tags.join(';') : '',
-          row.is_favorite
+          row.is_favorite,
         ]);
 &nbsp;
 <span class="cstat-no" title="statement not covered" >        return [headers, ...rows].map(<span class="fstat-no" title="function not covered" >ro</span>w =&gt; <span class="cstat-no" title="statement not covered" >row.map(<span class="fstat-no" title="function not covered" >ce</span>ll =&gt; <span class="cstat-no" title="statement not covered" >`"${cell}"`)</span>.join(','))</span>.join('\n');</span>
@@ -2188,7 +2200,7 @@ class FavoritesServiceOptimized {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-21T08:54:02.432Z
+                at 2025-11-28T13:32:53.036Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -99,3 +99,86 @@
   text-align: center;
   padding: 20px;
 }
+
+/* FavoritesPanel Layout */
+.favorites-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 12px;
+}
+
+.favorites-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--secondary);
+  padding-bottom: 8px;
+}
+
+.favorites-title {
+  font-family: 'Chicago_12', sans-serif;
+  font-size: 16px;
+  margin: 0;
+}
+
+.favorites-count {
+  font-family: 'Monaco', monospace;
+  font-size: 10px;
+}
+
+.favorites-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-container {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 150px;
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 4px;
+  flex: 1;
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  border: 1px dashed var(--secondary);
+  padding: 20px;
+  text-align: center;
+  color: var(--tertiary);
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--secondary);
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.page-info {
+  font-family: 'Monaco', monospace;
+  font-size: 10px;
+}

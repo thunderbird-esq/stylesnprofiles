@@ -1,4 +1,3 @@
-/* globals setTimeout */
 /**
  * Test Helpers and Utilities for server tests
  */

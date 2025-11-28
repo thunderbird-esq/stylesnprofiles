@@ -57,7 +57,7 @@ class QueryBenchmark {
           new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           isFavorite,
           hasTags ? ['space', category, type] : [],
-          hasNote ? `Personal note for item ${i}` : null
+          hasNote ? `Personal note for item ${i}` : null,
         ]);
 
         insertPromises.push(insertPromise);
@@ -85,7 +85,7 @@ class QueryBenchmark {
           this.testUserId,
           `Test Collection ${i + 1}`,
           `Description for test collection ${i + 1}`,
-          i % 3 === 0  // Every 3rd collection is public
+          i % 3 === 0,  // Every 3rd collection is public
         ]);
 
         collections.push(result.rows[0].id);
@@ -104,7 +104,7 @@ class QueryBenchmark {
             collectionId,
             `test_item_${itemCounter}`,
             i,
-            `Note for item ${itemCounter} in collection`
+            `Note for item ${itemCounter} in collection`,
           ]);
 
           itemCounter++;
@@ -134,7 +134,7 @@ class QueryBenchmark {
         queryName,
         executionTime,
         result,
-        success: true
+        success: true,
       };
     } catch (error) {
       const endTime = process.hrtime.bigint();
@@ -146,7 +146,7 @@ class QueryBenchmark {
         queryName,
         executionTime,
         error: error.message,
-        success: false
+        success: false,
       };
     }
   }
@@ -161,41 +161,41 @@ class QueryBenchmark {
       // Basic queries
       {
         name: 'Original: Get 20 favorites (page 1)',
-        test: () => favoritesService.getFavorites(this.testUserId, { page: 1, limit: 20 })
+        test: () => favoritesService.getFavorites(this.testUserId, { page: 1, limit: 20 }),
       },
       {
         name: 'Optimized: Get 20 favorites (page 1)',
-        test: () => favoritesServiceOptimized.getFavorites(this.testUserId, { page: 1, limit: 20 })
+        test: () => favoritesServiceOptimized.getFavorites(this.testUserId, { page: 1, limit: 20 }),
       },
 
       // Pagination tests
       {
         name: 'Original: Get favorites page 10 (offset)',
-        test: () => favoritesService.getFavorites(this.testUserId, { page: 10, limit: 20 })
+        test: () => favoritesService.getFavorites(this.testUserId, { page: 10, limit: 20 }),
       },
       {
         name: 'Optimized: Get favorites page 10 (offset)',
-        test: () => favoritesServiceOptimized.getFavorites(this.testUserId, { page: 10, limit: 20 })
+        test: () => favoritesServiceOptimized.getFavorites(this.testUserId, { page: 10, limit: 20 }),
       },
 
       // Type filtering
       {
         name: 'Original: Get APOD favorites only',
-        test: () => favoritesService.getFavorites(this.testUserId, { type: 'APOD', limit: 50 })
+        test: () => favoritesService.getFavorites(this.testUserId, { type: 'APOD', limit: 50 }),
       },
       {
         name: 'Optimized: Get APOD favorites only',
-        test: () => favoritesServiceOptimized.getFavorites(this.testUserId, { type: 'APOD', limit: 50 })
+        test: () => favoritesServiceOptimized.getFavorites(this.testUserId, { type: 'APOD', limit: 50 }),
       },
 
       // Search queries
       {
         name: 'Original: Search "space"',
-        test: () => favoritesService.searchFavorites(this.testUserId, 'space', { page: 1, limit: 20 })
+        test: () => favoritesService.searchFavorites(this.testUserId, 'space', { page: 1, limit: 20 }),
       },
       {
         name: 'Optimized: Search "space"',
-        test: () => favoritesServiceOptimized.searchFavorites(this.testUserId, 'space', { page: 1, limit: 20 })
+        test: () => favoritesServiceOptimized.searchFavorites(this.testUserId, 'space', { page: 1, limit: 20 }),
       },
 
       // Complex search with filters
@@ -204,27 +204,27 @@ class QueryBenchmark {
         test: () => favoritesService.searchFavorites(this.testUserId, 'space', {
           types: ['APOD', 'NEO'],
           tags: ['space'],
-          limit: 50
-        })
+          limit: 50,
+        }),
       },
       {
         name: 'Optimized: Complex search with filters',
         test: () => favoritesServiceOptimized.searchFavorites(this.testUserId, 'space', {
           types: ['APOD', 'NEO'],
           tags: ['space'],
-          limit: 50
-        })
+          limit: 50,
+        }),
       },
 
       // Statistics
       {
         name: 'Original: Get favorite statistics',
-        test: () => favoritesService.getFavoriteStats(this.testUserId)
+        test: () => favoritesService.getFavoriteStats(this.testUserId),
       },
       {
         name: 'Optimized: Get favorite statistics',
-        test: () => favoritesServiceOptimized.getFavoriteStats(this.testUserId)
-      }
+        test: () => favoritesServiceOptimized.getFavoriteStats(this.testUserId),
+      },
     ];
 
     const results = [];
@@ -249,11 +249,11 @@ class QueryBenchmark {
       // Get collections
       {
         name: 'Original: Get user collections',
-        test: () => collectionsService.getCollections(this.testUserId, { page: 1, limit: 20 })
+        test: () => collectionsService.getCollections(this.testUserId, { page: 1, limit: 20 }),
       },
       {
         name: 'Optimized: Get user collections',
-        test: () => collectionsServiceOptimized.getCollections(this.testUserId, { page: 1, limit: 20 })
+        test: () => collectionsServiceOptimized.getCollections(this.testUserId, { page: 1, limit: 20 }),
       },
 
       // Get collection with items
@@ -265,48 +265,51 @@ class QueryBenchmark {
             return collectionsService.getCollectionItems(collections.collections[0].id, { page: 1, limit: 20 });
           }
           return { items: [] };
-        }
+        },
       },
       {
         name: 'Optimized: Get collection items',
         test: async () => {
           const collections = await collectionsServiceOptimized.getCollections(this.testUserId, { limit: 1 });
           if (collections.collections.length > 0) {
-            return collectionsServiceOptimized.getCollectionItems(collections.collections[0].id, { page: 1, limit: 20 });
+            return collectionsServiceOptimized.getCollectionItems(
+              collections.collections[0].id,
+              { page: 1, limit: 20 },
+            );
           }
           return { items: [] };
-        }
+        },
       },
 
       // Public collections
       {
         name: 'Original: Get public collections',
-        test: () => collectionsService.getPublicCollections({ page: 1, limit: 20 })
+        test: () => collectionsService.getPublicCollections({ page: 1, limit: 20 }),
       },
       {
         name: 'Optimized: Get public collections',
-        test: () => collectionsServiceOptimized.getPublicCollections({ page: 1, limit: 20 })
+        test: () => collectionsServiceOptimized.getPublicCollections({ page: 1, limit: 20 }),
       },
 
       // Search public collections
       {
         name: 'Original: Search public collections',
-        test: () => collectionsService.getPublicCollections({ search: 'space', page: 1, limit: 20 })
+        test: () => collectionsService.getPublicCollections({ search: 'space', page: 1, limit: 20 }),
       },
       {
         name: 'Optimized: Search public collections',
-        test: () => collectionsServiceOptimized.getPublicCollections({ search: 'space', page: 1, limit: 20 })
+        test: () => collectionsServiceOptimized.getPublicCollections({ search: 'space', page: 1, limit: 20 }),
       },
 
       // Statistics
       {
         name: 'Original: Get collection statistics',
-        test: () => collectionsService.getCollectionStats(this.testUserId)
+        test: () => collectionsService.getCollectionStats(this.testUserId),
       },
       {
         name: 'Optimized: Get collection statistics',
-        test: () => collectionsServiceOptimized.getCollectionStats(this.testUserId)
-      }
+        test: () => collectionsServiceOptimized.getCollectionStats(this.testUserId),
+      },
     ];
 
     const results = [];
@@ -338,7 +341,7 @@ class QueryBenchmark {
           ORDER BY saved_at DESC
           LIMIT $2 OFFSET $3
         `,
-        params: [this.testUserId, 20, 100]
+        params: [this.testUserId, 20, 100],
       },
       {
         name: 'Complex JOIN with aggregation',
@@ -355,7 +358,7 @@ class QueryBenchmark {
           ORDER BY si.saved_at DESC
           LIMIT $2
         `,
-        params: [this.testUserId, 20]
+        params: [this.testUserId, 20],
       },
       {
         name: 'Full-text search',
@@ -373,13 +376,13 @@ class QueryBenchmark {
           ORDER BY relevance_score DESC
           LIMIT $3
         `,
-        params: [this.testUserId, 'space', 20]
+        params: [this.testUserId, 'space', 20],
       },
       {
         name: 'Optimized function call',
         query: 'SELECT * FROM get_user_favorites_optimized($1, 1, 20, NULL, false, NULL, \'saved_at\')',
-        params: [this.testUserId]
-      }
+        params: [this.testUserId],
+      },
     ];
 
     const results = [];
@@ -403,24 +406,24 @@ class QueryBenchmark {
     // First call (cache miss)
     const missResult = await this.measureTime(
       'Optimized: First call (cache miss)',
-      () => favoritesServiceOptimized.getFavorites(this.testUserId, { page: 1, limit: 20 })
+      () => favoritesServiceOptimized.getFavorites(this.testUserId, { page: 1, limit: 20 }),
     );
 
     // Second call (cache hit)
     const hitResult = await this.measureTime(
       'Optimized: Second call (cache hit)',
-      () => favoritesServiceOptimized.getFavorites(this.testUserId, { page: 1, limit: 20 })
+      () => favoritesServiceOptimized.getFavorites(this.testUserId, { page: 1, limit: 20 }),
     );
 
     // Search cache test
     const searchMissResult = await this.measureTime(
       'Optimized: Search first call (cache miss)',
-      () => favoritesServiceOptimized.searchFavorites(this.testUserId, 'space', { page: 1, limit: 20 })
+      () => favoritesServiceOptimized.searchFavorites(this.testUserId, 'space', { page: 1, limit: 20 }),
     );
 
     const searchHitResult = await this.measureTime(
       'Optimized: Search second call (cache hit)',
-      () => favoritesServiceOptimized.searchFavorites(this.testUserId, 'space', { page: 1, limit: 20 })
+      () => favoritesServiceOptimized.searchFavorites(this.testUserId, 'space', { page: 1, limit: 20 }),
     );
 
     return [missResult, hitResult, searchMissResult, searchHitResult];
@@ -450,7 +453,7 @@ class QueryBenchmark {
     originalResults.forEach(original => {
       const baseName = original.queryName.replace('Original: ', '');
       const optimized = optimizedResults.find(opt =>
-        opt.queryName.replace('Optimized: ', '') === baseName
+        opt.queryName.replace('Optimized: ', '') === baseName,
       );
 
       if (optimized && original.success && optimized.success) {
@@ -459,7 +462,7 @@ class QueryBenchmark {
           query: baseName,
           original: original.executionTime,
           optimized: optimized.executionTime,
-          improvement: improvement
+          improvement,
         });
       }
     });
@@ -492,7 +495,7 @@ class QueryBenchmark {
       originalResults,
       optimizedResults,
       improvements,
-      cacheResults
+      cacheResults,
     };
   }
 
@@ -538,12 +541,12 @@ if (require.main === module) {
       const fs = require('fs');
       const reportData = {
         timestamp: new Date().toISOString(),
-        ...report
+        ...report,
       };
 
       fs.writeFileSync(
         '/Users/edsaga/stylesnprofiles/server/benchmark-report.json',
-        JSON.stringify(reportData, null, 2)
+        JSON.stringify(reportData, null, 2),
       );
 
       console.log('Detailed report saved to: benchmark-report.json');

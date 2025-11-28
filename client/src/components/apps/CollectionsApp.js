@@ -1,10 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../contexts/AuthContext';
-import {
-  CollectionsPanel,
-  CreateCollectionModal,
-} from '../favorites';
+import { CollectionsPanel } from '../favorites';
 
 /**
  * CollectionsApp component
@@ -14,8 +11,7 @@ import {
  * @returns {JSX.Element} Collections application window
  */
 const CollectionsApp = ({ windowId: _windowId }) => {
-  const { user } = useAuth();
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   // Handle error display
   const handleError = useCallback((error) => {
@@ -23,11 +19,8 @@ const CollectionsApp = ({ windowId: _windowId }) => {
     alert(`Error: ${error}`);
   }, []);
 
-  // Handle collection creation
-  const handleCollectionCreated = useCallback((newCollection) => {
-    console.log('Collection created:', newCollection);
-    setShowCreateModal(false);
-  }, []);
+  // Handle loading state
+  if (authLoading) return <div className="nasa-loading">Loading...</div>;
 
   // If user is not authenticated, show login prompt
   if (!user) {
@@ -52,41 +45,8 @@ const CollectionsApp = ({ windowId: _windowId }) => {
 
   return (
     <div className="window-pane">
-      <div className="collections-app">
-        {/* Header with create button */}
-        <div className="collections-header" style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '1rem',
-          paddingBottom: '0.5rem',
-          borderBottom: '1px solid var(--secondary)',
-        }}>
-          <h2 className="font-chicago" style={{ fontSize: '16px', margin: 0 }}>
-            My Collections
-          </h2>
-          <button
-            className="btn btn-default"
-            onClick={() => setShowCreateModal(true)}
-            style={{ fontSize: '11px', padding: '0 8px', minHeight: 'auto' }}
-          >
-            + New Collection
-          </button>
-        </div>
-
-        {/* Collections Panel */}
-        <div className="collections-content" style={{ height: 'calc(100% - 60px)' }}>
-          <CollectionsPanel onError={handleError} />
-        </div>
-
-        {/* Create Collection Modal */}
-        {showCreateModal && (
-          <CreateCollectionModal
-            onClose={() => setShowCreateModal(false)}
-            onCollectionCreated={handleCollectionCreated}
-            onError={handleError}
-          />
-        )}
+      <div className="collections-app" style={{ height: '100%' }}>
+        <CollectionsPanel onError={handleError} />
       </div>
     </div>
   );

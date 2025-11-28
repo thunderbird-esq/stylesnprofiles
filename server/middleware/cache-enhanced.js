@@ -13,7 +13,7 @@
  */
 
 const redis = require('redis');
-const { logger, CacheError, withTimeout, CircuitBreaker, serviceMonitor } = require('./errorHandler');
+const { logger, withTimeout, CircuitBreaker, serviceMonitor } = require('./errorHandler');
 
 // Circuit breaker for Redis operations
 const redisCircuitBreaker = new CircuitBreaker({
@@ -254,7 +254,6 @@ const generateCacheKey = (req, prefix = 'cache') => {
   return `${prefix}:${path}:${query}:${userId}`;
 };
 
-/* globals setTimeout */
 /**
  * Enhanced caching middleware with comprehensive error handling
  * @param {number} duration - Cache duration in seconds

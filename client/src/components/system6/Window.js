@@ -26,6 +26,7 @@ export default function Window({
   y = 100,
   width = 500,
   height = 400,
+  ...props
 }) {
   const { closeApp, focusApp, activeWindow } = useApps();
 
@@ -185,7 +186,11 @@ export default function Window({
           className="close"
           onClick={e => {
             e.stopPropagation();
-            closeApp(windowId);
+            if (props.onClose) {
+              props.onClose();
+            } else {
+              closeApp(windowId);
+            }
           }}
         />
         <h1 className="title font-chicago">{title}</h1>
@@ -229,6 +234,7 @@ Window.propTypes = {
   y: PropTypes.number,
   width: PropTypes.number,
   height: PropTypes.number,
+  onClose: PropTypes.func,
 };
 
 Window.defaultProps = {

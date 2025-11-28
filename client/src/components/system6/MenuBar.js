@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import AuthModal from './auth/AuthModal';
+import SettingsWindow from './SettingsWindow';
+import Window from './Window';
 
 /**
  * System 6 authentic menu bar component with dropdown menus and time display
@@ -8,11 +9,12 @@ import AuthModal from './auth/AuthModal';
  * @returns {JSX.Element} The menu bar with system controls and time display
  */
 export default function MenuBar() {
+  const { user } = useAuth();
   const [time, setTime] = useState(new Date());
   const [activeMenu, setActiveMenu] = useState(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const menuBarRef = useRef(null);
-  const { user, isAuthenticated, logout } = useAuth();
+  // In silent auth, we are always "authenticated" if the user object exists
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000 * 30); // Update every 30 sec
@@ -80,9 +82,7 @@ export default function MenuBar() {
     File: ['New Folder', 'Open', 'Print', 'Close'],
     Edit: ['Undo', 'Cut', 'Copy', 'Paste', 'Select All'],
     View: ['By Name', 'By Date', 'By Size', 'By Kind'],
-    Special: isAuthenticated()
-      ? ['My Profile', 'Settings', 'Logout', 'Empty Trash', 'Eject Disk', 'Restart']
-      : ['Login', 'Register', 'Empty Trash', 'Eject Disk', 'Restart'],
+    Special: ['Settings', 'Empty Trash', 'Eject Disk', 'Restart'],
   };
 
   const handleMenuClick = (menuName) => {
@@ -95,24 +95,8 @@ export default function MenuBar() {
 
     // Handle authentication-related menu items
     switch (item) {
-      case 'Login':
-        setShowAuthModal(true);
-        break;
-      case 'Register':
-        setShowAuthModal(true);
-        break;
-      case 'Logout':
-        if (window.confirm('Are you sure you want to logout?')) {
-          logout();
-        }
-        break;
-      case 'My Profile':
-        // TODO: Open profile window
-        alert(`Profile for ${user?.username || 'User'}`);
-        break;
       case 'Settings':
-        // TODO: Open settings window
-        alert('Settings (coming soon)');
+        setShowSettings(true);
         break;
       case 'Close': {
         // Close focused window if any
@@ -173,28 +157,30 @@ export default function MenuBar() {
         </div>
 
         <div className="nasa-menu-right">
-          {isAuthenticated() && (
-            <span
-              className="nasa-user-display"
-              style={{
-                marginRight: '20px',
-                fontSize: '12px',
-                fontFamily: 'Chicago_12, monospace',
-              }}
-              title={`Logged in as ${user?.email}`}
-            >
-              👤 {user?.username || 'User'}
+          {user && (
+            <span style={{ marginRight: '12px', fontFamily: 'Chicago_12', fontSize: '12px' }}>
+              {user.username || 'Guest'}
             </span>
           )}
           <span className="nasa-time-display">{formatTime(time)}</span>
         </div>
       </div>
 
-      {/* Authentication Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      />
+      {/* Settings Window */}
+      {showSettings && (
+        <Window
+          title="Control Panel"
+          windowId="settings-window"
+          zIndex={2000}
+          width={400}
+          height={300}
+          x="center"
+          y="center"
+          onClose={() => setShowSettings(false)}
+        >
+          <SettingsWindow onClose={() => setShowSettings(false)} />
+        </Window>
+      )}
     </>
   );
 }

@@ -26,21 +26,21 @@ const createTestFavorite = (overrides = {}) => ({
     category: 'nebula',
     description: 'A beautiful nebula image from APOD',
     copyright: 'NASA/ESA',
-    metadata: { source: 'apod', resolution: '1920x1080' }
+    metadata: { source: 'apod', resolution: '1920x1080' },
   },
-  ...overrides
+  ...overrides,
 });
 
 const createTestCollection = (overrides = {}) => ({
   name: `Test Collection ${Date.now()}`,
   description: 'A test collection for integration testing',
   isPublic: false,
-  ...overrides
+  ...overrides,
 });
 
 describe('FavoritesService Integration Tests', () => {
   let testFavorites = [];
-  let testCollections = [];
+  const testCollections = [];
 
   beforeAll(async () => {
     // Clean up any existing test data
@@ -58,7 +58,7 @@ describe('FavoritesService Integration Tests', () => {
       try {
         await pool.query(
           'DELETE FROM saved_items WHERE user_id = $1 AND id = $2',
-          [TEST_USER_ID, favorite.id]
+          [TEST_USER_ID, favorite.id],
         );
       } catch (error) {
         console.warn('Failed to cleanup favorite:', error.message);
@@ -176,7 +176,7 @@ describe('FavoritesService Integration Tests', () => {
     test('should validate item type', async () => {
       await expect(favoritesService.addFavorite(TEST_USER_ID, {
         itemType: 'INVALID_TYPE',
-        itemId: 'test-id'
+        itemId: 'test-id',
       })).rejects.toThrow('Invalid item type');
     });
 
@@ -209,7 +209,7 @@ describe('FavoritesService Integration Tests', () => {
       const updateData = {
         userNote: 'Updated note',
         userTags: ['space', 'astronomy'],
-        isFavorite: true
+        isFavorite: true,
       };
 
       const result = await favoritesService.updateFavorite(TEST_USER_ID, favorite.id, updateData);
@@ -221,7 +221,7 @@ describe('FavoritesService Integration Tests', () => {
 
     test('should return null for non-existent favorite', async () => {
       const result = await favoritesService.updateFavorite(TEST_USER_ID, 'non-existent-id', {
-        userNote: 'test'
+        userNote: 'test',
       });
 
       expect(result).toBeNull();
@@ -252,7 +252,7 @@ describe('FavoritesService Integration Tests', () => {
       // Check directly in database
       const dbResult = await pool.query(
         'SELECT is_archived FROM saved_items WHERE id = $1 AND user_id = $2',
-        [favorite.id, TEST_USER_ID]
+        [favorite.id, TEST_USER_ID],
       );
       expect(dbResult.rows[0].is_archived).toBe(true);
     });
@@ -270,16 +270,16 @@ describe('FavoritesService Integration Tests', () => {
       const favorites = [
         createTestFavorite({
           itemType: 'APOD',
-          data: { title: 'Nebula in Space', description: 'A beautiful cosmic nebula', category: 'space' }
+          data: { title: 'Nebula in Space', description: 'A beautiful cosmic nebula', category: 'space' },
         }),
         createTestFavorite({
           itemType: 'NEO',
-          data: { title: 'Asteroid', description: 'Near Earth Object', category: 'asteroids' }
+          data: { title: 'Asteroid', description: 'Near Earth Object', category: 'asteroids' },
         }),
         createTestFavorite({
           itemType: 'MARS',
-          data: { title: 'Mars Surface', description: 'Red planet exploration', category: 'planets' }
-        })
+          data: { title: 'Mars Surface', description: 'Red planet exploration', category: 'planets' },
+        }),
       ];
 
       for (const fav of favorites) {
@@ -300,7 +300,7 @@ describe('FavoritesService Integration Tests', () => {
 
     test('should filter by types in search', async () => {
       const result = await favoritesService.searchFavorites(TEST_USER_ID, 'planet', {
-        types: ['APOD', 'MARS']
+        types: ['APOD', 'MARS'],
       });
 
       expect(result.favorites.every(fav => ['APOD', 'MARS'].includes(fav.type))).toBe(true);
@@ -310,11 +310,11 @@ describe('FavoritesService Integration Tests', () => {
       // Add tags to a favorite
       const favorite = testFavorites[0];
       await favoritesService.updateFavorite(TEST_USER_ID, favorite.id, {
-        userTags: ['space', 'nebula']
+        userTags: ['space', 'nebula'],
       });
 
       const result = await favoritesService.searchFavorites(TEST_USER_ID, 'nebula', {
-        tags: ['space']
+        tags: ['space'],
       });
 
       expect(result.favorites.length).toBeGreaterThan(0);
@@ -371,7 +371,7 @@ describe('CollectionsService Integration Tests', () => {
       try {
         await pool.query(
           'DELETE FROM collections WHERE user_id = $1 AND id = $2',
-          [TEST_USER_ID, collection.id]
+          [TEST_USER_ID, collection.id],
         );
       } catch (error) {
         console.warn('Failed to cleanup collection:', error.message);
@@ -383,7 +383,7 @@ describe('CollectionsService Integration Tests', () => {
       try {
         await pool.query(
           'DELETE FROM saved_items WHERE user_id = $1 AND id = $2',
-          [TEST_USER_ID, favorite.id]
+          [TEST_USER_ID, favorite.id],
         );
       } catch (error) {
         console.warn('Failed to cleanup favorite:', error.message);
@@ -449,12 +449,12 @@ describe('CollectionsService Integration Tests', () => {
         .rejects.toThrow('Collection name is required');
 
       await expect(collectionsService.createCollection(TEST_USER_ID, {
-        name: 'a'.repeat(101)
+        name: 'a'.repeat(101),
       })).rejects.toThrow('Collection name must be 100 characters or less');
 
       await expect(collectionsService.createCollection(TEST_USER_ID, {
         name: 'Test',
-        description: 'a'.repeat(501)
+        description: 'a'.repeat(501),
       })).rejects.toThrow('Collection description must be 500 characters or less');
     });
 
@@ -475,7 +475,7 @@ describe('CollectionsService Integration Tests', () => {
       const updateData = {
         name: 'Updated Collection Name',
         description: 'Updated description',
-        isPublic: true
+        isPublic: true,
       };
 
       const result = await collectionsService.updateCollection(TEST_USER_ID, collection.id, updateData);
@@ -487,7 +487,7 @@ describe('CollectionsService Integration Tests', () => {
 
     test('should return null for non-existent collection', async () => {
       const result = await collectionsService.updateCollection(TEST_USER_ID, 'non-existent-id', {
-        name: 'Test'
+        name: 'Test',
       });
 
       expect(result).toBeNull();
@@ -501,7 +501,7 @@ describe('CollectionsService Integration Tests', () => {
       testCollections.push(collection1, collection2);
 
       await expect(collectionsService.updateCollection(TEST_USER_ID, collection1.id, {
-        name: 'Collection 2'
+        name: 'Collection 2',
       })).rejects.toThrow('You already have another collection with this name');
     });
   });
@@ -536,7 +536,7 @@ describe('CollectionsService Integration Tests', () => {
 
       const result = await collectionsService.addItemToCollection(collection.id, favorite.id, {
         position: 0,
-        notes: 'Test notes'
+        notes: 'Test notes',
       });
 
       expect(result.collection_id).toBe(collection.id);
@@ -652,7 +652,7 @@ describe('CollectionsService Integration Tests', () => {
 
       const itemOrders = [
         { itemId: favorite2.id, position: 0 },
-        { itemId: favorite1.id, position: 1 }
+        { itemId: favorite1.id, position: 1 },
       ];
 
       const result = await collectionsService.reorderCollectionItems(TEST_USER_ID, collection.id, itemOrders);
@@ -679,7 +679,7 @@ describe('CollectionsService Integration Tests', () => {
         .rejects.toThrow('Item orders must be a non-empty array');
 
       await expect(collectionsService.reorderCollectionItems(TEST_USER_ID, collection.id, [
-        { itemId: 'test', position: -1 }
+        { itemId: 'test', position: -1 },
       ])).rejects.toThrow('Invalid item order data');
     });
   });
@@ -715,7 +715,7 @@ describe('CollectionsService Integration Tests', () => {
         createTestCollection({
           isPublic: true,
           name: 'Space Photos',
-          description: 'Beautiful space photography'
+          description: 'Beautiful space photography',
         }));
       testCollections.push(publicCollection);
 
@@ -732,19 +732,19 @@ describe('CollectionsService Integration Tests', () => {
         createTestCollection({
           isPublic: true,
           name: 'Nebula Collection',
-          description: 'Amazing nebula images'
+          description: 'Amazing nebula images',
         }));
       testCollections.push(publicCollection);
 
       const result = await collectionsService.getPublicCollections({
         search: 'nebula',
         page: 1,
-        limit: 10
+        limit: 10,
       });
 
       expect(result.collections.some(col =>
         col.name.toLowerCase().includes('nebula') ||
-        col.description?.toLowerCase().includes('nebula')
+        col.description?.toLowerCase().includes('nebula'),
       )).toBe(true);
     });
 
@@ -773,19 +773,19 @@ async function cleanupTestData() {
     // Clean up collections
     await pool.query(
       'DELETE FROM collections WHERE user_id = $1 OR user_id = $2',
-      [TEST_USER_ID, TEST_USER_ID_2]
+      [TEST_USER_ID, TEST_USER_ID_2],
     );
 
     // Clean up saved items
     await pool.query(
       'DELETE FROM saved_items WHERE user_id = $1 OR user_id = $2',
-      [TEST_USER_ID, TEST_USER_ID_2]
+      [TEST_USER_ID, TEST_USER_ID_2],
     );
 
     // Clean up users if they exist
     await pool.query(
       'DELETE FROM users WHERE id = $1 OR id = $2',
-      [TEST_USER_ID, TEST_USER_ID_2]
+      [TEST_USER_ID, TEST_USER_ID_2],
     );
 
     // Wait for cleanup to complete

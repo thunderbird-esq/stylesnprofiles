@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* globals localStorage, atob */
+/* globals atob */
 /**
  * Authentication Service
  * Handles user authentication and JWT token management

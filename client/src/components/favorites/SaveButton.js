@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useAuth } from '../../contexts/AuthContext';
 import { addFavorite, removeFavorite, isFavorited } from '../../services/favoritesService';
 import './favorites.css';
+import AddToCollectionButton from './AddToCollectionButton';
 
 /**
  * SaveButton Component
@@ -83,15 +84,28 @@ const SaveButton = ({
   if (!user) return null;
 
   return (
-    <button
-      className={`nasa-btn ${saved ? 'nasa-btn-primary' : ''} ${className}`}
-      onClick={handleToggleSave}
-      disabled={loading}
-      title={saved ? 'Remove from favorites' : 'Add to favorites'}
-      style={size === 'small' ? { fontSize: '10px', padding: '2px 6px' } : {}}
-    >
-      {loading ? '...' : saved ? '★ Saved' : '☆ Save'}
-    </button>
+    <div className={`save-button-container ${className}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+      <button
+        className={`nasa-btn ${saved ? 'nasa-btn-primary' : ''}`}
+        onClick={handleToggleSave}
+        disabled={loading}
+        title={saved ? 'Remove from favorites' : 'Add to favorites'}
+        style={size === 'small' ? { fontSize: '10px', padding: '2px 6px' } : {}}
+      >
+        {loading ? '...' : saved ? '★ Saved' : '☆ Save'}
+      </button>
+
+      {saved && (
+        <div style={size === 'small' ? { transform: 'scale(0.9)', transformOrigin: 'left center' } : {}}>
+          <AddToCollectionButton
+            itemId={itemId}
+            itemType={itemType}
+            onError={onError}
+            onSuccess={() => console.log('Added to collection')}
+          />
+        </div>
+      )}
+    </div>
   );
 };
 

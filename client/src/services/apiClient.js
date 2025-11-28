@@ -26,7 +26,9 @@ apiClient.interceptors.request.use(
       if (isTokenExpired(token)) {
         // Token expired, logout and redirect
         logout();
-        window.location.href = '/'; // Redirect to home/login
+        if (typeof window !== 'undefined') {
+          window.location.href = '/'; // Redirect to home/login
+        }
         return Promise.reject(new Error('Token expired'));
       }
 
@@ -35,9 +37,7 @@ apiClient.interceptors.request.use(
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
 // Response interceptor - handle 401 errors
@@ -47,9 +47,10 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Unauthorized - token invalid or expired
       logout();
-      window.location.href = '/'; // Redirect to home/login
+      if (typeof window !== 'undefined') {
+        window.location.href = '/'; // Redirect to home/login
+      }
     }
-
     return Promise.reject(error);
   },
 );

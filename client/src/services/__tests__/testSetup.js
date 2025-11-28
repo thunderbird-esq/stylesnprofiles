@@ -6,6 +6,12 @@
 const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 
+// Reset localStorage before each test
+beforeEach(() => {
+  localStorage.clear();
+  jest.clearAllMocks();
+});
+
 beforeAll(() => {
   console.error = jest.fn();
   console.warn = jest.fn();

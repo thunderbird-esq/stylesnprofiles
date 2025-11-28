@@ -5,13 +5,13 @@ const router = express.Router();
 
 // Validation middleware
 const addFavoriteValidation = [
-  body('id').exists().withMessage('Item ID is required'),
-  body('type')
+  body('itemId').exists().withMessage('Item ID is required'),
+  body('itemType')
     .isIn(['APOD', 'NEO', 'MARS', 'EPIC', 'EARTH', 'IMAGES'])
     .withMessage('Invalid item type'),
-  body('title').exists().withMessage('Title is required'),
-  body('url').optional().isURL(),
-  body('date').optional().isISO8601(),
+  body('data.title').exists().withMessage('Title is required'),
+  body('data.url').optional().isURL(),
+  body('itemDate').optional().isISO8601(),
 ];
 
 const queryValidation = [

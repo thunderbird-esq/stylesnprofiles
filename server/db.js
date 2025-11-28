@@ -7,9 +7,18 @@ const { Pool } = require('pg');
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_DATABASE || 'nasa_system6_portal',
-  password: process.env.DB_PASSWORD || 'password',
-  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_NAME || 'nasa_system6',
+  password: process.env.DB_PASSWORD || 'postgres',
+  port: process.env.DB_PORT || 5432,
+});
+
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client', err);
+  process.exit(-1);
+});
+
+pool.on('connect', () => {
+  console.log(`📦 Database pool connected to ${process.env.DB_NAME || 'nasa_system6'}`);
 });
 
 /**
@@ -35,13 +44,27 @@ const initDb = async () => {
   console.log('Initializing NASA System 6 database schema...');
   const client = await pool.connect();
   try {
+    // Run initial schema migration
     const migrationPath = path.join(__dirname, 'scripts/migrations/001_initial_schema.sql');
     console.log(`Reading migration from: ${migrationPath}`);
-
     const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
-
     await client.query(migrationSQL);
     console.log('✅ Database schema initialized from migration file.');
+
+    // Run local user migration
+    const localUserPath = path.join(__dirname, 'scripts/migrations/002_add_local_user.sql');
+    console.log(`Adding local user from: ${localUserPath}`);
+    const localUserSQL = fs.readFileSync(localUserPath, 'utf8');
+    await client.query(localUserSQL);
+    console.log('✅ Local user added for development mode.');
+
+    // Run missing service columns migration
+    const missingColsPath = path.join(__dirname, 'scripts/migrations/003_add_missing_service_columns.sql');
+    console.log(`Adding missing service columns from: ${missingColsPath}`);
+    const missingColsSQL = fs.readFileSync(missingColsPath, 'utf8');
+    await client.query(missingColsSQL);
+    console.log('✅ Missing service columns added.');
+
     console.log('🚀 NASA System 6 database initialization complete.');
   } catch (err) {
     console.error('❌ Error initializing database:', err.message);
@@ -49,7 +72,7 @@ const initDb = async () => {
   } finally {
     client.release();
     // Close pool only if this is being run as a standalone script
-    if (require.main === module || process.argv[1].includes('db:init')) {
+    if (require.main === module || (process.argv[1] && process.argv[1].includes('db:init'))) {
       pool.end();
     }
   }

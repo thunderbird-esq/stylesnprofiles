@@ -11,12 +11,19 @@ module.exports = {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
       '<rootDir>/src/__mocks__/fileMock.js',
+    '^.+\\.?css$': 'identity-obj-proxy',
+    './authService': '<rootDir>/src/services/__mocks__/authService.js',
   },
 
   // Transform configuration
   transform: {
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
+
+  // Transform ignore patterns - handle axios and other ES modules
+  transformIgnorePatterns: [
+    'node_modules/(?!(axios)/)',
+  ],
 
   // Coverage configuration
   collectCoverageFrom: [

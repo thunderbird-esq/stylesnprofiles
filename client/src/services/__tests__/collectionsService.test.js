@@ -4,7 +4,18 @@
  * Focus on input validation, error handling, and method behavior
  */
 
-import {
+// Mock the apiClient module
+jest.mock('../apiClient', () => ({
+  __esModule: true,
+  default: {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+  },
+}));
+
+const {
   getCollections,
   createCollection,
   getCollectionById,
@@ -13,8 +24,8 @@ import {
   getCollectionItems,
   addItemToCollection,
   removeItemFromCollection,
-} from '../services/collectionsService';
-import apiClient from '../services/apiClient';
+} = require('../collectionsService');
+const apiClient = require('../apiClient').default;
 
 // Mock console.error to keep test output clean
 const originalConsoleError = console.error;
@@ -65,14 +76,14 @@ describe('Collections Service Unit Tests', () => {
       });
 
       await expect(getCollections()).rejects.toThrow(errorMessage);
-      expect(console.error).toHaveBeenCalledWith('Error fetching collections:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error fetching collections:', expect.any(Object));
     });
 
     test('should handle network error with generic message', async () => {
       apiClient.get = jest.fn().mockRejectedValue(new Error('Network error'));
 
       await expect(getCollections()).rejects.toThrow('Failed to fetch collections');
-      expect(console.error).toHaveBeenCalledWith('Error fetching collections:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error fetching collections:', expect.any(Object));
     });
 
     test('should handle empty collections array', async () => {
@@ -148,7 +159,7 @@ describe('Collections Service Unit Tests', () => {
       });
 
       await expect(createCollection('')).rejects.toThrow('Name is required');
-      expect(console.error).toHaveBeenCalledWith('Error creating collection:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error creating collection:', expect.any(Object));
     });
 
     test('should handle network error', async () => {
@@ -190,7 +201,7 @@ describe('Collections Service Unit Tests', () => {
       });
 
       await expect(getCollectionById('non-existent')).rejects.toThrow('Collection not found');
-      expect(console.error).toHaveBeenCalledWith('Error fetching collection:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error fetching collection:', expect.any(Object));
     });
 
     test('should handle network error', async () => {
@@ -240,7 +251,7 @@ describe('Collections Service Unit Tests', () => {
       });
 
       await expect(updateCollection('non-existent', {})).rejects.toThrow('Collection not found');
-      expect(console.error).toHaveBeenCalledWith('Error updating collection:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error updating collection:', expect.any(Object));
     });
 
     test('should handle validation errors', async () => {
@@ -273,7 +284,7 @@ describe('Collections Service Unit Tests', () => {
       });
 
       await expect(deleteCollection('non-existent')).rejects.toThrow('Collection not found');
-      expect(console.error).toHaveBeenCalledWith('Error deleting collection:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error deleting collection:', expect.any(Object));
     });
 
     test('should handle network error', async () => {
@@ -321,7 +332,7 @@ describe('Collections Service Unit Tests', () => {
       });
 
       await expect(getCollectionItems('non-existent')).rejects.toThrow('Collection not found');
-      expect(console.error).toHaveBeenCalledWith('Error fetching collection items:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error fetching collection items:', expect.any(Object));
     });
 
     test('should handle network error', async () => {
@@ -350,7 +361,7 @@ describe('Collections Service Unit Tests', () => {
       });
 
       await expect(addItemToCollection('non-existent', '456')).rejects.toThrow('Collection not found');
-      expect(console.error).toHaveBeenCalledWith('Error adding item to collection:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error adding item to collection:', expect.any(Object));
     });
 
     test('should handle item not found', async () => {
@@ -399,7 +410,7 @@ describe('Collections Service Unit Tests', () => {
       });
 
       await expect(removeItemFromCollection('non-existent', '456')).rejects.toThrow('Collection not found');
-      expect(console.error).toHaveBeenCalledWith('Error removing item from collection:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith('Error removing item from collection:', expect.any(Object));
     });
 
     test('should handle item not found in collection', async () => {
@@ -460,7 +471,7 @@ describe('Collections Service Unit Tests', () => {
         response: { status: 400, data: { message: 'Validation error' } },
       });
 
-      await expect(createCollection('', undefined, null)).rejects.toThrow('Failed to create collection');
+      await expect(createCollection('', undefined, null)).rejects.toThrow('Validation error');
     });
 
     test('should handle extremely long IDs', async () => {

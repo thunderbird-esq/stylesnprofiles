@@ -3,19 +3,22 @@
  * Manages user's collections of saved items
  */
 
-import apiClient from './apiClient';
+const apiClient = require('./apiClient').default;
 
 /**
  * Get all user collections
  * @returns {Promise<Array>} - List of collections
  */
-export const getCollections = async () => {
+const getCollections = async () => {
   try {
     const response = await apiClient.get('/api/v1/users/collections');
     return response.data;
   } catch (error) {
     console.error('Error fetching collections:', error);
-    throw new Error(error.response?.data?.message || 'Failed to fetch collections');
+    // Preserve the original error object with response data
+    const enhancedError = new Error(error.response?.data?.message || 'Failed to fetch collections');
+    enhancedError.response = error.response;
+    throw enhancedError;
   }
 };
 
@@ -26,7 +29,7 @@ export const getCollections = async () => {
  * @param {boolean} isPublic - Whether collection is public
  * @returns {Promise<object>} - Created collection
  */
-export const createCollection = async (name, description = '', isPublic = false) => {
+const createCollection = async (name, description = '', isPublic = false) => {
   try {
     const response = await apiClient.post('/api/v1/users/collections', {
       name,
@@ -36,7 +39,10 @@ export const createCollection = async (name, description = '', isPublic = false)
     return response.data;
   } catch (error) {
     console.error('Error creating collection:', error);
-    throw new Error(error.response?.data?.message || 'Failed to create collection');
+    // Preserve the original error object with response data
+    const enhancedError = new Error(error.response?.data?.message || 'Failed to create collection');
+    enhancedError.response = error.response;
+    throw enhancedError;
   }
 };
 
@@ -45,13 +51,16 @@ export const createCollection = async (name, description = '', isPublic = false)
  * @param {string} collectionId - Collection ID
  * @returns {Promise<object>}
  */
-export const getCollectionById = async (collectionId) => {
+const getCollectionById = async (collectionId) => {
   try {
     const response = await apiClient.get(`/api/v1/users/collections/${collectionId}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching collection:', error);
-    throw new Error(error.response?.data?.message || 'Failed to fetch collection');
+    // Preserve the original error object with response data
+    const enhancedError = new Error(error.response?.data?.message || 'Failed to fetch collection');
+    enhancedError.response = error.response;
+    throw enhancedError;
   }
 };
 
@@ -61,13 +70,16 @@ export const getCollectionById = async (collectionId) => {
  * @param {object} updates - Fields to update (name, description, is_public)
  * @returns {Promise<object>} - Updated collection
  */
-export const updateCollection = async (collectionId, updates) => {
+const updateCollection = async (collectionId, updates) => {
   try {
     const response = await apiClient.patch(`/api/v1/users/collections/${collectionId}`, updates);
     return response.data;
   } catch (error) {
     console.error('Error updating collection:', error);
-    throw new Error(error.response?.data?.message || 'Failed to update collection');
+    // Preserve the original error object with response data
+    const enhancedError = new Error(error.response?.data?.message || 'Failed to update collection');
+    enhancedError.response = error.response;
+    throw enhancedError;
   }
 };
 
@@ -76,12 +88,15 @@ export const updateCollection = async (collectionId, updates) => {
  * @param {string} collectionId - Collection ID
  * @returns {Promise<void>}
  */
-export const deleteCollection = async (collectionId) => {
+const deleteCollection = async (collectionId) => {
   try {
     await apiClient.delete(`/api/v1/users/collections/${collectionId}`);
   } catch (error) {
     console.error('Error deleting collection:', error);
-    throw new Error(error.response?.data?.message || 'Failed to delete collection');
+    // Preserve the original error object with response data
+    const enhancedError = new Error(error.response?.data?.message || 'Failed to delete collection');
+    enhancedError.response = error.response;
+    throw enhancedError;
   }
 };
 
@@ -90,13 +105,16 @@ export const deleteCollection = async (collectionId) => {
  * @param {string} collectionId - Collection ID
  * @returns {Promise<Array>} - List of items
  */
-export const getCollectionItems = async (collectionId) => {
+const getCollectionItems = async (collectionId) => {
   try {
     const response = await apiClient.get(`/api/v1/users/collections/${collectionId}/items`);
     return response.data;
   } catch (error) {
     console.error('Error fetching collection items:', error);
-    throw new Error(error.response?.data?.message || 'Failed to fetch collection items');
+    // Preserve the original error object with response data
+    const enhancedError = new Error(error.response?.data?.message || 'Failed to fetch collection items');
+    enhancedError.response = error.response;
+    throw enhancedError;
   }
 };
 
@@ -106,7 +124,7 @@ export const getCollectionItems = async (collectionId) => {
  * @param {string} itemId - Item ID to add
  * @returns {Promise<object>} - Collection item relation
  */
-export const addItemToCollection = async (collectionId, itemId) => {
+const addItemToCollection = async (collectionId, itemId) => {
   try {
     const response = await apiClient.post(`/api/v1/users/collections/${collectionId}/items`, {
       itemId,
@@ -114,7 +132,10 @@ export const addItemToCollection = async (collectionId, itemId) => {
     return response.data;
   } catch (error) {
     console.error('Error adding item to collection:', error);
-    throw new Error(error.response?.data?.message || 'Failed to add item to collection');
+    // Preserve the original error object with response data
+    const enhancedError = new Error(error.response?.data?.message || 'Failed to add item to collection');
+    enhancedError.response = error.response;
+    throw enhancedError;
   }
 };
 
@@ -124,16 +145,19 @@ export const addItemToCollection = async (collectionId, itemId) => {
  * @param {string} itemId - Item ID to remove
  * @returns {Promise<void>}
  */
-export const removeItemFromCollection = async (collectionId, itemId) => {
+const removeItemFromCollection = async (collectionId, itemId) => {
   try {
     await apiClient.delete(`/api/v1/users/collections/${collectionId}/items/${itemId}`);
   } catch (error) {
     console.error('Error removing item from collection:', error);
-    throw new Error(error.response?.data?.message || 'Failed to remove item from collection');
+    // Preserve the original error object with response data
+    const enhancedError = new Error(error.response?.data?.message || 'Failed to remove item from collection');
+    enhancedError.response = error.response;
+    throw enhancedError;
   }
 };
 
-export default {
+module.exports = {
   getCollections,
   createCollection,
   getCollectionById,

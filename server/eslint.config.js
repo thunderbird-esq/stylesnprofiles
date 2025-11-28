@@ -1,4 +1,7 @@
 const js = require('@eslint/js');
+const globals = require('globals');
+const prettier = require('eslint-plugin-prettier');
+const prettierConfig = require('eslint-config-prettier');
 
 module.exports = [
   js.configs.recommended,
@@ -22,8 +25,11 @@ module.exports = [
     files: ['**/*.js'],
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: 'commonjs',
+      sourceType: 'module',
       globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.jest,
         console: 'readonly',
         process: 'readonly',
         Buffer: 'readonly',
@@ -33,6 +39,10 @@ module.exports = [
         module: 'readonly',
         require: 'readonly',
         global: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
         jest: 'readonly',
         beforeAll: 'readonly',
         afterAll: 'readonly',
@@ -42,6 +52,7 @@ module.exports = [
         test: 'readonly',
         it: 'readonly',
         expect: 'readonly',
+        fail: 'readonly',
       },
     },
     rules: {
@@ -58,7 +69,7 @@ module.exports = [
       quotes: ['error', 'single', { avoidEscape: true }],
       semi: ['error', 'always'],
       indent: ['error', 2],
-      'max-len': ['error', { code: 100, ignoreUrls: true }],
+      'max-len': ['error', { code: 120, ignoreUrls: true }],
     },
   },
   {

@@ -13,7 +13,7 @@
  */
 
 const redis = require('redis');
-const { logger, CacheError, withTimeout, CircuitBreaker, serviceMonitor } = require('./errorHandler');
+// const { logger, CacheError, withTimeout, CircuitBreaker, serviceMonitor } = require('./errorHandler');
 
 // Initialize Redis client with modern v4+ configuration
 const client = redis.createClient({

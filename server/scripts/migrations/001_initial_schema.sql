@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS saved_items (
     saved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    is_archived BOOLEAN DEFAULT false,
     metadata JSONB DEFAULT '{}'
 );
 
@@ -187,18 +188,22 @@ END;
 $$ language 'plpgsql';
 
 -- Apply triggers to tables with updated_at columns
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_saved_items_updated_at ON saved_items;
 CREATE TRIGGER update_saved_items_updated_at BEFORE UPDATE ON saved_items
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_collections_updated_at ON collections;
 CREATE TRIGGER update_collections_updated_at BEFORE UPDATE ON collections
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Create views for common queries
 
 -- View for saved items with user information
+DROP VIEW IF EXISTS saved_items_with_users;
 CREATE OR REPLACE VIEW saved_items_with_users AS
 SELECT
     si.*,
@@ -209,6 +214,7 @@ FROM saved_items si
 LEFT JOIN users u ON si.user_id = u.id;
 
 -- View for public collections
+DROP VIEW IF EXISTS public_collections;
 CREATE OR REPLACE VIEW public_collections AS
 SELECT
     c.*,
@@ -222,6 +228,7 @@ WHERE c.is_public = true
 GROUP BY c.id, u.username, u.display_name;
 
 -- View for user statistics
+DROP VIEW IF EXISTS user_statistics;
 CREATE OR REPLACE VIEW user_statistics AS
 SELECT
     u.id,
@@ -333,9 +340,11 @@ $$ LANGUAGE plpgsql;
 -- Create constraints and data validation
 
 -- Add check constraints for data integrity
+ALTER TABLE saved_items DROP CONSTRAINT IF EXISTS chk_saved_items_url;
 ALTER TABLE saved_items ADD CONSTRAINT chk_saved_items_url
     CHECK (url IS NULL OR url ~ '^https?://.*');
 
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_email;
 ALTER TABLE users ADD CONSTRAINT chk_users_email
     CHECK (email ~ '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
 

@@ -96,14 +96,14 @@
 **Dependencies:** Track C complete (needs auth)
 
 #### D1: Favorites Service
-- [ ] Create `client/src/services/favoritesService.js`
+- [x] Create `client/src/services/favoritesService.js`
   - `getFavorites(page, limit, type)` → GET /api/v1/users/favorites
   - `addFavorite(itemData)` → POST /api/v1/users/favorites
   - `removeFavorite(itemId)` → DELETE /api/v1/users/favorites/:id
   - `getFavoriteById(itemId)` → GET /api/v1/users/favorites/:id
 
 #### D2: SaveButton Component
-- [ ] Create `client/src/components/common/SaveButton.js`
+- [x] Create `client/src/components/common/SaveButton.js`
   - Heart icon (filled if saved, outline if not)
   - Click to save/unsave
   - Show loading state
@@ -111,18 +111,18 @@
   - System 6 styled
 
 #### D3: APOD Integration
-- [ ] Update `client/src/components/apps/ApodApp.js`
+- [x] Update `client/src/components/apps/ApodApp.js`
   - Add SaveButton to each APOD
   - Check if current APOD is saved
   - Pass item data to SaveButton
 
 #### D4: NeoWs Integration
-- [ ] Update `client/src/components/apps/NeoWsApp.js`
+- [x] Update `client/src/components/apps/NeoWsApp.js`
   - Add SaveButton to each NEO
   - Same pattern as APOD
 
 #### D5: FavoritesApp Component
-- [ ] Create `client/src/components/apps/FavoritesApp.js`
+- [x] Create `client/src/components/apps/FavoritesApp.js`
   - List all saved favorites
   - Filter by type (APOD, NEO, MARS)
   - Pagination controls
@@ -130,7 +130,7 @@
   - Delete button for each item
 
 #### D6: Desktop Integration
-- [ ] Add FavoritesApp icon to Desktop
+- [x] Add FavoritesApp icon to Desktop
   - System 6 styled icon
   - Launch FavoritesApp window
 
@@ -141,7 +141,7 @@
 **Dependencies:** Track D complete
 
 #### E1: Collections Service
-- [ ] Create `client/src/services/collectionsService.js`
+- [x] Create `client/src/services/collectionsService.js`
   - `getCollections()` → GET /api/v1/users/collections
   - `createCollection(name, desc, isPublic)` → POST /api/v1/users/collections
   - `updateCollection(id, data)` → PATCH /api/v1/users/collections/:id
@@ -151,14 +151,14 @@
   - `removeItemFromCollection(collectionId, itemId)` → DELETE
 
 #### E2: CollectionsApp Component
-- [ ] Create `client/src/components/apps/CollectionsApp.js`
+- [x] Create `client/src/components/apps/CollectionsApp.js`
   - List all collections
   - "New Collection" button
   - Click collection to view items
   - Edit/Delete buttons
 
 #### E3: CollectionDetailView
-- [ ] Create sub-component for collection detail
+- [x] Create sub-component for collection detail
   - Show collection name, description
   - List items in collection
   - "Add Item" dropdown (from favorites)
@@ -166,7 +166,7 @@
   - Drag & drop reordering (optional MVP)
 
 #### E4: SaveButton Enhancement
-- [ ] Update SaveButton component
+- [x] Update SaveButton component
   - Add "Add to Collection" dropdown
   - List user's collections
   - Quick-add to collection
