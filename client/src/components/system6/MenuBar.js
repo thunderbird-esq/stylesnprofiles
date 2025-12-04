@@ -36,22 +36,22 @@ export default function MenuBar() {
       // System 6 style menu keyboard shortcuts
       if (event.altKey && !activeMenu) {
         switch (event.key.toLowerCase()) {
-          case 'f':
-            setActiveMenu('File');
-            event.preventDefault();
-            break;
-          case 'e':
-            setActiveMenu('Edit');
-            event.preventDefault();
-            break;
-          case 'v':
-            setActiveMenu('View');
-            event.preventDefault();
-            break;
-          case 's':
-            setActiveMenu('Special');
-            event.preventDefault();
-            break;
+        case 'f':
+          setActiveMenu('File');
+          event.preventDefault();
+          break;
+        case 'e':
+          setActiveMenu('Edit');
+          event.preventDefault();
+          break;
+        case 'v':
+          setActiveMenu('View');
+          event.preventDefault();
+          break;
+        case 's':
+          setActiveMenu('Special');
+          event.preventDefault();
+          break;
         }
       }
     };
@@ -95,29 +95,29 @@ export default function MenuBar() {
 
     // Handle authentication-related menu items
     switch (item) {
-      case 'Settings':
-        setShowSettings(true);
-        break;
-      case 'Close': {
-        // Close focused window if any
-        const activeWindow = document.querySelector('.window:focus');
-        if (activeWindow) {
-          const closeButton = activeWindow.querySelector('.close');
-          if (closeButton) closeButton.click();
-        }
-        break;
+    case 'Settings':
+      setShowSettings(true);
+      break;
+    case 'Close': {
+      // Close focused window if any
+      const activeWindow = document.querySelector('.window:focus');
+      if (activeWindow) {
+        const closeButton = activeWindow.querySelector('.close');
+        if (closeButton) closeButton.click();
       }
-      case 'Restart':
-        // Simulate system restart
-        if (window.confirm('Are you sure you want to restart?')) {
-          window.location.reload();
-        }
-        break;
-      case 'Empty Trash':
-        alert('Trash emptied (demo)');
-        break;
-      default:
-        break;
+      break;
+    }
+    case 'Restart':
+      // Simulate system restart
+      if (window.confirm('Are you sure you want to restart?')) {
+        window.location.reload();
+      }
+      break;
+    case 'Empty Trash':
+      alert('Trash emptied (demo)');
+      break;
+    default:
+      break;
     }
   };
 
@@ -144,7 +144,7 @@ export default function MenuBar() {
                     <div
                       key={item}
                       className={`nasa-dropdown-item ${index === menuItems[menuName].length - 1 ? 'last-item' : ''
-                        }`}
+                      }`}
                       onClick={() => handleMenuItemClick(item)}
                     >
                       {item}

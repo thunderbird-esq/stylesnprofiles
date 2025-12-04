@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { useAuth } from '../../contexts/AuthContext';
 import FavoritesPanel from './FavoritesPanel';
 import './favorites.css';
 
@@ -9,24 +8,10 @@ import './favorites.css';
  * Displays a list of user's saved favorites using FavoritesPanel
  */
 const FavoritesApp = ({ windowId: _windowId }) => {
-  const { user, loading: authLoading } = useAuth();
-
   const handleError = useCallback((error) => {
     console.error('Favorites App Error:', error);
     // Optional: Show toast or alert
   }, []);
-
-  if (authLoading) return <div className="nasa-loading">Loading...</div>;
-
-  if (!user) {
-    return (
-      <div className="window-pane">
-        <div className="favorites-empty">
-          <p>Please login to view your favorites.</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="window-pane">
@@ -42,3 +27,4 @@ FavoritesApp.propTypes = {
 };
 
 export default FavoritesApp;
+

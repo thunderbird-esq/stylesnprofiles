@@ -73,4 +73,36 @@ module.exports = [
       'no-unused-vars': 'off',
     },
   },
+  {
+    files: ['client/src/**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        navigator: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        URL: 'readonly',
+        alert: 'readonly',
+      },
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-console': 'off',
+    },
+  },
 ];

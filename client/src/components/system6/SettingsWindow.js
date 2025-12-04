@@ -12,33 +12,13 @@ export default function SettingsWindow({ onClose }) {
   const [status, setStatus] = useState('');
   const [showSavedKey, setShowSavedKey] = useState(false);
 
-  // Local database settings (for future use)
-  const [dbSettings, setDbSettings] = useState({
-    username: '',
-    password: '',
-  });
-
   useEffect(() => {
     setKeyInput(apiKey || '');
-
-    // Load any local database settings from localStorage
-    const savedDbSettings = localStorage.getItem('nasa_db_settings');
-    if (savedDbSettings) {
-      try {
-        setDbSettings(JSON.parse(savedDbSettings));
-      } catch (e) {
-        console.warn('Failed to parse saved database settings');
-      }
-    }
   }, [apiKey]);
 
   const handleSave = (e) => {
     e.preventDefault();
     saveApiKey(keyInput);
-
-    // Save database settings locally
-    localStorage.setItem('nasa_db_settings', JSON.stringify(dbSettings));
-
     setStatus('Settings saved successfully!');
     setTimeout(() => setStatus(''), 3000);
   };
@@ -52,16 +32,17 @@ export default function SettingsWindow({ onClose }) {
     }
   };
 
-  const handleResetAll = () => {
+  const handleClearAllData = () => {
     if (window.confirm(
-      'Are you sure you want to reset all settings to defaults? '
-      + 'This will clear your API key and local database settings.',
+      'Are you sure you want to clear ALL local data? '
+      + 'This will remove your favorites, collections, and settings.',
     )) {
+      localStorage.removeItem('nasa_favorites');
+      localStorage.removeItem('nasa_collections');
+      localStorage.removeItem('nasa_collection_items');
+      localStorage.removeItem('nasa_api_key');
       setKeyInput('');
-      setDbSettings({ username: '', password: '' });
-      saveApiKey('');
-      localStorage.removeItem('nasa_db_settings');
-      setStatus('All settings reset to defaults');
+      setStatus('All data cleared');
       setTimeout(() => setStatus(''), 2000);
     }
   };
@@ -153,58 +134,13 @@ export default function SettingsWindow({ onClose }) {
             </div>
           </div>
 
-          {/* Local Database Section (for future use) */}
-          <div className="nasa-data-section" style={{ marginBottom: '16px' }}>
-            <div className="nasa-data-title">Local Database Settings</div>
-
-            <div className="field-row" style={{ marginBottom: '8px' }}>
-              <label
-                htmlFor="db-username"
-                className="font-geneva"
-                style={{ display: 'block', marginBottom: '4px' }}
-              >
-                Username:
-              </label>
-              <input
-                id="db-username"
-                type="text"
-                value={dbSettings.username}
-                onChange={(e) => setDbSettings(
-                  prev => ({ ...prev, username: e.target.value }),
-                )}
-                style={{ width: '100%' }}
-                placeholder="Local username (optional)"
-              />
-            </div>
-
-            <div className="field-row" style={{ marginBottom: '8px' }}>
-              <label
-                htmlFor="db-password"
-                className="font-geneva"
-                style={{ display: 'block', marginBottom: '4px' }}
-              >
-                Password:
-              </label>
-              <input
-                id="db-password"
-                type="password"
-                value={dbSettings.password}
-                onChange={(e) => setDbSettings(
-                  prev => ({ ...prev, password: e.target.value }),
-                )}
-                style={{ width: '100%' }}
-                placeholder="Local password (optional)"
-              />
-            </div>
-          </div>
-
-          {/* Current User Info */}
+          {/* Current Session Info */}
           {user && (
             <div className="nasa-data-section" style={{ marginBottom: '16px' }}>
               <div className="nasa-data-title">Current Session</div>
               <div className="font-geneva" style={{ fontSize: '11px', lineHeight: '1.4' }}>
                 <div style={{ marginBottom: '4px' }}>
-                  <strong>User ID:</strong> {user.id}
+                  <strong>Device ID:</strong> {user.id?.substring(0, 8)}...
                 </div>
                 <div style={{ marginBottom: '4px' }}>
                   <strong>Username:</strong> {user.username}
@@ -246,11 +182,11 @@ export default function SettingsWindow({ onClose }) {
             </button>
             <button
               type="button"
-              onClick={handleResetAll}
+              onClick={handleClearAllData}
               className="btn"
               style={{ fontSize: '11px' }}
             >
-              Reset All
+              Clear All Data
             </button>
             <button
               type="button"
@@ -268,9 +204,9 @@ export default function SettingsWindow({ onClose }) {
             <p><strong>System Information:</strong></p>
             <ul style={{ margin: '4px 0', paddingLeft: '16px' }}>
               <li>Your favorites and collections are saved locally to this device</li>
-              <li>NASA API data is fetched in real-time when available</li>
-              <li>Demo mode uses limited public NASA endpoints</li>
-              <li>Local database settings are stored in your browser</li>
+              <li>All data is private and stored only in your browser</li>
+              <li>NASA API data is fetched directly from NASA servers</li>
+              <li>Get your own API key for higher rate limits</li>
             </ul>
           </div>
         </div>
@@ -282,3 +218,4 @@ export default function SettingsWindow({ onClose }) {
 SettingsWindow.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
+

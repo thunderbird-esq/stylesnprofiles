@@ -4,29 +4,30 @@ import { useAuth } from '../../contexts/AuthContext';
 
 /**
  * ProfileApp - System 6 styled user profile window
- * Displays user information and provides profile management
+ * Displays user information from localStorage
  * @component
  */
 const ProfileApp = ({ windowId: _windowId }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching user stats
+    // Calculate stats from localStorage
     const timer = setTimeout(() => {
+      const favorites = JSON.parse(localStorage.getItem('nasa_favorites') || '[]');
+      const collections = JSON.parse(localStorage.getItem('nasa_collections') || '[]');
+
       setStats({
-        memberSince: '2023-01-15',
-        lastLogin: new Date().toLocaleDateString(),
-        favoritesCount: 12,
-        searchesCount: 45,
+        deviceCreated: localStorage.getItem('nasa_device_id')?.substring(0, 8) || 'Unknown',
+        favoritesCount: favorites.length,
+        collectionsCount: collections.length,
+        storageUsed: `${Math.round((JSON.stringify(localStorage).length / 1024))} KB`,
       });
       setLoading(false);
-    }, 1000);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
-
-  if (!user) return <div className="window-pane">Please login to view profile.</div>;
 
   return (
     <div className="window-pane">
@@ -36,51 +37,40 @@ const ProfileApp = ({ windowId: _windowId }) => {
             <span>👤</span>
           </div>
           <div className="profile-info">
-            <h2>{user.username || 'User'}</h2>
-            <p>{user.email}</p>
-            <span className="badge">Explorer Level 1</span>
+            <h2>{user?.username || 'Explorer'}</h2>
+            <p style={{ fontSize: '11px', color: '#666' }}>Local Storage Mode</p>
+            <span className="badge">Space Explorer</span>
           </div>
         </div>
 
         <div className="profile-stats">
-          <h3>Mission Statistics</h3>
+          <h3>Your Statistics</h3>
           {loading ? (
             <div className="loading">Loading stats...</div>
           ) : (
             <div className="stats-grid">
               <div className="stat-item">
-                <label>Member Since</label>
-                <span>{stats.memberSince}</span>
-              </div>
-              <div className="stat-item">
-                <label>Last Login</label>
-                <span>{stats.lastLogin}</span>
+                <label>Device ID</label>
+                <span>{stats.deviceCreated}</span>
               </div>
               <div className="stat-item">
                 <label>Saved Items</label>
                 <span>{stats.favoritesCount}</span>
               </div>
               <div className="stat-item">
-                <label>Total Searches</label>
-                <span>{stats.searchesCount}</span>
+                <label>Collections</label>
+                <span>{stats.collectionsCount}</span>
+              </div>
+              <div className="stat-item">
+                <label>Storage Used</label>
+                <span>{stats.storageUsed}</span>
               </div>
             </div>
           )}
         </div>
 
-        <div className="profile-actions">
-          <button className="nasa-btn">Edit Profile</button>
-          <button className="nasa-btn">Account Settings</button>
-          <button
-            className="nasa-btn danger"
-            onClick={() => {
-              if (window.confirm('Are you sure you want to logout?')) {
-                logout();
-              }
-            }}
-          >
-            Logout
-          </button>
+        <div className="profile-info" style={{ marginTop: '16px', fontSize: '11px', color: '#666' }}>
+          <p>All your data is stored locally in your browser and is private to you.</p>
         </div>
       </div>
     </div>

@@ -24,3 +24,20 @@ Thumbs.db
 # System.css build artifacts (keeping source)
 system-css-main/dist/
 system-css-main/docs/
+
+# AI/Agent tool directories - NOT PART OF PROJECT
+.claude/
+.kimi/
+.gemini/
+
+# Python virtual environment
+.venv/
+
+# Experimental/scratch directories
+nasa-system-6-v2/
+
+# Large terminal output logs
+termoutput*.txt
+
+# Test orchestrator cache
+test-orchestrator/

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useAuth } from '../../contexts/AuthContext';
 import { addFavorite, removeFavorite, isFavorited } from '../../services/favoritesService';
 import './favorites.css';
 import AddToCollectionButton from './AddToCollectionButton';
@@ -27,7 +26,6 @@ const SaveButton = ({
   size = 'normal',
   onError,
 }) => {
-  const { user } = useAuth();
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +34,7 @@ const SaveButton = ({
     let mounted = true;
 
     const checkSavedStatus = async () => {
-      if (!user || !itemId) return;
+      if (!itemId) return;
 
       try {
         const isSaved = await isFavorited(itemId);
@@ -48,15 +46,10 @@ const SaveButton = ({
 
     checkSavedStatus();
     return () => { mounted = false; };
-  }, [user, itemId]);
+  }, [itemId]);
 
   const handleToggleSave = async (e) => {
     e.stopPropagation(); // Prevent parent click events
-
-    if (!user) {
-      if (onError) onError('Please login to save items');
-      return;
-    }
 
     setLoading(true);
 
@@ -66,10 +59,10 @@ const SaveButton = ({
         setSaved(false);
       } else {
         await addFavorite({
-          itemType,
-          itemId,
-          itemDate,
-          data: itemData,
+          id: itemId,
+          type: itemType,
+          date: itemDate,
+          ...itemData,
         });
         setSaved(true);
       }
@@ -81,10 +74,11 @@ const SaveButton = ({
     }
   };
 
-  if (!user) return null;
-
   return (
-    <div className={`save-button-container ${className}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+    <div
+      className={`save-button-container ${className}`}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+    >
       <button
         className={`nasa-btn ${saved ? 'nasa-btn-primary' : ''}`}
         onClick={handleToggleSave}

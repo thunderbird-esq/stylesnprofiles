@@ -1,49 +1,78 @@
 /**
  * Collections Service
  * Manages user's collections of saved items
+ * Pure localStorage implementation for GitHub Pages static deployment
  */
 
-const apiClient = require('./apiClient').default;
+/* eslint-env browser */
+
+const COLLECTIONS_KEY = 'nasa_collections';
+const COLLECTION_ITEMS_KEY = 'nasa_collection_items';
+
+/**
+ * Helper to get collections from local storage
+ */
+const getLocalCollections = () => {
+  try {
+    return JSON.parse(localStorage.getItem(COLLECTIONS_KEY) || '[]');
+  } catch (_e) {
+    return [];
+  }
+};
+
+/**
+ * Helper to save collections to local storage
+ */
+const saveLocalCollections = (collections) => {
+  localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collections));
+};
+
+/**
+ * Helper to get collection items from local storage
+ */
+const getLocalCollectionItems = () => {
+  try {
+    return JSON.parse(localStorage.getItem(COLLECTION_ITEMS_KEY) || '{}');
+  } catch (_e) {
+    return {};
+  }
+};
+
+/**
+ * Helper to save collection items to local storage
+ */
+const saveLocalCollectionItems = (items) => {
+  localStorage.setItem(COLLECTION_ITEMS_KEY, JSON.stringify(items));
+};
 
 /**
  * Get all user collections
  * @returns {Promise<Array>} - List of collections
  */
-const getCollections = async () => {
-  try {
-    const response = await apiClient.get('/api/v1/users/collections');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching collections:', error);
-    // Preserve the original error object with response data
-    const enhancedError = new Error(error.response?.data?.message || 'Failed to fetch collections');
-    enhancedError.response = error.response;
-    throw enhancedError;
-  }
+export const getCollections = async () => {
+  return getLocalCollections();
 };
 
 /**
  * Create a new collection
  * @param {string} name - Collection name
  * @param {string} description - Collection description
- * @param {boolean} isPublic - Whether collection is public
+ * @param {boolean} isPublic - Whether collection is public (unused in localStorage mode)
  * @returns {Promise<object>} - Created collection
  */
-const createCollection = async (name, description = '', isPublic = false) => {
-  try {
-    const response = await apiClient.post('/api/v1/users/collections', {
-      name,
-      description,
-      is_public: isPublic,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error creating collection:', error);
-    // Preserve the original error object with response data
-    const enhancedError = new Error(error.response?.data?.message || 'Failed to create collection');
-    enhancedError.response = error.response;
-    throw enhancedError;
-  }
+export const createCollection = async (name, description = '', isPublic = false) => {
+  const collections = getLocalCollections();
+  const newCollection = {
+    id: `col-${Date.now()}`,
+    name,
+    description,
+    is_public: isPublic,
+    created_at: new Date().toISOString(),
+    item_count: 0,
+  };
+  collections.push(newCollection);
+  saveLocalCollections(collections);
+  return newCollection;
 };
 
 /**
@@ -51,17 +80,15 @@ const createCollection = async (name, description = '', isPublic = false) => {
  * @param {string} collectionId - Collection ID
  * @returns {Promise<object>}
  */
-const getCollectionById = async (collectionId) => {
-  try {
-    const response = await apiClient.get(`/api/v1/users/collections/${collectionId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching collection:', error);
-    // Preserve the original error object with response data
-    const enhancedError = new Error(error.response?.data?.message || 'Failed to fetch collection');
-    enhancedError.response = error.response;
-    throw enhancedError;
+export const getCollectionById = async (collectionId) => {
+  const collections = getLocalCollections();
+  const collection = collections.find(c => c.id === collectionId);
+  if (!collection) {
+    const error = new Error('Collection not found');
+    error.response = { status: 404 };
+    throw error;
   }
+  return collection;
 };
 
 /**
@@ -70,17 +97,18 @@ const getCollectionById = async (collectionId) => {
  * @param {object} updates - Fields to update (name, description, is_public)
  * @returns {Promise<object>} - Updated collection
  */
-const updateCollection = async (collectionId, updates) => {
-  try {
-    const response = await apiClient.patch(`/api/v1/users/collections/${collectionId}`, updates);
-    return response.data;
-  } catch (error) {
-    console.error('Error updating collection:', error);
-    // Preserve the original error object with response data
-    const enhancedError = new Error(error.response?.data?.message || 'Failed to update collection');
-    enhancedError.response = error.response;
-    throw enhancedError;
+export const updateCollection = async (collectionId, updates) => {
+  const collections = getLocalCollections();
+  const index = collections.findIndex(c => c.id === collectionId);
+  if (index === -1) {
+    const error = new Error('Collection not found');
+    error.response = { status: 404 };
+    throw error;
   }
+
+  collections[index] = { ...collections[index], ...updates };
+  saveLocalCollections(collections);
+  return collections[index];
 };
 
 /**
@@ -88,15 +116,16 @@ const updateCollection = async (collectionId, updates) => {
  * @param {string} collectionId - Collection ID
  * @returns {Promise<void>}
  */
-const deleteCollection = async (collectionId) => {
-  try {
-    await apiClient.delete(`/api/v1/users/collections/${collectionId}`);
-  } catch (error) {
-    console.error('Error deleting collection:', error);
-    // Preserve the original error object with response data
-    const enhancedError = new Error(error.response?.data?.message || 'Failed to delete collection');
-    enhancedError.response = error.response;
-    throw enhancedError;
+export const deleteCollection = async (collectionId) => {
+  let collections = getLocalCollections();
+  collections = collections.filter(c => c.id !== collectionId);
+  saveLocalCollections(collections);
+
+  // Also cleanup items
+  const allItems = getLocalCollectionItems();
+  if (allItems[collectionId]) {
+    delete allItems[collectionId];
+    saveLocalCollectionItems(allItems);
   }
 };
 
@@ -105,17 +134,9 @@ const deleteCollection = async (collectionId) => {
  * @param {string} collectionId - Collection ID
  * @returns {Promise<Array>} - List of items
  */
-const getCollectionItems = async (collectionId) => {
-  try {
-    const response = await apiClient.get(`/api/v1/users/collections/${collectionId}/items`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching collection items:', error);
-    // Preserve the original error object with response data
-    const enhancedError = new Error(error.response?.data?.message || 'Failed to fetch collection items');
-    enhancedError.response = error.response;
-    throw enhancedError;
-  }
+export const getCollectionItems = async (collectionId) => {
+  const allItems = getLocalCollectionItems();
+  return allItems[collectionId] || [];
 };
 
 /**
@@ -124,19 +145,35 @@ const getCollectionItems = async (collectionId) => {
  * @param {string} itemId - Item ID to add
  * @returns {Promise<object>} - Collection item relation
  */
-const addItemToCollection = async (collectionId, itemId) => {
-  try {
-    const response = await apiClient.post(`/api/v1/users/collections/${collectionId}/items`, {
-      itemId,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error adding item to collection:', error);
-    // Preserve the original error object with response data
-    const enhancedError = new Error(error.response?.data?.message || 'Failed to add item to collection');
-    enhancedError.response = error.response;
-    throw enhancedError;
+export const addItemToCollection = async (collectionId, itemId) => {
+  const allItems = getLocalCollectionItems();
+  if (!allItems[collectionId]) allItems[collectionId] = [];
+
+  // Check duplicates
+  if (allItems[collectionId].some(item => item.id === itemId)) {
+    throw new Error('Item already in collection');
   }
+
+  // Fetch the actual item details from favorites
+  const favorites = JSON.parse(localStorage.getItem('nasa_favorites') || '[]');
+  const item = favorites.find(f => f.id === itemId);
+
+  if (!item) {
+    throw new Error('Item not found in favorites');
+  }
+
+  allItems[collectionId].push(item);
+  saveLocalCollectionItems(allItems);
+
+  // Update count
+  const collections = getLocalCollections();
+  const colIndex = collections.findIndex(c => c.id === collectionId);
+  if (colIndex !== -1) {
+    collections[colIndex].item_count = allItems[collectionId].length;
+    saveLocalCollections(collections);
+  }
+
+  return { collectionId, itemId };
 };
 
 /**
@@ -145,19 +182,23 @@ const addItemToCollection = async (collectionId, itemId) => {
  * @param {string} itemId - Item ID to remove
  * @returns {Promise<void>}
  */
-const removeItemFromCollection = async (collectionId, itemId) => {
-  try {
-    await apiClient.delete(`/api/v1/users/collections/${collectionId}/items/${itemId}`);
-  } catch (error) {
-    console.error('Error removing item from collection:', error);
-    // Preserve the original error object with response data
-    const enhancedError = new Error(error.response?.data?.message || 'Failed to remove item from collection');
-    enhancedError.response = error.response;
-    throw enhancedError;
+export const removeItemFromCollection = async (collectionId, itemId) => {
+  const allItems = getLocalCollectionItems();
+  if (!allItems[collectionId]) return;
+
+  allItems[collectionId] = allItems[collectionId].filter(item => item.id !== itemId);
+  saveLocalCollectionItems(allItems);
+
+  // Update count
+  const collections = getLocalCollections();
+  const colIndex = collections.findIndex(c => c.id === collectionId);
+  if (colIndex !== -1) {
+    collections[colIndex].item_count = allItems[collectionId].length;
+    saveLocalCollections(collections);
   }
 };
 
-module.exports = {
+export default {
   getCollections,
   createCollection,
   getCollectionById,
@@ -167,3 +208,4 @@ module.exports = {
   addItemToCollection,
   removeItemFromCollection,
 };
+

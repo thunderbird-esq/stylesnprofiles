@@ -1,86 +1,121 @@
 /**
  * Favorites Service
  * Manages user's saved favorite items (APOD, NEO, MARS, etc.)
+ * Pure localStorage implementation for GitHub Pages static deployment
  */
 
-const apiClient = require('./apiClient').default;
+/* eslint-env browser */
+
+const STORAGE_KEY = 'nasa_favorites';
+
+/**
+ * Helper to get favorites from local storage
+ */
+const getLocalFavorites = () => {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch (_e) {
+    return [];
+  }
+};
+
+/**
+ * Helper to save favorites to local storage
+ */
+const saveLocalFavorites = (favorites) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+};
 
 /**
  * Get user's favorites with optional filtering and pagination
  */
-async function getFavorites(page = 1, limit = 20, type = null, search = '') {
-  try {
-    const params = { page, limit };
-    if (type) params.type = type;
-    if (search) params.search = search;
+export const getFavorites = async (page = 1, limit = 20, type = null, search = '') => {
+  let favorites = getLocalFavorites();
 
-    const response = await apiClient.get('/api/v1/users/favorites', { params });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching favorites:', error);
-    throw new Error(error.response?.data?.message || 'Failed to fetch favorites');
+  // Filter by type
+  if (type) {
+    favorites = favorites.filter(f => f.type === type);
   }
-}
+
+  // Filter by search
+  if (search) {
+    const lowerSearch = search.toLowerCase();
+    favorites = favorites.filter(f =>
+      (f.title && f.title.toLowerCase().includes(lowerSearch)) ||
+      (f.description && f.description.toLowerCase().includes(lowerSearch)),
+    );
+  }
+
+  // Pagination
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const paginated = favorites.slice(startIndex, endIndex);
+
+  return {
+    data: paginated,
+    pagination: {
+      total: favorites.length,
+      page,
+      pages: Math.ceil(favorites.length / limit),
+    },
+  };
+};
 
 /**
  * Add an item to favorites
  */
-async function addFavorite(itemData) {
-  try {
-    const response = await apiClient.post('/api/v1/users/favorites', itemData);
-    return response.data;
-  } catch (error) {
-    console.error('Error adding favorite:', error);
-    throw new Error(error.response?.data?.message || 'Failed to add favorite');
+export const addFavorite = async (itemData) => {
+  const favorites = getLocalFavorites();
+
+  // Check for duplicates
+  if (favorites.some(f => f.id === itemData.id)) {
+    throw new Error('Item already favorited');
   }
-}
+
+  const newFavorite = {
+    ...itemData,
+    created_at: new Date().toISOString(),
+  };
+
+  favorites.unshift(newFavorite); // Add to beginning
+  saveLocalFavorites(favorites);
+  return newFavorite;
+};
 
 /**
  * Remove an item from favorites
  */
-async function removeFavorite(itemId) {
-  try {
-    await apiClient.delete(`/api/v1/users/favorites/${itemId}`);
-  } catch (error) {
-    console.error('Error removing favorite:', error);
-    throw new Error(error.response?.data?.message || 'Failed to remove favorite');
+export const removeFavorite = async (itemId) => {
+  const favorites = getLocalFavorites();
+  const filtered = favorites.filter(f => f.id !== itemId);
+
+  if (favorites.length === filtered.length) {
+    throw new Error('Favorite not found');
   }
-}
+
+  saveLocalFavorites(filtered);
+};
 
 /**
  * Get a specific favorite by ID
  */
-async function getFavoriteById(itemId) {
-  try {
-    const response = await apiClient.get(`/api/v1/users/favorites/${itemId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching favorite:', error);
-    // Preserve the original error object with response data
-    const enhancedError = new Error(error.response?.data?.message || 'Failed to fetch favorite');
-    enhancedError.response = error.response;
-    throw enhancedError;
+export const getFavoriteById = async (itemId) => {
+  const favorites = getLocalFavorites();
+  const favorite = favorites.find(f => f.id === itemId);
+
+  if (!favorite) {
+    const error = new Error('Favorite not found');
+    error.response = { status: 404 };
+    throw error;
   }
-}
+  return favorite;
+};
 
 /**
  * Check if an item is favorited
  */
-async function isFavorited(itemId) {
-  try {
-    await getFavoriteById(itemId);
-    return true;
-  } catch (error) {
-    // If 404, item is not favorited
-    if (error.response?.status === 404) return false;
-    throw error;
-  }
-}
-
-module.exports = {
-  getFavorites,
-  addFavorite,
-  removeFavorite,
-  getFavoriteById,
-  isFavorited,
+export const isFavorited = async (itemId) => {
+  const favorites = getLocalFavorites();
+  return favorites.some(f => f.id === itemId);
 };
+
