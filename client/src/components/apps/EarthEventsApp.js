@@ -15,6 +15,7 @@ export default function EarthEventsApp({ windowId: _windowId }) {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [viewMode, setViewMode] = useState('map');
+    const [mapError, setMapError] = useState(false);
 
     // Category information
     const CATEGORY_INFO = {
@@ -78,13 +79,11 @@ export default function EarthEventsApp({ windowId: _windowId }) {
     useEffect(() => { fetchCategories(); }, [fetchCategories]);
     useEffect(() => { fetchEvents(); }, [fetchEvents]);
 
-    // Map dimensions - using proper aspect ratio for equirectangular projection
+    // Map dimensions
     const MAP_WIDTH = 560;
-    const MAP_HEIGHT = 280; // 2:1 ratio for equirectangular
+    const MAP_HEIGHT = 280;
 
-    // CORRECT coordinate projection for equirectangular map
-    // Longitude: -180 to +180 maps to 0 to MAP_WIDTH
-    // Latitude: +90 to -90 maps to 0 to MAP_HEIGHT
+    // Coordinate projection
     const coordToMapPos = (lon, lat) => {
         const x = ((lon + 180) / 360) * MAP_WIDTH;
         const y = ((90 - lat) / 180) * MAP_HEIGHT;
@@ -110,7 +109,7 @@ export default function EarthEventsApp({ windowId: _windowId }) {
         return d.toISOString().split('T')[0];
     }, []);
 
-    // Count events by category for summary
+    // Count events by category
     const categoryCounts = useMemo(() => {
         const counts = {};
         events.forEach(e => {
@@ -120,32 +119,37 @@ export default function EarthEventsApp({ windowId: _windowId }) {
         return counts;
     }, [events]);
 
+    // SVG fallback map when GIBS fails
+    const FallbackMap = () => (
+        <svg width={MAP_WIDTH} height={MAP_HEIGHT} style={{ position: 'absolute', top: 0, left: 0 }}>
+            <rect width="100%" height="100%" fill="#9cf" />
+            {/* Simple continent outlines */}
+            <ellipse cx="140" cy="100" rx="80" ry="60" fill="#9c9" stroke="#696" /> {/* Americas */}
+            <ellipse cx="310" cy="80" rx="50" ry="50" fill="#9c9" stroke="#696" /> {/* Europe/Africa */}
+            <ellipse cx="420" cy="100" rx="70" ry="55" fill="#9c9" stroke="#696" /> {/* Asia */}
+            <ellipse cx="450" cy="200" rx="40" ry="25" fill="#9c9" stroke="#696" /> {/* Australia */}
+            <rect x="0" y={MAP_HEIGHT - 30} width={MAP_WIDTH} height="30" fill="#fff" opacity="0.7" /> {/* Antarctica */}
+            <text x={MAP_WIDTH / 2} y={MAP_HEIGHT / 2} textAnchor="middle" fontSize="12" fill="#666">
+                Map loading... Events shown below
+            </text>
+        </svg>
+    );
+
     return (
         <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Header */}
             <div className="nasa-data-title">🌍 Earth Events Tracker</div>
             <div style={{ fontSize: '12px', marginBottom: '8px' }}>
                 EONET Active Natural Events • {events.length} tracked
             </div>
 
-            {/* Category Summary Bar */}
+            {/* Category Summary */}
             <div style={{
-                display: 'flex',
-                gap: '8px',
-                marginBottom: '8px',
-                padding: '4px 6px',
-                background: 'var(--tertiary)',
-                fontSize: '11px',
-                flexWrap: 'wrap',
+                display: 'flex', gap: '8px', marginBottom: '8px', padding: '4px 6px',
+                background: 'var(--tertiary)', fontSize: '11px', flexWrap: 'wrap',
             }}>
-                {Object.entries(categoryCounts).slice(0, 6).map(([catId, count]) => {
-                    const info = getCategoryInfo(catId);
-                    return (
-                        <span key={catId} style={{ whiteSpace: 'nowrap' }}>
-                            {info.icon} {count}
-                        </span>
-                    );
-                })}
+                {Object.entries(categoryCounts).slice(0, 6).map(([catId, count]) => (
+                    <span key={catId}>{getCategoryInfo(catId).icon} {count}</span>
+                ))}
             </div>
 
             {/* Controls */}
@@ -157,26 +161,12 @@ export default function EarthEventsApp({ windowId: _windowId }) {
                 >
                     <option value="">All Categories</option>
                     {categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                            {getCategoryInfo(cat.id).icon} {cat.title}
-                        </option>
+                        <option key={cat.id} value={cat.id}>{getCategoryInfo(cat.id).icon} {cat.title}</option>
                     ))}
                 </select>
-                <div className="btn-group" style={{ display: 'flex' }}>
-                    <button
-                        className={`btn ${viewMode === 'map' ? 'btn-default' : ''}`}
-                        onClick={() => setViewMode('map')}
-                        style={{ fontSize: '11px', padding: '4px 8px' }}
-                    >
-                        Map
-                    </button>
-                    <button
-                        className={`btn ${viewMode === 'list' ? 'btn-default' : ''}`}
-                        onClick={() => setViewMode('list')}
-                        style={{ fontSize: '11px', padding: '4px 8px' }}
-                    >
-                        List
-                    </button>
+                <div style={{ display: 'flex' }}>
+                    <button className={`btn ${viewMode === 'map' ? 'btn-default' : ''}`} onClick={() => setViewMode('map')} style={{ fontSize: '11px', padding: '4px 8px' }}>Map</button>
+                    <button className={`btn ${viewMode === 'list' ? 'btn-default' : ''}`} onClick={() => setViewMode('list')} style={{ fontSize: '11px', padding: '4px 8px' }}>List</button>
                 </div>
             </div>
 
@@ -187,7 +177,6 @@ export default function EarthEventsApp({ windowId: _windowId }) {
                 {loading ? (
                     <div className="nasa-loading">Loading earth events...</div>
                 ) : viewMode === 'map' ? (
-                    /* MAP VIEW - Using WMS for proper full-globe coverage */
                     <div style={{ textAlign: 'center' }}>
                         <div style={{
                             position: 'relative',
@@ -195,22 +184,23 @@ export default function EarthEventsApp({ windowId: _windowId }) {
                             height: MAP_HEIGHT,
                             margin: '0 auto',
                             border: '2px solid var(--secondary)',
-                            background: '#cde', /* Light blue ocean fallback */
+                            background: '#9cf',
                             overflow: 'hidden',
                         }}>
-                            {/* Full-globe WMS image - proper equirectangular projection */}
-                            <img
-                                src={`https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=BlueMarble_NextGeneration&CRS=EPSG:4326&BBOX=-90,-180,90,180&WIDTH=${MAP_WIDTH}&HEIGHT=${MAP_HEIGHT}&FORMAT=image/jpeg&TIME=2004-08`}
-                                alt="World Map"
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: MAP_WIDTH,
-                                    height: MAP_HEIGHT,
-                                }}
-                                draggable={false}
-                            />
+                            {/* Map Image or Fallback */}
+                            {mapError ? <FallbackMap /> : (
+                                <img
+                                    src="https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57752/land_shallow_topo_2048.jpg"
+                                    alt="World Map"
+                                    crossOrigin="anonymous"
+                                    onError={() => setMapError(true)}
+                                    style={{
+                                        position: 'absolute', top: 0, left: 0,
+                                        width: MAP_WIDTH, height: MAP_HEIGHT,
+                                        objectFit: 'cover',
+                                    }}
+                                />
+                            )}
 
                             {/* Event Markers */}
                             {events.map((event) => {
@@ -247,20 +237,13 @@ export default function EarthEventsApp({ windowId: _windowId }) {
                         </div>
 
                         {/* Legend */}
-                        <div style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: '8px',
-                            marginTop: '6px',
-                            fontSize: '10px',
-                            justifyContent: 'center',
-                        }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '6px', fontSize: '10px', justifyContent: 'center' }}>
                             {Object.entries(CATEGORY_INFO).slice(0, 8).map(([id, info]) => (
                                 <span key={id}>{info.icon} {info.what}</span>
                             ))}
                         </div>
 
-                        {/* Event List Below Map */}
+                        {/* Event List */}
                         <div style={{ marginTop: '8px', textAlign: 'left', maxHeight: '120px', overflow: 'auto' }}>
                             {events.slice(0, 15).map((event) => {
                                 const info = getCategoryInfo(event.categories?.[0]?.id);
@@ -270,13 +253,9 @@ export default function EarthEventsApp({ windowId: _windowId }) {
                                         key={event.id}
                                         onClick={() => setSelectedEvent(event)}
                                         style={{
-                                            padding: '3px 6px',
-                                            cursor: 'pointer',
+                                            padding: '3px 6px', cursor: 'pointer',
                                             borderBottom: '1px dotted var(--tertiary)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            fontSize: '11px',
+                                            display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px',
                                             background: selectedEvent?.id === event.id ? 'var(--tertiary)' : 'transparent',
                                         }}
                                     >
@@ -299,22 +278,14 @@ export default function EarthEventsApp({ windowId: _windowId }) {
                                     key={event.id}
                                     onClick={() => setSelectedEvent(event)}
                                     style={{
-                                        padding: '8px',
-                                        border: '1px solid var(--secondary)',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px',
+                                        padding: '8px', border: '1px solid var(--secondary)',
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
                                     }}
                                 >
                                     <span style={{ fontSize: '20px' }}>{info.icon}</span>
                                     <div style={{ flex: 1 }}>
-                                        <div style={{ fontSize: '12px', fontWeight: 'bold' }}>
-                                            {event.title?.substring(0, 45)}{event.title?.length > 45 ? '…' : ''}
-                                        </div>
-                                        <div style={{ fontSize: '11px', opacity: 0.7 }}>
-                                            {event.categories?.[0]?.title} • {geo ? formatCoords(geo.coordinates[1], geo.coordinates[0]) : ''}
-                                        </div>
+                                        <div style={{ fontSize: '12px', fontWeight: 'bold' }}>{event.title?.substring(0, 45)}{event.title?.length > 45 ? '…' : ''}</div>
+                                        <div style={{ fontSize: '11px', opacity: 0.7 }}>{event.categories?.[0]?.title} • {geo ? formatCoords(geo.coordinates[1], geo.coordinates[0]) : ''}</div>
                                     </div>
                                 </div>
                             );
@@ -323,102 +294,62 @@ export default function EarthEventsApp({ windowId: _windowId }) {
                 )}
             </div>
 
-            {/* Event Detail Modal - System 6 Style */}
+            {/* Event Detail Modal */}
             {selectedEvent && (
                 <div
                     style={{
-                        position: 'fixed',
-                        top: 0, left: 0, right: 0, bottom: 0,
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
                         background: 'rgba(128,128,128,0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
                     }}
                     onClick={() => setSelectedEvent(null)}
                 >
                     <div
                         style={{
-                            background: 'var(--primary)',
-                            border: '2px solid var(--secondary)',
+                            background: 'var(--primary)', border: '2px solid var(--secondary)',
                             boxShadow: '4px 4px 0 var(--secondary)',
-                            maxWidth: '500px',
-                            maxHeight: '70vh',
-                            overflow: 'auto',
-                            width: '90%',
+                            maxWidth: '500px', maxHeight: '70vh', overflow: 'auto', width: '90%',
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Modal Title Bar */}
                         <div style={{
-                            background: 'var(--secondary)',
-                            color: 'var(--primary)',
-                            padding: '4px 8px',
-                            fontSize: '12px',
-                            fontWeight: 'bold',
-                            display: 'flex',
-                            justifyContent: 'space-between',
+                            background: 'var(--secondary)', color: 'var(--primary)',
+                            padding: '4px 8px', fontSize: '12px', fontWeight: 'bold',
+                            display: 'flex', justifyContent: 'space-between',
                         }}>
                             <span>{getCategoryInfo(selectedEvent.categories?.[0]?.id).icon} Event Details</span>
-                            <button
-                                onClick={() => setSelectedEvent(null)}
-                                style={{
-                                    background: 'var(--primary)',
-                                    color: 'var(--secondary)',
-                                    border: '1px solid var(--primary)',
-                                    padding: '0 6px',
-                                    cursor: 'pointer',
-                                    fontSize: '10px',
-                                }}
-                            >
-                                ✕
-                            </button>
+                            <button onClick={() => setSelectedEvent(null)} style={{ background: 'var(--primary)', color: 'var(--secondary)', border: '1px solid var(--primary)', padding: '0 6px', cursor: 'pointer', fontSize: '10px' }}>✕</button>
                         </div>
 
-                        {/* Modal Content */}
                         <div style={{ padding: '12px', fontSize: '12px' }}>
                             <h3 style={{ margin: '0 0 8px 0', fontSize: '14px' }}>{selectedEvent.title}</h3>
 
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: '1fr 1fr',
-                                gap: '8px',
-                                marginBottom: '10px',
-                            }}>
-                                {/* WHAT */}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
                                 <div style={{ padding: '6px', border: '1px solid var(--tertiary)' }}>
                                     <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>📌 WHAT</div>
                                     <div>{getCategoryInfo(selectedEvent.categories?.[0]?.id).what}</div>
                                 </div>
-                                {/* WHERE */}
                                 <div style={{ padding: '6px', border: '1px solid var(--tertiary)' }}>
                                     <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>📍 WHERE</div>
                                     {selectedEvent.geometry?.slice(-1).map((geo, i) => (
                                         <div key={i}>{formatCoords(geo.coordinates[1], geo.coordinates[0])}</div>
                                     ))}
                                 </div>
-                                {/* WHEN */}
                                 <div style={{ padding: '6px', border: '1px solid var(--tertiary)' }}>
                                     <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>📅 WHEN</div>
                                     <div>First: {formatDate(selectedEvent.geometry?.[0]?.date)}</div>
-                                    {selectedEvent.geometry?.length > 1 && (
-                                        <div style={{ fontSize: '10px' }}>+{selectedEvent.geometry.length - 1} updates</div>
-                                    )}
                                 </div>
-                                {/* WHY */}
                                 <div style={{ padding: '6px', border: '1px solid var(--tertiary)' }}>
                                     <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>❓ WHY</div>
                                     <div>{getCategoryInfo(selectedEvent.categories?.[0]?.id).why}</div>
                                 </div>
                             </div>
 
-                            {/* HOW */}
                             <div style={{ padding: '6px', border: '1px solid var(--tertiary)', marginBottom: '10px' }}>
                                 <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>🔬 HOW DETECTED</div>
                                 <div>{getCategoryInfo(selectedEvent.categories?.[0]?.id).how}</div>
                             </div>
 
-                            {/* Sources */}
                             {selectedEvent.sources?.length > 0 && (
                                 <div style={{ marginBottom: '10px' }}>
                                     <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>🌐 Sources</div>
@@ -426,47 +357,28 @@ export default function EarthEventsApp({ windowId: _windowId }) {
                                         const srcInfo = getSourceInfo(src.id);
                                         return (
                                             <div key={i} style={{ fontSize: '11px', marginBottom: '2px' }}>
-                                                <strong>{srcInfo.name}</strong> ({srcInfo.org}) - {srcInfo.desc}
-                                                {' '}
-                                                <a href={src.url} target="_blank" rel="noopener noreferrer" style={{ color: '#00c' }}>→</a>
+                                                <strong>{srcInfo.name}</strong> ({srcInfo.org}) <a href={src.url} target="_blank" rel="noopener noreferrer" style={{ color: '#00c' }}>→</a>
                                             </div>
                                         );
                                     })}
                                 </div>
                             )}
 
-                            {/* Worldview Link */}
                             <div style={{ textAlign: 'center' }}>
                                 <a
                                     href={`https://worldview.earthdata.nasa.gov/?v=${selectedEvent.geometry?.[0]?.coordinates[0] - 10},${selectedEvent.geometry?.[0]?.coordinates[1] - 10},${selectedEvent.geometry?.[0]?.coordinates[0] + 10},${selectedEvent.geometry?.[0]?.coordinates[1] + 10}&t=${yesterday}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn"
-                                    style={{ fontSize: '11px' }}
-                                >
-                                    🛰️ View in NASA Worldview
-                                </a>
+                                    target="_blank" rel="noopener noreferrer" className="btn" style={{ fontSize: '11px' }}
+                                >🛰️ View in NASA Worldview</a>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Blink animation */}
-            <style>{`
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
+            <style>{`@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
         </div>
     );
 }
 
-EarthEventsApp.propTypes = {
-    windowId: PropTypes.string,
-};
-
-EarthEventsApp.defaultProps = {
-    windowId: null,
-};
+EarthEventsApp.propTypes = { windowId: PropTypes.string };
+EarthEventsApp.defaultProps = { windowId: null };

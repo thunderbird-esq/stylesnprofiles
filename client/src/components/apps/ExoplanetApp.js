@@ -19,28 +19,43 @@ export default function ExoplanetApp({ windowId: _windowId }) {
         setError(null);
 
         try {
+            // Build query - use URL encoding for safety
             let query = 'select top 100 pl_name,hostname,disc_year,discoverymethod,pl_orbper,pl_rade,pl_bmasse,sy_dist from ps';
-            if (searchQuery) {
-                query = `select top 100 pl_name,hostname,disc_year,discoverymethod,pl_orbper,pl_rade,pl_bmasse,sy_dist from ps where pl_name like '%${searchQuery}%' or hostname like '%${searchQuery}%'`;
+            if (searchQuery.trim()) {
+                const search = searchQuery.trim().replace(/'/g, "''"); // Escape quotes
+                query = `select top 100 pl_name,hostname,disc_year,discoverymethod,pl_orbper,pl_rade,pl_bmasse,sy_dist from ps where pl_name like '%${search}%' or hostname like '%${search}%'`;
             }
             query += ' order by disc_year desc';
 
+            console.log('Exoplanet query:', query);
+
             const response = await axios.get('https://exoplanetarchive.ipac.caltech.edu/TAP/sync', {
-                params: { query, format: 'json' }
+                params: { query, format: 'json' },
+                timeout: 30000, // 30 second timeout
             });
 
+            console.log('Exoplanet response:', response.data);
             const data = Array.isArray(response.data) ? response.data : [];
             setPlanets(data);
             if (data.length === 0) setError('No exoplanets found.');
         } catch (err) {
             console.error('Exoplanet fetch error:', err);
-            setError('Failed to load exoplanet data.');
+            if (err.code === 'ECONNABORTED') {
+                setError('Request timed out. Try again.');
+            } else if (err.response?.status === 400) {
+                setError('Invalid search query.');
+            } else {
+                setError('Failed to load exoplanet data. Check console.');
+            }
         } finally {
             setLoading(false);
         }
     }, [searchQuery]);
 
-    useEffect(() => { fetchPlanets(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // Fetch on mount
+    useEffect(() => {
+        fetchPlanets();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -78,42 +93,37 @@ export default function ExoplanetApp({ windowId: _windowId }) {
         return counts;
     }, [planets]);
 
+    const years = Object.keys(yearHistogram).map(Number).sort((a, b) => a - b);
     const maxCount = Math.max(...Object.values(yearHistogram), 1);
 
     return (
         <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Header */}
             <div className="nasa-data-title">🪐 Exoplanet Explorer</div>
             <div style={{ fontSize: '11px', marginBottom: '6px', opacity: 0.8 }}>
-                NASA Exoplanet Archive • {planets.length} planets
+                NASA Exoplanet Archive • {planets.length} planets loaded
             </div>
 
-            {/* Discovery Timeline Mini-Chart */}
-            {Object.keys(yearHistogram).length > 0 && (
-                <div style={{
-                    marginBottom: '8px',
-                    padding: '4px',
-                    border: '1px solid var(--tertiary)',
-                    fontSize: '9px',
-                }}>
+            {/* Discovery Timeline */}
+            {years.length > 0 && (
+                <div style={{ marginBottom: '8px', padding: '4px', border: '1px solid var(--tertiary)', fontSize: '9px' }}>
                     <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>Discoveries by Year:</div>
                     <div style={{ display: 'flex', alignItems: 'flex-end', height: '20px', gap: '1px' }}>
-                        {Object.entries(yearHistogram).sort((a, b) => a[0] - b[0]).slice(-15).map(([year, count]) => (
+                        {years.slice(-15).map(year => (
                             <div
                                 key={year}
-                                title={`${year}: ${count} planets`}
+                                title={`${year}: ${yearHistogram[year]} planets`}
                                 style={{
                                     flex: 1,
                                     background: 'var(--secondary)',
-                                    height: `${(count / maxCount) * 100}%`,
+                                    height: `${(yearHistogram[year] / maxCount) * 100}%`,
                                     minHeight: '2px',
                                 }}
                             />
                         ))}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1px' }}>
-                        <span>{Object.keys(yearHistogram).sort()[0]}</span>
-                        <span>{Object.keys(yearHistogram).sort().pop()}</span>
+                        <span>{years.slice(-15)[0]}</span>
+                        <span>{years[years.length - 1]}</span>
                     </div>
                 </div>
             )}
@@ -138,6 +148,11 @@ export default function ExoplanetApp({ windowId: _windowId }) {
             <div style={{ flex: 1, overflow: 'auto' }}>
                 {loading ? (
                     <div className="nasa-loading">Scanning the galaxy...</div>
+                ) : planets.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '20px', fontSize: '12px' }}>
+                        <div style={{ fontSize: '48px', marginBottom: '8px' }}>🔭</div>
+                        <div>No planets found. Try a different search.</div>
+                    </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         {planets.map((planet, idx) => {
@@ -163,7 +178,7 @@ export default function ExoplanetApp({ windowId: _windowId }) {
                                         </div>
                                     </div>
                                     <div style={{ fontSize: '10px', opacity: 0.6, textAlign: 'right' }}>
-                                        {planet.sy_dist ? `${planet.sy_dist.toFixed(0)} ly` : ''}
+                                        {planet.sy_dist ? `${Math.round(planet.sy_dist)} ly` : ''}
                                     </div>
                                 </div>
                             );
@@ -172,59 +187,33 @@ export default function ExoplanetApp({ windowId: _windowId }) {
                 )}
             </div>
 
-            {/* Planet Detail Modal - System 6 Style */}
+            {/* Planet Detail Modal */}
             {selectedPlanet && (
                 <div
                     style={{
-                        position: 'fixed',
-                        top: 0, left: 0, right: 0, bottom: 0,
+                        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
                         background: 'rgba(128,128,128,0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1000,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
                     }}
                     onClick={() => setSelectedPlanet(null)}
                 >
                     <div
                         style={{
-                            background: 'var(--primary)',
-                            border: '2px solid var(--secondary)',
+                            background: 'var(--primary)', border: '2px solid var(--secondary)',
                             boxShadow: '4px 4px 0 var(--secondary)',
-                            maxWidth: '400px',
-                            maxHeight: '70vh',
-                            overflow: 'auto',
-                            width: '90%',
+                            maxWidth: '400px', maxHeight: '70vh', overflow: 'auto', width: '90%',
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Modal Title Bar */}
                         <div style={{
-                            background: 'var(--secondary)',
-                            color: 'var(--primary)',
-                            padding: '4px 8px',
-                            fontSize: '12px',
-                            fontWeight: 'bold',
-                            display: 'flex',
-                            justifyContent: 'space-between',
+                            background: 'var(--secondary)', color: 'var(--primary)',
+                            padding: '4px 8px', fontSize: '12px', fontWeight: 'bold',
+                            display: 'flex', justifyContent: 'space-between',
                         }}>
                             <span>{getPlanetType(selectedPlanet.pl_rade, selectedPlanet.pl_bmasse).icon} {selectedPlanet.pl_name}</span>
-                            <button
-                                onClick={() => setSelectedPlanet(null)}
-                                style={{
-                                    background: 'var(--primary)',
-                                    color: 'var(--secondary)',
-                                    border: '1px solid var(--primary)',
-                                    padding: '0 6px',
-                                    cursor: 'pointer',
-                                    fontSize: '10px',
-                                }}
-                            >
-                                ✕
-                            </button>
+                            <button onClick={() => setSelectedPlanet(null)} style={{ background: 'var(--primary)', color: 'var(--secondary)', border: '1px solid var(--primary)', padding: '0 6px', cursor: 'pointer', fontSize: '10px' }}>✕</button>
                         </div>
 
-                        {/* Modal Content */}
                         <div style={{ padding: '12px', fontSize: '12px' }}>
                             <div style={{ textAlign: 'center', marginBottom: '10px' }}>
                                 <div style={{ fontSize: '48px' }}>{getPlanetType(selectedPlanet.pl_rade, selectedPlanet.pl_bmasse).icon}</div>
@@ -249,7 +238,7 @@ export default function ExoplanetApp({ windowId: _windowId }) {
                                     <div>{formatMass(selectedPlanet.pl_bmasse)}</div>
                                 </div>
                                 <div style={{ padding: '6px', border: '1px solid var(--tertiary)' }}>
-                                    <div style={{ fontWeight: 'bold', fontSize: '10px' }}>🔄 Orbit Period</div>
+                                    <div style={{ fontWeight: 'bold', fontSize: '10px' }}>🔄 Orbit</div>
                                     <div>{selectedPlanet.pl_orbper ? `${selectedPlanet.pl_orbper.toFixed(1)} days` : 'Unknown'}</div>
                                 </div>
                                 <div style={{ padding: '6px', border: '1px solid var(--tertiary)' }}>
@@ -258,13 +247,7 @@ export default function ExoplanetApp({ windowId: _windowId }) {
                                 </div>
                             </div>
 
-                            <button
-                                onClick={() => setSelectedPlanet(null)}
-                                className="btn"
-                                style={{ marginTop: '10px', width: '100%', fontSize: '12px' }}
-                            >
-                                Close
-                            </button>
+                            <button onClick={() => setSelectedPlanet(null)} className="btn" style={{ marginTop: '10px', width: '100%', fontSize: '12px' }}>Close</button>
                         </div>
                     </div>
                 </div>
@@ -273,10 +256,5 @@ export default function ExoplanetApp({ windowId: _windowId }) {
     );
 }
 
-ExoplanetApp.propTypes = {
-    windowId: PropTypes.string,
-};
-
-ExoplanetApp.defaultProps = {
-    windowId: null,
-};
+ExoplanetApp.propTypes = { windowId: PropTypes.string };
+ExoplanetApp.defaultProps = { windowId: null };
