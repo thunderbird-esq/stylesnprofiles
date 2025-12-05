@@ -913,18 +913,19 @@ ul[role='menu']>[role='menu-item'][aria-haspopup='true'] {
 
 /* NEO Detail Panel */
 .neo-detail-panel {
-  padding: 12px;
+  padding: 16px;
+  font-size: 16px;
 }
 
 .neo-detail-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .neo-detail-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   font-family: Chicago_12;
 }
@@ -932,17 +933,18 @@ ul[role='menu']>[role='menu-item'][aria-haspopup='true'] {
 .neo-detail-row {
   display: flex;
   justify-content: space-between;
-  padding: 4px 0;
+  padding: 8px 0;
   border-bottom: 1px dotted var(--tertiary);
+  font-size: 16px;
 }
 
 .neo-detail-row .label {
   font-weight: bold;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 .neo-detail-row .value {
-  font-size: 13px;
+  font-size: 16px;
 }
 
 /* Favorites and Collections panels */
