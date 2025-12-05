@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/stylesnprofiles/static/css/main.b8fcc56e.css",
+    "main.js": "/stylesnprofiles/static/js/main.7913b8b7.js",
+    "static/media/ChicagoFLF.woff": "/stylesnprofiles/static/media/ChicagoFLF.1fc01d6b69fad63e3bf5.woff",
+    "static/media/ChicagoFLF.woff2": "/stylesnprofiles/static/media/ChicagoFLF.835bc739763a639988e2.woff2",
+    "static/media/ChiKareGo2.woff": "/stylesnprofiles/static/media/ChiKareGo2.3bf61dbb305fae41689f.woff",
+    "static/media/FindersKeepers.woff": "/stylesnprofiles/static/media/FindersKeepers.ac2f921ef4c3c63107a9.woff",
+    "static/media/ChiKareGo2.woff2": "/stylesnprofiles/static/media/ChiKareGo2.fa52657afa2f46da97b5.woff2",
+    "static/media/monaco.woff": "/stylesnprofiles/static/media/monaco.1533e461f14a5d071443.woff",
+    "static/media/FindersKeepers.woff2": "/stylesnprofiles/static/media/FindersKeepers.a04bc38817a829a7b4f7.woff2",
+    "static/media/monaco.woff2": "/stylesnprofiles/static/media/monaco.9f0c755ba32552ecfd97.woff2",
+    "static/media/button-default.svg": "/stylesnprofiles/static/media/button-default.33d9fa956730ecacb13b.svg",
+    "index.html": "/stylesnprofiles/index.html",
+    "static/media/button.svg": "/stylesnprofiles/static/media/button.692d8269c01a5c4053ec.svg",
+    "main.b8fcc56e.css.map": "/stylesnprofiles/static/css/main.b8fcc56e.css.map",
+    "main.7913b8b7.js.map": "/stylesnprofiles/static/js/main.7913b8b7.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b8fcc56e.css",
+    "static/js/main.7913b8b7.js"
+  ]
+}
