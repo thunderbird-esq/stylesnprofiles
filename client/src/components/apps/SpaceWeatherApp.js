@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { getDonkiCME, getDonkiFLR, getDonkiGST } from '../../services/nasaApi';
-import { getNoaaScales, getAlerts, getKpIndex } from '../../services/noaaSwpcApi';
+import { getNoaaScales, getAlerts, getKpIndex, getSolarRegions } from '../../services/noaaSwpcApi';
 import SunVisualization from './SunVisualization';
 import NoaaScalesGauge from './NoaaScalesGauge';
 import KpIndexChart from './KpIndexChart';
@@ -21,6 +21,7 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
     const [noaaScales, setNoaaScales] = useState(null);
     const [alerts, setAlerts] = useState([]);
     const [kpIndex, setKpIndex] = useState([]);
+    const [solarRegions, setSolarRegions] = useState([]);
     const [noaaLoading, setNoaaLoading] = useState(true);
 
     // DONKI data
@@ -40,15 +41,17 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
         setError(null);
 
         try {
-            const [scalesData, alertsData, kpData] = await Promise.all([
+            const [scalesData, alertsData, kpData, regionsData] = await Promise.all([
                 getNoaaScales().catch(() => null),
                 getAlerts().catch(() => []),
                 getKpIndex().catch(() => []),
+                getSolarRegions().catch(() => []),
             ]);
 
             setNoaaScales(scalesData);
             setAlerts(alertsData);
             setKpIndex(kpData);
+            setSolarRegions(regionsData);
         } catch (err) {
             console.error('NOAA fetch error:', err);
             setError('Failed to load NOAA data');
@@ -112,7 +115,7 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
 
     // If showing 3D visualization
     if (showSunViz) {
-        return <SunVisualization events={donkiEvents} onClose={() => setShowSunViz(false)} />;
+        return <SunVisualization events={donkiEvents} solarRegions={solarRegions} onClose={() => setShowSunViz(false)} />;
     }
 
     // Tab button style
