@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-12-05 (Week 5)
+
+### 🚀 Five New NASA Apps
+- **🌞 Space Weather App**: Real-time solar events from DONKI API
+  - Coronal Mass Ejections (CME) with impact estimates
+  - Solar Flares (FLR) with intensity classification
+  - Geomagnetic Storms (GST) with Kp index
+  - Event timeline with severity indicators
+- **🔥 Earth Events App**: Natural disasters from EONET API
+  - Wildfires, storms, volcanoes, earthquakes tracker
+  - Category filtering with custom icons
+  - Location coordinates and source links
+  - Active/closed event status
+- **🪐 Exoplanet Explorer**: 5,000+ confirmed exoplanets
+  - Search by planet or star name
+  - Planet type classification (Rocky, Super-Earth, Neptune-like, Gas Giant)
+  - Discovery method, orbital period, mass, and radius
+  - Data from NASA Exoplanet Archive (TAP API)
+- **💫 Close Approach Tracker**: Asteroid flybys from JPL SSD/CNEOS
+  - Next 60 days of close approaches
+  - Distance and velocity data
+  - Threat level indicators (Very Close → Distant)
+  - Adjustable distance filter (0.01 - 0.2 AU)
+- **🔬 NASA Techport**: Technology projects browser
+  - Active, completed, and cancelled projects
+  - Technology readiness levels
+  - Project descriptions and timelines
+
+### API Expansion (9 New Functions)
+- `getDonkiCME()`, `getDonkiFLR()`, `getDonkiGST()`, `getDonkiSEP()` - Space weather
+- `getEonetEvents()`, `getEonetCategories()` - Earth events
+- `getCloseApproaches()`, `getSmallBodyData()` - Asteroid data
+- `getExoplanets()` - Exoplanet Archive TAP queries
+- `getTechportProjects()`, `getTechportProject()` - NASA technology
+- `getInsightWeather()` - Mars weather from InSight
+
+### EPIC App Fix
+- Added fallback to api.nasa.gov mirror when direct endpoint fails
+- Retry logic with 10-second timeout
+- Better error messages for connectivity issues
+
+### Text Size Increase (+35% from original)
+- Base content: 20px (was 15px)
+- Titles: 26-30px (was 17-22px)
+- Menu bar and window titles: 20px
+- NEO detail panel: 22px
+- Panel titles: 28px
+
+### Desktop Updates
+- 11 application icons on desktop (was 6)
+- New apps: Space Weather, Earth Events, Exoplanets, Close Approach, Techport
+
 ## [0.3.0] - 2025-12-05 (Week 4)
 
 ### New NASA Apps

@@ -42,6 +42,31 @@ export default function Desktop() {
           onDoubleClick={() => openApp('library')}
         />
         <DesktopIcon
+          label="Space Weather"
+          icon={APPS['spaceweather'].icon}
+          onDoubleClick={() => openApp('spaceweather')}
+        />
+        <DesktopIcon
+          label="Earth Events"
+          icon={APPS['earthevents'].icon}
+          onDoubleClick={() => openApp('earthevents')}
+        />
+        <DesktopIcon
+          label="Exoplanets"
+          icon={APPS['exoplanets'].icon}
+          onDoubleClick={() => openApp('exoplanets')}
+        />
+        <DesktopIcon
+          label="Close Approach"
+          icon={APPS['closeapproach'].icon}
+          onDoubleClick={() => openApp('closeapproach')}
+        />
+        <DesktopIcon
+          label="Techport"
+          icon={APPS['techport'].icon}
+          onDoubleClick={() => openApp('techport')}
+        />
+        <DesktopIcon
           label="Bookmarks"
           icon={APPS['bookmarks'].icon}
           onDoubleClick={() => openApp('bookmarks')}

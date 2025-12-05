@@ -853,19 +853,19 @@ ul [role='menu-item'].divider::after {
 /* ============================================
    NASA PORTAL SPECIFIC STYLES
    Enhanced readability and text scaling
-   Text increased by ~8.5% (except buttons/dropdowns)
+   Text increased by ~35% from original for laptop readability
    ============================================ */
 
-/* Base text size increase for laptops (+25%: 15px → 18px) */
+/* Base text size increase for laptops (15px → 20px) */
 .nasa-app-content,
 .nasa-data-section,
 .nasa-data-content {
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1.5;
 }
 
 .nasa-data-title {
-  font-size: 21px;
+  font-size: 26px;
   font-weight: bold;
   font-family: Chicago_12;
   margin-bottom: 8px;
@@ -880,7 +880,7 @@ ul [role='menu-item'].divider::after {
 .nasa-error {
   padding: 20px;
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
   font-family: Chicago_12;
 }
 
@@ -888,29 +888,29 @@ ul [role='menu-item'].divider::after {
   color: #ff0000;
 }
 
-/* Menu bar text scaling (+25%: 15px → 18px) */
+/* Menu bar text scaling (15px → 20px) */
 .nasa-menu-bar {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .nasa-menu-item {
-  font-size: 18px;
+  font-size: 20px;
 }
 
-/* Window title bar (+25%: 15px → 18px) */
+/* Window title bar (15px → 20px) */
 .title-bar .title {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 /* Window content text */
 .window-pane {
-  font-size: 18px;
+  font-size: 20px;
 }
 
-/* NEO Detail Panel (+25%: 17→20px, 22→27px) */
+/* NEO Detail Panel */
 .neo-detail-panel {
   padding: 16px;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .neo-detail-header {
@@ -921,7 +921,7 @@ ul [role='menu-item'].divider::after {
 }
 
 .neo-detail-title {
-  font-size: 27px;
+  font-size: 30px;
   font-weight: bold;
   font-family: Chicago_12;
 }
@@ -931,34 +931,34 @@ ul [role='menu-item'].divider::after {
   justify-content: space-between;
   padding: 8px 0;
   border-bottom: 1px dotted var(--tertiary);
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .neo-detail-row .label {
   font-weight: bold;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .neo-detail-row .value {
-  font-size: 20px;
+  font-size: 22px;
 }
 
 /* Favorites and Collections panels */
 .favorites-panel,
 .collections-panel {
   padding: 12px;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .favorites-title,
 .collections-title {
-  font-size: 24px;
+  font-size: 28px;
   font-family: Chicago_12;
   margin-bottom: 8px;
 }
 
 .favorites-count {
-  font-size: 16px;
+  font-size: 18px;
   opacity: 0.8;
 }
 

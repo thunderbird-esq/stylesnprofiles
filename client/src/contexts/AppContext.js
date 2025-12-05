@@ -9,6 +9,11 @@ import BookmarksApp from '../components/apps/BookmarksApp';
 import MarsRoverApp from '../components/apps/MarsRoverApp';
 import NasaLibraryApp from '../components/apps/NasaLibraryApp';
 import EpicApp from '../components/apps/EpicApp';
+import SpaceWeatherApp from '../components/apps/SpaceWeatherApp';
+import EarthEventsApp from '../components/apps/EarthEventsApp';
+import ExoplanetApp from '../components/apps/ExoplanetApp';
+import CloseApproachApp from '../components/apps/CloseApproachApp';
+import TechportApp from '../components/apps/TechportApp';
 
 const AppContext = createContext();
 
@@ -52,6 +57,46 @@ const APPS = {
     icon: '📷',
     component: props => <NasaLibraryApp {...props} />,
     defaultWidth: 650,
+    defaultHeight: 550,
+  },
+  spaceweather: {
+    id: 'spaceweather',
+    title: 'Space Weather',
+    icon: '🌞',
+    component: props => <SpaceWeatherApp {...props} />,
+    defaultWidth: 550,
+    defaultHeight: 550,
+  },
+  earthevents: {
+    id: 'earthevents',
+    title: 'Earth Events',
+    icon: '🔥',
+    component: props => <EarthEventsApp {...props} />,
+    defaultWidth: 600,
+    defaultHeight: 550,
+  },
+  exoplanets: {
+    id: 'exoplanets',
+    title: 'Exoplanets',
+    icon: '🪐',
+    component: props => <ExoplanetApp {...props} />,
+    defaultWidth: 600,
+    defaultHeight: 550,
+  },
+  closeapproach: {
+    id: 'closeapproach',
+    title: 'Close Approach',
+    icon: '💫',
+    component: props => <CloseApproachApp {...props} />,
+    defaultWidth: 550,
+    defaultHeight: 550,
+  },
+  techport: {
+    id: 'techport',
+    title: 'NASA Techport',
+    icon: '🔬',
+    component: props => <TechportApp {...props} />,
+    defaultWidth: 600,
     defaultHeight: 550,
   },
   resources: {
