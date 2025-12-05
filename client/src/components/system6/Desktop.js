@@ -27,9 +27,19 @@ export default function Desktop() {
           onDoubleClick={() => openApp('neo')}
         />
         <DesktopIcon
-          label="Resource Nav"
-          icon={APPS['resources'].icon}
-          onDoubleClick={() => openApp('resources')}
+          label="Mars Rovers"
+          icon={APPS['mars'].icon}
+          onDoubleClick={() => openApp('mars')}
+        />
+        <DesktopIcon
+          label="EPIC Earth"
+          icon={APPS['epic'].icon}
+          onDoubleClick={() => openApp('epic')}
+        />
+        <DesktopIcon
+          label="NASA Library"
+          icon={APPS['library'].icon}
+          onDoubleClick={() => openApp('library')}
         />
         <DesktopIcon
           label="Bookmarks"

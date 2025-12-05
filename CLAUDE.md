@@ -4,7 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a JavaScript/TypeScript project optimized for modern web development. The project uses industry-standard tools and follows best practices for scalable application development.
+**NASA System 6 Portal** - A retro-styled web application for exploring NASA data, built with React and styled to emulate Apple System 6. The application is client-side only, deployed to GitHub Pages with no backend required.
+
+### Available Apps
+- **APOD Viewer** - Astronomy Picture of the Day
+- **NEO Tracker** - Near Earth Objects with 3D visualization
+- **Mars Rovers** - Browse Mars rover imagery (Curiosity, Opportunity, Spirit, Perseverance)
+- **EPIC Earth** - DSCOVR satellite Earth images
+- **NASA Library** - Search 140,000+ NASA media assets
+- **Bookmarks** - Save and organize favorites (localStorage)
+
+### Key Files
+- `client/src/services/nasaApi.js` - NASA API functions
+- `client/src/contexts/AppContext.js` - App registration and window management
+- `client/src/components/system6/Desktop.js` - Desktop icons
+- `client/src/styles/system.css` - System 6 styling
 
 ## Development Commands
 

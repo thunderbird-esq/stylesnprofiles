@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-12-05 (Week 4)
+
+### New NASA Apps
+- **🔴 Mars Rover Photos App**: Browse imagery from Curiosity, Opportunity, Spirit, and Perseverance rovers
+  - Sol (Mars day) and camera filters
+  - Paginated photo grid with thumbnails
+  - Full-size modal view with mission metadata
+  - Save to Bookmarks integration
+- **🌍 EPIC Earth App**: View Earth from DSCOVR satellite
+  - Natural and Enhanced color modes
+  - Date picker for browsing historical images
+  - Image carousel with thumbnail strip
+  - Coordinate and sun position metadata
+- **📷 NASA Image Library App**: Search 140,000+ NASA media assets
+  - Full-text search across images, videos, and audio
+  - Year range and media type filters
+  - Paginated results with detail modal
+  - Save to Bookmarks integration
+
+### API Enhancements
+- `getMarsPhotos()` - Mars rover imagery endpoint
+- `getMarsRoverManifest()` - Rover mission info
+- `searchNasaLibrary()` - images.nasa.gov search
+- `getNasaLibraryAsset()` - Asset details
+- `getEpicImages()` - EPIC satellite images
+- `getEpicDates()` - Available EPIC dates
+- `buildEpicImageUrl()` - Image URL builder
+
+### UI/UX Improvements
+- Text size increased by 8.5% (menu bar, window titles, content)
+- Mobile touch support for window dragging
+- Responsive scaling for mobile/tablet devices
+- Touch device improvements (44px minimum touch targets)
+
+### Desktop Updates
+- 6 application icons: APOD, NEO, Mars, EPIC, Library, Bookmarks
+- Removed Resource Navigator (functionality absorbed into Library)
+
 ## [Unreleased]
 
 ### **NEW**: Comprehensive REST API Implementation

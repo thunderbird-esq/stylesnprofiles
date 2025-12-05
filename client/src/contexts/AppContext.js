@@ -6,6 +6,9 @@ import NeoWsApp from '../components/apps/NeoWsApp';
 import ResourceNavigatorApp from '../components/apps/ResourceNavigatorApp';
 import ProfileApp from '../components/apps/ProfileApp';
 import BookmarksApp from '../components/apps/BookmarksApp';
+import MarsRoverApp from '../components/apps/MarsRoverApp';
+import NasaLibraryApp from '../components/apps/NasaLibraryApp';
+import EpicApp from '../components/apps/EpicApp';
 
 const AppContext = createContext();
 
@@ -25,6 +28,30 @@ const APPS = {
     icon: '☄️',
     component: props => <NeoWsApp {...props} />,
     defaultWidth: 550,
+    defaultHeight: 550,
+  },
+  mars: {
+    id: 'mars',
+    title: 'Mars Rovers',
+    icon: '🔴',
+    component: props => <MarsRoverApp {...props} />,
+    defaultWidth: 600,
+    defaultHeight: 550,
+  },
+  epic: {
+    id: 'epic',
+    title: 'EPIC Earth',
+    icon: '🌍',
+    component: props => <EpicApp {...props} />,
+    defaultWidth: 550,
+    defaultHeight: 550,
+  },
+  library: {
+    id: 'library',
+    title: 'NASA Library',
+    icon: '📷',
+    component: props => <NasaLibraryApp {...props} />,
+    defaultWidth: 650,
     defaultHeight: 550,
   },
   resources: {
