@@ -856,16 +856,16 @@ ul [role='menu-item'].divider::after {
    Text increased by ~8.5% (except buttons/dropdowns)
    ============================================ */
 
-/* Base text size increase (+8.5%: 14px → 15px) */
+/* Base text size increase for laptops (+25%: 15px → 18px) */
 .nasa-app-content,
 .nasa-data-section,
 .nasa-data-content {
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.5;
 }
 
 .nasa-data-title {
-  font-size: 17px;
+  font-size: 21px;
   font-weight: bold;
   font-family: Chicago_12;
   margin-bottom: 8px;
@@ -880,7 +880,7 @@ ul [role='menu-item'].divider::after {
 .nasa-error {
   padding: 20px;
   text-align: center;
-  font-size: 15px;
+  font-size: 18px;
   font-family: Chicago_12;
 }
 
@@ -888,29 +888,29 @@ ul [role='menu-item'].divider::after {
   color: #ff0000;
 }
 
-/* Menu bar text scaling (+8.5%: 14px → 15px) */
+/* Menu bar text scaling (+25%: 15px → 18px) */
 .nasa-menu-bar {
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .nasa-menu-item {
-  font-size: 15px;
+  font-size: 18px;
 }
 
-/* Window title bar (+8.5%: 14px → 15px) */
+/* Window title bar (+25%: 15px → 18px) */
 .title-bar .title {
-  font-size: 15px;
+  font-size: 18px;
 }
 
 /* Window content text */
 .window-pane {
-  font-size: 15px;
+  font-size: 18px;
 }
 
-/* NEO Detail Panel (+8.5%: 16→17px, 20→22px) */
+/* NEO Detail Panel (+25%: 17→20px, 22→27px) */
 .neo-detail-panel {
   padding: 16px;
-  font-size: 17px;
+  font-size: 20px;
 }
 
 .neo-detail-header {
@@ -921,7 +921,7 @@ ul [role='menu-item'].divider::after {
 }
 
 .neo-detail-title {
-  font-size: 22px;
+  font-size: 27px;
   font-weight: bold;
   font-family: Chicago_12;
 }
@@ -931,34 +931,34 @@ ul [role='menu-item'].divider::after {
   justify-content: space-between;
   padding: 8px 0;
   border-bottom: 1px dotted var(--tertiary);
-  font-size: 17px;
+  font-size: 20px;
 }
 
 .neo-detail-row .label {
   font-weight: bold;
-  font-size: 17px;
+  font-size: 20px;
 }
 
 .neo-detail-row .value {
-  font-size: 17px;
+  font-size: 20px;
 }
 
 /* Favorites and Collections panels */
 .favorites-panel,
 .collections-panel {
   padding: 12px;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .favorites-title,
 .collections-title {
-  font-size: 20px;
+  font-size: 24px;
   font-family: Chicago_12;
   margin-bottom: 8px;
 }
 
 .favorites-count {
-  font-size: 14px;
+  font-size: 16px;
   opacity: 0.8;
 }
 

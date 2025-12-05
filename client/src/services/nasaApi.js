@@ -20,15 +20,13 @@ const getApiKey = () => {
 };
 
 /**
- * Axios instance for direct NASA API calls
+ * Make a NASA API request with proper api_key injection
  */
-const createNasaClient = () => {
-  return axios.create({
-    baseURL: NASA_BASE_URL,
-    params: {
-      api_key: getApiKey(),
-    },
-  });
+const nasaRequest = (endpoint, params = {}) => {
+  const url = `${NASA_BASE_URL}${endpoint}`;
+  const mergedParams = { ...params, api_key: getApiKey() };
+  console.log('NASA API Request:', url, mergedParams);
+  return axios.get(url, { params: mergedParams });
 };
 
 // --- NASA API Functions ---
@@ -37,18 +35,14 @@ const createNasaClient = () => {
  * Fetches the Astronomy Picture of the Day
  */
 export const getApod = (params = {}) => {
-  const client = createNasaClient();
-  return client.get('/planetary/apod', { params });
+  return nasaRequest('/planetary/apod', params);
 };
 
 /**
  * Fetches Near Earth Objects for a given date range
  */
 export const getNeoFeed = (startDate, endDate) => {
-  const client = createNasaClient();
-  return client.get('/neo/rest/v1/feed', {
-    params: { start_date: startDate, end_date: endDate },
-  });
+  return nasaRequest('/neo/rest/v1/feed', { start_date: startDate, end_date: endDate });
 };
 
 /**
@@ -61,7 +55,6 @@ export const getNeoFeed = (startDate, endDate) => {
  * @param {number} [options.page=1] - Page number for pagination
  */
 export const getMarsPhotos = ({ rover = 'curiosity', sol, earthDate, camera, page = 1 }) => {
-  const client = createNasaClient();
   const params = { page };
 
   if (sol !== undefined) {
@@ -77,7 +70,7 @@ export const getMarsPhotos = ({ rover = 'curiosity', sol, earthDate, camera, pag
     params.camera = camera;
   }
 
-  return client.get(`/mars-photos/api/v1/rovers/${rover}/photos`, { params });
+  return nasaRequest(`/mars-photos/api/v1/rovers/${rover}/photos`, params);
 };
 
 /**
@@ -85,8 +78,7 @@ export const getMarsPhotos = ({ rover = 'curiosity', sol, earthDate, camera, pag
  * @param {string} rover - Rover name
  */
 export const getMarsRoverManifest = (rover = 'curiosity') => {
-  const client = createNasaClient();
-  return client.get(`/mars-photos/api/v1/manifests/${rover}`);
+  return nasaRequest(`/mars-photos/api/v1/manifests/${rover}`);
 };
 
 /**
@@ -130,13 +122,11 @@ export const getNasaLibraryAsset = (nasaId) => {
  * @param {string} [options.collection='natural'] - Collection: natural or enhanced
  */
 export const getEpicImages = ({ date, collection = 'natural' } = {}) => {
-  const client = createNasaClient();
-
   if (date) {
-    return client.get(`/EPIC/api/${collection}/date/${date}`);
+    return nasaRequest(`/EPIC/api/${collection}/date/${date}`);
   }
   // Get most recent images
-  return client.get(`/EPIC/api/${collection}`);
+  return nasaRequest(`/EPIC/api/${collection}`);
 };
 
 /**
@@ -144,8 +134,7 @@ export const getEpicImages = ({ date, collection = 'natural' } = {}) => {
  * @param {string} [collection='natural'] - Collection type
  */
 export const getEpicDates = (collection = 'natural') => {
-  const client = createNasaClient();
-  return client.get(`/EPIC/api/${collection}/all`);
+  return nasaRequest(`/EPIC/api/${collection}/all`);
 };
 
 /**
