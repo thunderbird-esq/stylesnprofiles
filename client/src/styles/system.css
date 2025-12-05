@@ -853,18 +853,19 @@ ul [role='menu-item'].divider::after {
 /* ============================================
    NASA PORTAL SPECIFIC STYLES
    Enhanced readability and text scaling
+   Text increased by ~8.5% (except buttons/dropdowns)
    ============================================ */
 
-/* Base text size increase */
+/* Base text size increase (+8.5%: 14px → 15px) */
 .nasa-app-content,
 .nasa-data-section,
 .nasa-data-content {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
 }
 
 .nasa-data-title {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: bold;
   font-family: Chicago_12;
   margin-bottom: 8px;
@@ -879,7 +880,7 @@ ul [role='menu-item'].divider::after {
 .nasa-error {
   padding: 20px;
   text-align: center;
-  font-size: 14px;
+  font-size: 15px;
   font-family: Chicago_12;
 }
 
@@ -887,34 +888,29 @@ ul [role='menu-item'].divider::after {
   color: #ff0000;
 }
 
-/* Menu bar text scaling */
-ul[role='menu-bar'] {
-  font-size: 14px;
+/* Menu bar text scaling (+8.5%: 14px → 15px) */
+.nasa-menu-bar {
+  font-size: 15px;
 }
 
-ul[role='menu-bar']>[role='menu-item'] {
-  padding: 8px 12px;
+.nasa-menu-item {
+  font-size: 15px;
 }
 
-ul[role='menu'] {
-  font-size: 14px;
-}
-
-ul[role='menu']>[role='menu-item']>a,
-ul[role='menu']>[role='menu-item']>button,
-ul[role='menu']>[role='menu-item'][aria-haspopup='true'] {
-  padding: 8px 20px;
-}
-
-/* Window title bar */
+/* Window title bar (+8.5%: 14px → 15px) */
 .title-bar .title {
-  font-size: 14px;
+  font-size: 15px;
 }
 
-/* NEO Detail Panel */
+/* Window content text */
+.window-pane {
+  font-size: 15px;
+}
+
+/* NEO Detail Panel (+8.5%: 16→17px, 20→22px) */
 .neo-detail-panel {
   padding: 16px;
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .neo-detail-header {
@@ -925,7 +921,7 @@ ul[role='menu']>[role='menu-item'][aria-haspopup='true'] {
 }
 
 .neo-detail-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   font-family: Chicago_12;
 }
@@ -935,34 +931,34 @@ ul[role='menu']>[role='menu-item'][aria-haspopup='true'] {
   justify-content: space-between;
   padding: 8px 0;
   border-bottom: 1px dotted var(--tertiary);
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .neo-detail-row .label {
   font-weight: bold;
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .neo-detail-row .value {
-  font-size: 16px;
+  font-size: 17px;
 }
 
 /* Favorites and Collections panels */
 .favorites-panel,
 .collections-panel {
   padding: 12px;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .favorites-title,
 .collections-title {
-  font-size: 18px;
+  font-size: 20px;
   font-family: Chicago_12;
   margin-bottom: 8px;
 }
 
 .favorites-count {
-  font-size: 13px;
+  font-size: 14px;
   opacity: 0.8;
 }
 
@@ -981,4 +977,108 @@ ul[role='menu']>[role='menu-item'][aria-haspopup='true'] {
 
 .mt-2 {
   margin-top: 16px;
+}
+
+/* ============================================
+   RESPONSIVE SCALING
+   Device type and orientation detection
+   ============================================ */
+
+/* Mobile portrait */
+@media screen and (max-width: 480px) {
+  :root {
+    --system-scale: 0.85;
+  }
+
+  .window {
+    min-width: 95vw !important;
+    max-width: 95vw !important;
+  }
+
+  .desktop-icons {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px;
+  }
+
+  .desktop-icon {
+    width: 70px;
+  }
+
+  .desktop-icon-text {
+    font-size: 11px;
+  }
+
+  .nasa-menu-bar {
+    font-size: 13px;
+  }
+
+  .title-bar .title {
+    font-size: 13px;
+  }
+}
+
+/* Mobile landscape */
+@media screen and (max-width: 812px) and (orientation: landscape) {
+  .window {
+    max-height: 85vh;
+  }
+
+  .window-pane {
+    max-height: calc(85vh - 60px);
+  }
+}
+
+/* Tablet */
+@media screen and (min-width: 481px) and (max-width: 1024px) {
+  :root {
+    --system-scale: 0.95;
+  }
+
+  .window {
+    min-width: 70vw;
+  }
+
+  .desktop-icons {
+    gap: 16px;
+  }
+}
+
+/* Touch device improvements */
+@media (hover: none) and (pointer: coarse) {
+
+  /* Larger touch targets */
+  .title-bar button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: 8px 16px;
+  }
+
+  .nasa-window-resize-handle {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Better touch feedback */
+  .title-bar {
+    cursor: grab;
+  }
+
+  .title-bar:active {
+    cursor: grabbing;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+  .window {
+    border-width: 1px;
+  }
 }

@@ -76,13 +76,14 @@ export default function NeoOrbitViewer({ neo, onClose }) {
         const width = container.clientWidth || 500;
         const height = container.clientHeight || 400;
 
-        // Scene setup
+        // Scene setup - brighter background
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x000008);
+        scene.background = new THREE.Color(0x0a0a20); // Lighter space color
 
-        // Camera with zoom
-        const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 2000);
-        camera.position.set(0, 35 / zoom, 40 / zoom);
+        // Camera with zoom - positioned to see full orbits
+        const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 2000);
+        // Higher angle view to see complete orbits
+        camera.position.set(0, 50 / zoom, 30 / zoom);
         camera.lookAt(0, 0, 0);
         cameraRef.current = camera;
 
@@ -93,8 +94,8 @@ export default function NeoOrbitViewer({ neo, onClose }) {
         container.appendChild(renderer.domElement);
         rendererRef.current = renderer;
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0x333333, 1);
+        // Lighting - brighter ambient for visibility
+        const ambientLight = new THREE.AmbientLight(0x666688, 1.5);
         scene.add(ambientLight);
 
         // Sun with glow
@@ -113,8 +114,8 @@ export default function NeoOrbitViewer({ neo, onClose }) {
         const glow = new THREE.Mesh(glowGeometry, glowMaterial);
         scene.add(glow);
 
-        // Point light from sun
-        const sunLight = new THREE.PointLight(0xffffff, 2, 100);
+        // Point light from sun - brighter
+        const sunLight = new THREE.PointLight(0xffffff, 3, 200);
         scene.add(sunLight);
 
         // Create planets and orbits
@@ -127,17 +128,17 @@ export default function NeoOrbitViewer({ neo, onClose }) {
         };
 
         Object.entries(PLANETS).forEach(([name, data]) => {
-            // Orbit ring
+            // Orbit ring - thicker and brighter
             const orbitGeometry = new THREE.RingGeometry(
-                data.distance * SCALE - 0.05,
-                data.distance * SCALE + 0.05,
+                data.distance * SCALE - 0.1,
+                data.distance * SCALE + 0.1,
                 128
             );
             const orbitMaterial = new THREE.MeshBasicMaterial({
-                color: 0x444466,
+                color: 0x6688aa, // Brighter blue-gray
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.4,
+                opacity: 0.7, // More visible
             });
             const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
             orbit.rotation.x = Math.PI / 2;
