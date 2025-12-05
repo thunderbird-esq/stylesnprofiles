@@ -5,8 +5,7 @@ import ApodApp from '../components/apps/ApodApp';
 import NeoWsApp from '../components/apps/NeoWsApp';
 import ResourceNavigatorApp from '../components/apps/ResourceNavigatorApp';
 import ProfileApp from '../components/apps/ProfileApp';
-import FavoritesApp from '../components/favorites/FavoritesApp';
-import CollectionsApp from '../components/apps/CollectionsApp';
+import BookmarksApp from '../components/apps/BookmarksApp';
 
 const AppContext = createContext();
 
@@ -15,23 +14,23 @@ const APPS = {
   apod: {
     id: 'apod',
     title: 'APOD Viewer',
-    icon: '🖼️', // Will be replaced with proper System 6 icon
+    icon: '🖼️',
     component: props => <ApodApp {...props} />,
-    defaultWidth: 500,
-    defaultHeight: 400,
+    defaultWidth: 550,
+    defaultHeight: 500,
   },
   neo: {
     id: 'neo',
     title: 'NEO Tracker',
-    icon: '☄️', // Will be replaced with proper System 6 icon
+    icon: '☄️',
     component: props => <NeoWsApp {...props} />,
-    defaultWidth: 500,
-    defaultHeight: 400,
+    defaultWidth: 550,
+    defaultHeight: 550,
   },
   resources: {
     id: 'resources',
     title: 'Resource Navigator',
-    icon: '📊', // Will be replaced with proper System 6 icon
+    icon: '📊',
     component: props => <ResourceNavigatorApp {...props} />,
     defaultWidth: 500,
     defaultHeight: 400,
@@ -39,26 +38,18 @@ const APPS = {
   profile: {
     id: 'profile',
     title: 'My Profile',
-    icon: '👤', // Will be replaced with proper System 6 icon
+    icon: '👤',
     component: props => <ProfileApp {...props} />,
     defaultWidth: 400,
     defaultHeight: 300,
     requiresAuth: true,
   },
-  favorites: {
-    id: 'favorites',
-    title: 'Favorites & Collections',
-    icon: '⭐', // Will be replaced with proper System 6 icon
-    component: props => <FavoritesApp {...props} />,
-    defaultWidth: 800,
-    defaultHeight: 600,
-  },
-  collections: {
-    id: 'collections',
-    title: 'My Collections',
-    icon: '📁', // Will be replaced with proper System 6 icon
-    component: props => <CollectionsApp {...props} />,
-    defaultWidth: 700,
+  bookmarks: {
+    id: 'bookmarks',
+    title: 'My Bookmarks',
+    icon: '📚',
+    component: props => <BookmarksApp {...props} />,
+    defaultWidth: 600,
     defaultHeight: 500,
   },
 };
