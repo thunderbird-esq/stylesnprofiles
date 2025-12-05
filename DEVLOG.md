@@ -134,4 +134,52 @@ https://thunderbird-esq.github.io/stylesnprofiles
 
 ---
 
+## 2025-12-05 - System 6 HIG Overhaul + Three.js Sun
+
+### Session Summary
+Major design discipline enforcement (Apple HIG 1986), critical bug fixes, and new Three.js sun visualization for DONKI space weather.
+
+### Root Cause Analysis
+- **Earth Events Map**: GIBS tiles were only showing southern hemisphere. Switched to WMS.
+- **Dark Themes**: Violated Apple HIG 1986 - all removed.
+- **Techport Rate Limit**: DEMO_KEY gets throttled - added sequential requests.
+
+### Completed Tasks
+
+**Phase A: Design Discipline**
+- Removed dark themes from EPIC, Earth Viewer, Exoplanets, Techport
+- All apps use white backgrounds, System 6 modals
+- Modal overlays now semi-transparent gray
+
+**Phase B: Three.js Sun Visualization**
+- Created `SunVisualization.js` with animated sun + corona
+- CME particle system radiating from sun
+- Earth with orbital path
+- System 6 styled controls (play/pause, intensity slider)
+- Integrated into SpaceWeatherApp with toggle button
+
+**Phase C: Bug Fixes**
+- Earth Events: NASA Earth Observatory map (reliable CORS)
+- Exoplanet: 30s timeout, better error handling
+- Techport: Sequential API requests, API key status display
+- Deleted CloseApproachApp (duplicated NEO)
+
+**Phase D: Earth Viewer Enhancement**
+- 20+ GIBS layers in 6 categories
+- 9 region presets
+- Zoom controls (0.5x - 8x)
+- 7-day skip buttons
+
+### Files Changed
+- `EarthEventsApp.js` - Map fix
+- `EarthViewerApp.js` - 20+ layers, zoom, regions
+- `ExoplanetApp.js` - Error handling
+- `TechportApp.js` - Sequential requests
+- `SpaceWeatherApp.js` - Sun viz integration
+- `SunVisualization.js` - NEW Three.js component
+- `EPIC/EarthViewer/Exoplanet/Techport` - System 6 styling
+
+---
+
 *Development log for NASA System 6 Portal*
+

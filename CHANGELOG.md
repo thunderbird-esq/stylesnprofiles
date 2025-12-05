@@ -5,7 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-12-05 (Week 5 - Part 2)
+
+### 🎨 Apple System 6 HIG Overhaul
+- Removed all dark "space themes" from apps
+- All apps now use `var(--primary)` white backgrounds
+- System 6 styled modals with title bars
+- Modal overlays changed to `rgba(128,128,128,0.5)`
+
+### 🌞 Three.js Sun Visualization (NEW)
+- **SunVisualization.js**: Animated 3D sun with corona glow
+- CME particle system radiating outward from sun
+- Earth with orbital path visualization
+- Controls: Play/pause, Show Earth, CME intensity slider
+- System 6 styled control panel
+
+### 🌍 Earth Events Map Fix
+- Fixed coordinate projection (events display correctly)
+- Switched to NASA Earth Observatory map (reliable CORS)
+- Added SVG fallback map
+
+### 🌐 Earth Viewer Enhancement
+- 20+ GIBS layers in 6 categories
+- 9 region presets (Global, North America, Europe, etc.)
+- Zoom controls (0.5x to 8x)
+- 7-day skip buttons for faster browsing
+
+### 📊 Data Visualization
+- Space Weather: 30-day activity timeline
+- NEO Tracker: Visual bar indicators
+- Exoplanets: Discovery year histogram
+
+### 🔧 Bug Fixes
+- Exoplanet: 30s timeout, better errors
+- Techport: Sequential API requests, API key status
+- Removed CloseApproachApp (duplicate)
+
 ## [0.4.0] - 2025-12-05 (Week 5)
+
 
 ### 🚀 Six New NASA Apps
 - **🌞 Space Weather App**: Real-time solar events from DONKI API

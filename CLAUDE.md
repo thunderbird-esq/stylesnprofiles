@@ -8,17 +8,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Available Apps
 - **APOD Viewer** - Astronomy Picture of the Day
-- **NEO Tracker** - Near Earth Objects with 3D visualization
-- **Mars Rovers** - Browse Mars rover imagery (Curiosity, Opportunity, Spirit, Perseverance)
-- **EPIC Earth** - DSCOVR satellite Earth images
+- **NEO Tracker** - Near Earth Objects with 3D orbit visualization
+- **Mars Rovers** - Browse rover imagery (API currently limited)
+- **EPIC Earth** - DSCOVR satellite Earth images with animation
 - **NASA Library** - Search 140,000+ NASA media assets
 - **Bookmarks** - Save and organize favorites (localStorage)
+- **Space Weather** - DONKI solar events with 3D Sun visualization
+- **Earth Events** - EONET natural disasters on world map
+- **Exoplanets** - 5,000+ confirmed exoplanets from TAP API
+- **Techport** - NASA technology projects
+- **Earth Viewer** - GIBS satellite imagery (20+ layers, zoom)
+
+### Design Guidelines (CRITICAL)
+- **Apple System 6 HIG (1986)** - All UI must follow retro Mac aesthetic
+- **NO dark themes** - Use `var(--primary)` white backgrounds
+- **System 6 modals** - Black title bar, white close button, 4px shadow
+- **Chicago font** - Primary typeface
+- **Consistent controls** - Use `.btn` class for all buttons
 
 ### Key Files
 - `client/src/services/nasaApi.js` - NASA API functions
 - `client/src/contexts/AppContext.js` - App registration and window management
 - `client/src/components/system6/Desktop.js` - Desktop icons
 - `client/src/styles/system.css` - System 6 styling
+- `client/src/components/apps/SunVisualization.js` - Three.js sun for Space Weather
 
 ## Development Commands
 
