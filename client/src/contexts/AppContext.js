@@ -12,7 +12,6 @@ import EpicApp from '../components/apps/EpicApp';
 import SpaceWeatherApp from '../components/apps/SpaceWeatherApp';
 import EarthEventsApp from '../components/apps/EarthEventsApp';
 import ExoplanetApp from '../components/apps/ExoplanetApp';
-import CloseApproachApp from '../components/apps/CloseApproachApp';
 import TechportApp from '../components/apps/TechportApp';
 import EarthViewerApp from '../components/apps/EarthViewerApp';
 
@@ -82,14 +81,6 @@ const APPS = {
     icon: '🪐',
     component: props => <ExoplanetApp {...props} />,
     defaultWidth: 600,
-    defaultHeight: 550,
-  },
-  closeapproach: {
-    id: 'closeapproach',
-    title: 'Close Approach',
-    icon: '💫',
-    component: props => <CloseApproachApp {...props} />,
-    defaultWidth: 550,
     defaultHeight: 550,
   },
   techport: {
