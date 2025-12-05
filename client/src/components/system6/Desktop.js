@@ -67,6 +67,11 @@ export default function Desktop() {
           onDoubleClick={() => openApp('techport')}
         />
         <DesktopIcon
+          label="Earth Viewer"
+          icon={APPS['earthviewer'].icon}
+          onDoubleClick={() => openApp('earthviewer')}
+        />
+        <DesktopIcon
           label="Bookmarks"
           icon={APPS['bookmarks'].icon}
           onDoubleClick={() => openApp('bookmarks')}

@@ -14,6 +14,7 @@ import EarthEventsApp from '../components/apps/EarthEventsApp';
 import ExoplanetApp from '../components/apps/ExoplanetApp';
 import CloseApproachApp from '../components/apps/CloseApproachApp';
 import TechportApp from '../components/apps/TechportApp';
+import EarthViewerApp from '../components/apps/EarthViewerApp';
 
 const AppContext = createContext();
 
@@ -98,6 +99,14 @@ const APPS = {
     component: props => <TechportApp {...props} />,
     defaultWidth: 600,
     defaultHeight: 550,
+  },
+  earthviewer: {
+    id: 'earthviewer',
+    title: 'Earth Viewer',
+    icon: '🌐',
+    component: props => <EarthViewerApp {...props} />,
+    defaultWidth: 650,
+    defaultHeight: 600,
   },
   resources: {
     id: 'resources',

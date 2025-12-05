@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.0] - 2025-12-05 (Week 5)
 
-### 🚀 Five New NASA Apps
+### 🚀 Six New NASA Apps
 - **🌞 Space Weather App**: Real-time solar events from DONKI API
   - Coronal Mass Ejections (CME) with impact estimates
   - Solar Flares (FLR) with intensity classification
@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Active, completed, and cancelled projects
   - Technology readiness levels
   - Project descriptions and timelines
+- **🌐 Earth Viewer**: GIBS satellite imagery browser
+  - 7 imagery layers (Terra, Aqua, VIIRS, Aerosol, Temperature, Snow, Chlorophyll)
+  - Date picker with historical browsing
+  - Zoom controls
+  - Direct link to NASA Worldview
 
 ### API Expansion (9 New Functions)
 - `getDonkiCME()`, `getDonkiFLR()`, `getDonkiGST()`, `getDonkiSEP()` - Space weather
