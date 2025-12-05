@@ -19,25 +19,45 @@ export default function ExoplanetApp({ windowId: _windowId }) {
         setError(null);
 
         try {
-            // Build query - use URL encoding for safety
+            // Build query
             let query = 'select top 100 pl_name,hostname,disc_year,discoverymethod,pl_orbper,pl_rade,pl_bmasse,sy_dist from ps';
             if (searchQuery.trim()) {
-                const search = searchQuery.trim().replace(/'/g, "''"); // Escape quotes
+                const search = searchQuery.trim().replace(/'/g, "''");
                 query = `select top 100 pl_name,hostname,disc_year,discoverymethod,pl_orbper,pl_rade,pl_bmasse,sy_dist from ps where pl_name like '%${search}%' or hostname like '%${search}%'`;
             }
             query += ' order by disc_year desc';
 
+            const baseUrl = 'https://exoplanetarchive.ipac.caltech.edu/TAP/sync';
+            const params = new URLSearchParams({ query, format: 'json' });
+            const directUrl = `${baseUrl}?${params}`;
+
             console.log('Exoplanet query:', query);
 
-            const response = await axios.get('https://exoplanetarchive.ipac.caltech.edu/TAP/sync', {
-                params: { query, format: 'json' },
-                timeout: 30000, // 30 second timeout
-            });
+            let data;
 
-            console.log('Exoplanet response:', response.data);
-            const data = Array.isArray(response.data) ? response.data : [];
-            setPlanets(data);
-            if (data.length === 0) setError('No exoplanets found.');
+            // Try direct request first
+            try {
+                const response = await axios.get(directUrl, { timeout: 10000 });
+                data = response.data;
+                console.log('Direct Exoplanet API succeeded');
+            } catch (directErr) {
+                // If direct fails (CORS), use allorigins proxy
+                console.log('Direct request failed, trying CORS proxy...');
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(directUrl)}`;
+                const proxyResponse = await axios.get(proxyUrl, { timeout: 20000 });
+
+                // allorigins returns { contents: "...", status: {...} }
+                if (proxyResponse.data?.contents) {
+                    data = JSON.parse(proxyResponse.data.contents);
+                    console.log('CORS proxy succeeded');
+                } else {
+                    throw new Error('Invalid proxy response');
+                }
+            }
+
+            const planets = Array.isArray(data) ? data : [];
+            setPlanets(planets);
+            if (planets.length === 0) setError('No exoplanets found.');
         } catch (err) {
             console.error('Exoplanet fetch error:', err);
             if (err.code === 'ECONNABORTED') {
@@ -45,7 +65,7 @@ export default function ExoplanetApp({ windowId: _windowId }) {
             } else if (err.response?.status === 400) {
                 setError('Invalid search query.');
             } else {
-                setError('Failed to load exoplanet data. Check console.');
+                setError('Failed to load exoplanet data. The API may be temporarily unavailable.');
             }
         } finally {
             setLoading(false);

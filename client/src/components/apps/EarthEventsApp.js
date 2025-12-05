@@ -190,7 +190,7 @@ export default function EarthEventsApp({ windowId: _windowId }) {
                             {/* Map Image or Fallback */}
                             {mapError ? <FallbackMap /> : (
                                 <img
-                                    src="https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57752/land_shallow_topo_2048.jpg"
+                                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Equirectangular-projection.jpg/2048px-Equirectangular-projection.jpg"
                                     alt="World Map"
                                     crossOrigin="anonymous"
                                     onError={() => setMapError(true)}
