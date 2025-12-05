@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getNeoFeed } from '../../services/nasaApi';
 import { SaveButton } from '../favorites';
+import NeoDetailPanel from './NeoDetailPanel';
 import '../favorites/favorites.css';
 
 /**
@@ -24,7 +25,7 @@ export default function NeoWsApp({ windowId: _windowId }) {
   const [neoData, setNeoData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [selectedNeo, setSelectedNeo] = useState(null);
 
   useEffect(() => {
     const today = new Date();
@@ -45,6 +46,16 @@ export default function NeoWsApp({ windowId: _windowId }) {
         setLoading(false);
       });
   }, []);
+
+  // Show detail panel if NEO is selected
+  if (selectedNeo) {
+    return (
+      <NeoDetailPanel
+        neo={selectedNeo}
+        onClose={() => setSelectedNeo(null)}
+      />
+    );
+  }
 
   if (loading) return <div className="nasa-loading">Loading Near Earth Objects...</div>;
   if (error) return <div className="nasa-error">Error: {error}</div>;
@@ -82,7 +93,10 @@ export default function NeoWsApp({ windowId: _windowId }) {
               >
                 <div className="nasa-data-title" style={{ flex: 1 }}>{neo.name}</div>
                 <div className="asteroid-actions">
-                  <button className="nasa-btn" onClick={() => console.log('View details', neo)}>
+                  <button
+                    className="nasa-btn"
+                    onClick={() => setSelectedNeo(neo)}
+                  >
                     View Details
                   </button>
                   <SaveButton
@@ -134,3 +148,4 @@ NeoWsApp.propTypes = {
 NeoWsApp.defaultProps = {
   windowId: null,
 };
+

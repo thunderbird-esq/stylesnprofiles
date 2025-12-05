@@ -52,11 +52,11 @@ export const getFavorites = async (page = 1, limit = 20, type = null, search = '
   const paginated = favorites.slice(startIndex, endIndex);
 
   return {
-    data: paginated,
+    favorites: paginated,
     pagination: {
-      total: favorites.length,
-      page,
-      pages: Math.ceil(favorites.length / limit),
+      totalCount: favorites.length,
+      currentPage: page,
+      totalPages: Math.ceil(favorites.length / limit),
     },
   };
 };

@@ -18,7 +18,7 @@ import CollectionDetail from './CollectionDetail';
  * @returns {JSX.Element} Collections panel component
  */
 export default function CollectionsPanel({ onError }) {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [collections, setCollections] = useState([]);
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ export default function CollectionsPanel({ onError }) {
 
   // Fetch collections
   const fetchCollections = useCallback(async () => {
-    if (!user || !token) return;
+    if (!user) return;
 
     setLoading(true);
     setError(null);
@@ -43,7 +43,7 @@ export default function CollectionsPanel({ onError }) {
     } finally {
       setLoading(false);
     }
-  }, [user, token, onError]);
+  }, [user, onError]);
 
   // Initial load
   useEffect(() => {

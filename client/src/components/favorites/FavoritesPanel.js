@@ -17,7 +17,7 @@ import * as favoritesService from '../../services/favoritesService';
  * @returns {JSX.Element} Favorites panel component
  */
 export default function FavoritesPanel({ onError }) {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,7 +45,7 @@ export default function FavoritesPanel({ onError }) {
   // Fetch favorites
   const fetchFavorites = useCallback(
     async (page = 1, type = filterType, search = debouncedSearch) => {
-      if (!user || !token) return;
+      if (!user) return;
 
       setLoading(true);
       setError(null);
@@ -71,7 +71,7 @@ export default function FavoritesPanel({ onError }) {
         setLoading(false);
       }
     },
-    [user, token, filterType, debouncedSearch, pageSize, onError],
+    [user, filterType, debouncedSearch, pageSize, onError],
   );
 
   // Initial load and refetch on dependencies change
