@@ -3,7 +3,9 @@
  * Detail view for a Near Earth Object showing full orbital data and close approach info
  */
 
+import { useState } from 'react';
 import PropTypes from 'prop-types';
+import NeoOrbitViewer from './NeoOrbitViewer';
 
 /**
  * Format a number with thousands separators
@@ -21,7 +23,19 @@ const formatNumber = (num) => {
  * @returns {JSX.Element} NEO detail panel
  */
 export default function NeoDetailPanel({ neo, onClose }) {
+    const [showOrbitViewer, setShowOrbitViewer] = useState(false);
+
     if (!neo) return null;
+
+    // Show 3D orbit viewer if selected
+    if (showOrbitViewer) {
+        return (
+            <NeoOrbitViewer
+                neo={neo}
+                onClose={() => setShowOrbitViewer(false)}
+            />
+        );
+    }
 
     const closeApproach = neo.close_approach_data?.[0];
     const diameter = neo.estimated_diameter?.meters || {};
@@ -52,6 +66,17 @@ export default function NeoDetailPanel({ neo, onClose }) {
                     ⚠️ POTENTIALLY HAZARDOUS ASTEROID
                 </div>
             )}
+
+            {/* 3D Visualization Button */}
+            <div style={{ marginBottom: '12px', textAlign: 'center' }}>
+                <button
+                    className="btn btn-default"
+                    onClick={() => setShowOrbitViewer(true)}
+                    style={{ fontSize: '14px', padding: '8px 16px' }}
+                >
+                    🌍 View 3D Orbit Trajectory
+                </button>
+            </div>
 
             {/* Basic Info */}
             <div className="nasa-data-section">
@@ -192,3 +217,4 @@ NeoDetailPanel.propTypes = {
     neo: PropTypes.object.isRequired,
     onClose: PropTypes.func.isRequired,
 };
+
