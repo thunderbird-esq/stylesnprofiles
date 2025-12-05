@@ -849,3 +849,134 @@ ul [role='menu-item'].divider::after {
 .menu-items>li {
   margin-bottom: 1rem;
 }
+
+/* ============================================
+   NASA PORTAL SPECIFIC STYLES
+   Enhanced readability and text scaling
+   ============================================ */
+
+/* Base text size increase */
+.nasa-app-content,
+.nasa-data-section,
+.nasa-data-content {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.nasa-data-title {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: Chicago_12;
+  margin-bottom: 8px;
+}
+
+.nasa-data-content {
+  font-family: Geneva_9, 'Inconsolata', Menlo, monospace;
+}
+
+/* Loading and error states */
+.nasa-loading,
+.nasa-error {
+  padding: 20px;
+  text-align: center;
+  font-size: 14px;
+  font-family: Chicago_12;
+}
+
+.nasa-error {
+  color: #ff0000;
+}
+
+/* Menu bar text scaling */
+ul[role='menu-bar'] {
+  font-size: 14px;
+}
+
+ul[role='menu-bar']>[role='menu-item'] {
+  padding: 8px 12px;
+}
+
+ul[role='menu'] {
+  font-size: 14px;
+}
+
+ul[role='menu']>[role='menu-item']>a,
+ul[role='menu']>[role='menu-item']>button,
+ul[role='menu']>[role='menu-item'][aria-haspopup='true'] {
+  padding: 8px 20px;
+}
+
+/* Window title bar */
+.title-bar .title {
+  font-size: 14px;
+}
+
+/* NEO Detail Panel */
+.neo-detail-panel {
+  padding: 12px;
+}
+
+.neo-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.neo-detail-title {
+  font-size: 18px;
+  font-weight: bold;
+  font-family: Chicago_12;
+}
+
+.neo-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dotted var(--tertiary);
+}
+
+.neo-detail-row .label {
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.neo-detail-row .value {
+  font-size: 13px;
+}
+
+/* Favorites and Collections panels */
+.favorites-panel,
+.collections-panel {
+  padding: 12px;
+  font-size: 14px;
+}
+
+.favorites-title,
+.collections-title {
+  font-size: 18px;
+  font-family: Chicago_12;
+  margin-bottom: 8px;
+}
+
+.favorites-count {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* Utility spacing */
+.mb-1 {
+  margin-bottom: 8px;
+}
+
+.mb-2 {
+  margin-bottom: 16px;
+}
+
+.mt-1 {
+  margin-top: 8px;
+}
+
+.mt-2 {
+  margin-top: 16px;
+}
