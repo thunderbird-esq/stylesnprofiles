@@ -24,16 +24,30 @@ export default function EpicApp({ windowId: _windowId }) {
 
         getEpicImages({ date: date || undefined, collection })
             .then(res => {
+                // Check for API error response
+                if (res.data?.error) {
+                    if (res.data.error.code === 'OVER_RATE_LIMIT') {
+                        setError('⚠️ API rate limit exceeded. Get your FREE API key at api.nasa.gov and enter it in Settings (⚙️ menu).');
+                    } else {
+                        setError(res.data.error.message || 'API error occurred');
+                    }
+                    return;
+                }
                 const data = Array.isArray(res.data) ? res.data : [];
                 setImages(data);
                 setSelectedIndex(0);
-                if (data.length === 0) {
+                if (data.length === 0 && !res.data?.error) {
                     setError('No images available for this date. Try a different date or collection.');
                 }
             })
             .catch(err => {
                 console.error('Failed to fetch EPIC images:', err);
-                setError(err.message || 'Failed to load Earth images');
+                const errMsg = err.response?.data?.error?.message || err.message;
+                if (errMsg?.includes('rate limit') || errMsg?.includes('OVER_RATE_LIMIT')) {
+                    setError('⚠️ API rate limit exceeded. Get your FREE API key at api.nasa.gov and enter it in Settings (⚙️ menu).');
+                } else {
+                    setError(errMsg || 'Failed to load Earth images. Check your API key in Settings.');
+                }
             })
             .finally(() => setLoading(false));
     };

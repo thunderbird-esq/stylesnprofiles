@@ -45,6 +45,15 @@ export default function MarsRoverApp({ windowId: _windowId }) {
 
         getMarsPhotos({ rover, sol, camera: camera || undefined, page })
             .then(res => {
+                // Check for API error response
+                if (res.data.error) {
+                    if (res.data.error.code === 'OVER_RATE_LIMIT') {
+                        setError('⚠️ API rate limit exceeded. Get your FREE API key at api.nasa.gov and enter it in Settings (⚙️ menu).');
+                    } else {
+                        setError(res.data.error.message || 'API error occurred');
+                    }
+                    return;
+                }
                 setPhotos(res.data.photos || []);
                 if (res.data.photos?.length === 0) {
                     setError('No photos found for this sol/camera combination. Try a different sol or camera.');
@@ -52,7 +61,12 @@ export default function MarsRoverApp({ windowId: _windowId }) {
             })
             .catch(err => {
                 console.error('Failed to fetch Mars photos:', err);
-                setError(err.message || 'Failed to load Mars photos');
+                const errMsg = err.response?.data?.error?.message || err.message;
+                if (errMsg?.includes('rate limit') || errMsg?.includes('OVER_RATE_LIMIT')) {
+                    setError('⚠️ API rate limit exceeded. Get your FREE API key at api.nasa.gov and enter it in Settings (⚙️ menu).');
+                } else {
+                    setError(errMsg || 'Failed to load Mars photos. Check your API key in Settings.');
+                }
             })
             .finally(() => setLoading(false));
     }, [rover, sol, camera, page]);
