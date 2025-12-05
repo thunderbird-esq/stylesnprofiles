@@ -1,205 +1,253 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 /**
  * Earth Viewer App - NASA GIBS satellite imagery
- * Uses WMTS tiles without external map library
+ * Proper WMTS tile implementation
  * @component
  */
 export default function EarthViewerApp({ windowId: _windowId }) {
     const [selectedLayer, setSelectedLayer] = useState('MODIS_Terra_CorrectedReflectance_TrueColor');
     const [selectedDate, setSelectedDate] = useState('');
-    const [zoom, setZoom] = useState(2);
+    const [imageUrl, setImageUrl] = useState('');
     const [loading, setLoading] = useState(false);
-    const [tileUrls, setTileUrls] = useState([]);
+    const [error, setError] = useState(null);
 
-    // Available GIBS layers
+    // GIBS layers that work reliably
+    // Using "best" endpoint with proper layer identifiers
     const LAYERS = [
-        { id: 'MODIS_Terra_CorrectedReflectance_TrueColor', name: '🌍 Terra True Color', format: 'jpg' },
-        { id: 'MODIS_Aqua_CorrectedReflectance_TrueColor', name: '🌊 Aqua True Color', format: 'jpg' },
-        { id: 'VIIRS_SNPP_CorrectedReflectance_TrueColor', name: '🛰️ VIIRS True Color', format: 'jpg' },
-        { id: 'MODIS_Terra_Aerosol', name: '💨 Aerosol Optical Depth', format: 'png' },
-        { id: 'MODIS_Terra_Land_Surface_Temp_Day', name: '🌡️ Land Surface Temp', format: 'png' },
-        { id: 'MODIS_Terra_Snow_Cover', name: '❄️ Snow Cover', format: 'png' },
-        { id: 'MODIS_Terra_Chlorophyll_A', name: '🌿 Chlorophyll', format: 'png' },
+        {
+            id: 'MODIS_Terra_CorrectedReflectance_TrueColor',
+            name: '🌍 Terra True Color (Daily)',
+            format: 'jpg',
+            matrix: '250m',
+        },
+        {
+            id: 'MODIS_Aqua_CorrectedReflectance_TrueColor',
+            name: '🌊 Aqua True Color (Daily)',
+            format: 'jpg',
+            matrix: '250m',
+        },
+        {
+            id: 'VIIRS_SNPP_CorrectedReflectance_TrueColor',
+            name: '🛰️ VIIRS True Color (Daily)',
+            format: 'jpg',
+            matrix: '250m',
+        },
+        {
+            id: 'BlueMarble_NextGeneration',
+            name: '🌏 Blue Marble (Static)',
+            format: 'jpg',
+            matrix: '500m',
+            staticDate: '2004-08', // Blue Marble uses fixed date
+        },
+        {
+            id: 'VIIRS_Black_Marble',
+            name: '🌃 Black Marble (Night)',
+            format: 'png',
+            matrix: '500m',
+            staticDate: '2016-01-01',
+        },
     ];
 
-    // Set default date to yesterday (GIBS data has ~1 day lag)
+    // Set default date to 2 days ago (GIBS data has 1-2 day lag)
     useEffect(() => {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        setSelectedDate(yesterday.toISOString().split('T')[0]);
+        const twoDaysAgo = new Date();
+        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+        setSelectedDate(twoDaysAgo.toISOString().split('T')[0]);
     }, []);
 
-    // Generate tile URLs for the selected layer and date
+    // Build full image URL using WMS (simpler than WMTS for single image)
+    const currentLayer = useMemo(() =>
+        LAYERS.find(l => l.id === selectedLayer),
+        [selectedLayer]);
+
     useEffect(() => {
-        if (!selectedDate) return;
+        if (!selectedDate || !currentLayer) return;
         setLoading(true);
+        setError(null);
 
-        const layer = LAYERS.find(l => l.id === selectedLayer);
-        const format = layer?.format || 'jpg';
+        // Use the layer's static date if it has one, otherwise use selected date
+        const dateToUse = currentLayer.staticDate || selectedDate;
 
-        // GIBS WMTS URL pattern for geographic projection
-        // Zoom level 3 = 10 tiles wide x 5 tiles tall
-        const tilesX = Math.pow(2, zoom + 1);
-        const tilesY = Math.pow(2, zoom);
+        // Build a WMS GetMap URL for a full Earth view
+        // GIBS WMS endpoint provides full Earth images
+        const wmsUrl = `https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=${selectedLayer}&CRS=EPSG:4326&BBOX=-90,-180,90,180&WIDTH=800&HEIGHT=400&FORMAT=image/${currentLayer.format === 'jpg' ? 'jpeg' : 'png'}&TIME=${dateToUse}`;
 
-        const urls = [];
-        // Just show a 4x2 grid of central tiles for performance
-        const startRow = Math.floor(tilesY / 2) - 1;
-        const startCol = Math.floor(tilesX / 2) - 2;
-
-        for (let row = startRow; row < startRow + 2 && row < tilesY; row++) {
-            for (let col = startCol; col < startCol + 4 && col < tilesX; col++) {
-                // GIBS WMTS tile URL format
-                const url = `https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/${selectedLayer}/default/${selectedDate}/250m/${zoom}/${row}/${col}.${format}`;
-                urls.push({ row, col, url });
-            }
-        }
-
-        setTileUrls(urls);
+        setImageUrl(wmsUrl);
         setLoading(false);
-    }, [selectedLayer, selectedDate, zoom]);
+    }, [selectedLayer, selectedDate, currentLayer]);
 
     const handleDateChange = (offset) => {
         const date = new Date(selectedDate);
         date.setDate(date.getDate() + offset);
-        // Don't allow future dates
-        if (date <= new Date()) {
+        const today = new Date();
+        today.setDate(today.getDate() - 1);
+        if (date <= today) {
             setSelectedDate(date.toISOString().split('T')[0]);
         }
     };
 
-    const currentLayer = LAYERS.find(l => l.id === selectedLayer);
-
     return (
-        <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div className="nasa-data-title" style={{ fontSize: '22px' }}>🌐 Earth Viewer (GIBS)</div>
-            <div style={{ fontSize: '16px', marginBottom: '10px', opacity: 0.8 }}>
-                NASA Global Imagery Browse Services
+        <div style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            background: '#0a0a1a',
+            color: '#fff',
+            fontFamily: 'Chicago_12, Geneva_9, sans-serif',
+        }}>
+            {/* Header */}
+            <div style={{
+                padding: '10px 12px',
+                background: '#1a1a2e',
+                borderBottom: '1px solid #333',
+                fontSize: '20px',
+            }}>
+                🌐 Earth Viewer (GIBS)
             </div>
 
             {/* Controls */}
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-                {/* Layer Selector */}
+            <div style={{
+                display: 'flex',
+                gap: '10px',
+                padding: '10px 12px',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                background: '#151528',
+                borderBottom: '1px solid #333',
+            }}>
                 <select
                     value={selectedLayer}
                     onChange={(e) => setSelectedLayer(e.target.value)}
-                    style={{ fontSize: '16px', padding: '6px', flex: 1, minWidth: '200px' }}
+                    style={{
+                        fontSize: '16px',
+                        padding: '6px 10px',
+                        flex: 1,
+                        minWidth: '200px',
+                        background: '#252540',
+                        color: '#fff',
+                        border: '1px solid #444',
+                    }}
                 >
                     {LAYERS.map(layer => (
                         <option key={layer.id} value={layer.id}>{layer.name}</option>
                     ))}
                 </select>
 
-                {/* Date Controls */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <button className="btn" onClick={() => handleDateChange(-1)} style={{ fontSize: '16px' }}>◀</button>
-                    <input
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        max={new Date().toISOString().split('T')[0]}
-                        style={{ fontSize: '16px', padding: '4px' }}
-                    />
-                    <button className="btn" onClick={() => handleDateChange(1)} style={{ fontSize: '16px' }}>▶</button>
-                </div>
-
-                {/* Zoom Controls */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <button
-                        className="btn"
-                        onClick={() => setZoom(Math.max(0, zoom - 1))}
-                        disabled={zoom <= 0}
-                        style={{ fontSize: '16px' }}
-                    >
-                        −
-                    </button>
-                    <span style={{ fontSize: '16px', minWidth: '60px', textAlign: 'center' }}>
-                        Zoom: {zoom}
-                    </span>
-                    <button
-                        className="btn"
-                        onClick={() => setZoom(Math.min(6, zoom + 1))}
-                        disabled={zoom >= 6}
-                        style={{ fontSize: '16px' }}
-                    >
-                        +
-                    </button>
-                </div>
-            </div>
-
-            {/* Layer Info */}
-            <div style={{ fontSize: '14px', marginBottom: '8px', opacity: 0.7 }}>
-                {currentLayer?.name} • {selectedDate}
-            </div>
-
-            {/* Image Viewer */}
-            <div style={{
-                flex: 1,
-                overflow: 'auto',
-                background: '#000',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '10px',
-            }}>
-                {loading ? (
-                    <div className="nasa-loading" style={{ fontSize: '18px', color: 'white' }}>
-                        Loading satellite imagery...
-                    </div>
-                ) : tileUrls.length > 0 ? (
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(4, 1fr)',
-                        gap: '0px',
-                        background: '#1a1a2e',
-                    }}>
-                        {tileUrls.map((tile, idx) => (
-                            <img
-                                key={`${tile.row}-${tile.col}-${idx}`}
-                                src={tile.url}
-                                alt={`Tile ${tile.row},${tile.col}`}
-                                style={{
-                                    width: '128px',
-                                    height: '128px',
-                                    objectFit: 'cover',
-                                    display: 'block',
-                                }}
-                                onError={(e) => {
-                                    const img = e.target;
-                                    img.style.background = '#333';
-                                    img.style.opacity = '0.5';
-                                }}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div style={{ color: 'white', fontSize: '16px', textAlign: 'center' }}>
-                        Select a layer and date to view satellite imagery
+                {/* Date Controls - only show for non-static layers */}
+                {!currentLayer?.staticDate && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <button
+                            onClick={() => handleDateChange(-1)}
+                            style={btnStyle}
+                        >
+                            ◀
+                        </button>
+                        <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            max={new Date(Date.now() - 86400000).toISOString().split('T')[0]}
+                            style={{
+                                fontSize: '16px',
+                                padding: '6px',
+                                background: '#252540',
+                                color: '#fff',
+                                border: '1px solid #444',
+                            }}
+                        />
+                        <button
+                            onClick={() => handleDateChange(1)}
+                            style={btnStyle}
+                        >
+                            ▶
+                        </button>
                     </div>
                 )}
             </div>
 
-            {/* Help Text */}
-            <div style={{ fontSize: '14px', marginTop: '8px', opacity: 0.7, textAlign: 'center' }}>
-                ℹ️ Imagery has ~1 day lag. Use ◀ ▶ to browse dates.
+            {/* Layer Info */}
+            <div style={{
+                padding: '6px 12px',
+                fontSize: '14px',
+                opacity: 0.7,
+                background: '#0d0d1a',
+            }}>
+                {currentLayer?.name} • {currentLayer?.staticDate ? 'Static composite' : selectedDate}
+                {currentLayer?.staticDate && <span style={{ marginLeft: '8px', color: '#888' }}>(This layer doesn't change by date)</span>}
             </div>
 
-            {/* Full View Link */}
-            <div style={{ marginTop: '8px', textAlign: 'center' }}>
+            {/* Error */}
+            {error && (
+                <div style={{ padding: '10px', background: '#550000', fontSize: '16px' }}>
+                    {error}
+                </div>
+            )}
+
+            {/* Main Image */}
+            <div style={{
+                flex: 1,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '12px',
+                background: '#000',
+                minHeight: 0,
+                overflow: 'hidden',
+            }}>
+                {loading ? (
+                    <div style={{ fontSize: '20px' }}>🌍 Loading satellite imagery...</div>
+                ) : imageUrl ? (
+                    <img
+                        src={imageUrl}
+                        alt={`${currentLayer?.name} - ${selectedDate}`}
+                        style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            objectFit: 'contain',
+                            border: '2px solid #333',
+                        }}
+                        onError={() => setError('Failed to load image. Try a different date or layer.')}
+                        onLoad={() => setError(null)}
+                    />
+                ) : (
+                    <div style={{ fontSize: '20px' }}>Select a layer and date</div>
+                )}
+            </div>
+
+            {/* Footer with Worldview link */}
+            <div style={{
+                padding: '10px 12px',
+                textAlign: 'center',
+                background: '#1a1a2e',
+                borderTop: '1px solid #333',
+            }}>
                 <a
                     href={`https://worldview.earthdata.nasa.gov/?v=-180,-90,180,90&t=${selectedDate}&l=${selectedLayer}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ color: '#4a90d9', fontSize: '16px' }}
+                    style={{
+                        color: '#4a9eff',
+                        fontSize: '16px',
+                        textDecoration: 'none',
+                    }}
                 >
-                    🔗 Open in NASA Worldview →
+                    🔗 Open in NASA Worldview for full interactivity →
                 </a>
             </div>
         </div>
     );
 }
+
+const btnStyle = {
+    fontSize: '18px',
+    padding: '6px 12px',
+    background: '#252540',
+    color: '#fff',
+    border: '1px solid #444',
+    cursor: 'pointer',
+};
 
 EarthViewerApp.propTypes = {
     windowId: PropTypes.string,

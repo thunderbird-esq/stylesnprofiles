@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { getTechportProjects, getTechportProject } from '../../services/nasaApi';
+import axios from 'axios';
 
 /**
  * Techport App - NASA Technology Projects
+ * Simplified implementation with working API calls
  * @component
  */
 export default function TechportApp({ windowId: _windowId }) {
@@ -11,108 +12,133 @@ export default function TechportApp({ windowId: _windowId }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedProject, setSelectedProject] = useState(null);
-    const [loadingDetails, setLoadingDetails] = useState(false);
 
-    const fetchProjects = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            // Get projects updated in the last year
-            const oneYearAgo = new Date();
-            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-            const response = await getTechportProjects({
-                updatedSince: oneYearAgo.toISOString().split('T')[0]
-            });
-
-            const data = response.data?.projects?.project || response.data?.projects || [];
-            const projectList = Array.isArray(data) ? data : [data];
-            setProjects(projectList.slice(0, 50)); // Limit to 50
-            if (projectList.length === 0) {
-                setError('No recent projects found.');
-            }
-        } catch (err) {
-            console.error('Techport fetch error:', err);
-            setError('Failed to load NASA technology projects');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    // Sample featured projects (hardcoded IDs that are known to work)
+    const FEATURED_IDS = [
+        17700, 93617, 94234, 94385, 96541, 95987, 88534, 91815, 93746, 94127,
+        88071, 95548, 91454, 94720, 95326, 93218, 96088, 94891, 88163, 91627
+    ];
 
     useEffect(() => {
+        const fetchProjects = async () => {
+            setLoading(true);
+            setError(null);
+
+            try {
+                const apiKey = localStorage.getItem('nasa_api_key') || 'DEMO_KEY';
+
+                // Fetch details for featured projects
+                const projectPromises = FEATURED_IDS.slice(0, 12).map(id =>
+                    axios.get(`https://api.nasa.gov/techport/api/projects/${id}`, {
+                        params: { api_key: apiKey }
+                    }).catch(() => null) // Ignore individual failures
+                );
+
+                const results = await Promise.all(projectPromises);
+                const validProjects = results
+                    .filter(r => r?.data?.project)
+                    .map(r => r.data.project);
+
+                setProjects(validProjects);
+
+                if (validProjects.length === 0) {
+                    setError('Could not load projects. API may be slow - try again later.');
+                }
+            } catch (err) {
+                console.error('Techport error:', err);
+                setError('Failed to load NASA projects.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchProjects();
-    }, [fetchProjects]);
+    }, []);
 
-    const handleSelectProject = async (projectId) => {
-        setLoadingDetails(true);
-        try {
-            const response = await getTechportProject(projectId);
-            setSelectedProject(response.data?.project || { projectId });
-        } catch (err) {
-            console.error('Failed to load project details:', err);
-            setSelectedProject({ projectId, error: 'Failed to load details' });
-        } finally {
-            setLoadingDetails(false);
-        }
-    };
-
-    const getStatusColor = (status) => {
-        const statusLower = (status || '').toLowerCase();
-        if (statusLower.includes('active')) return '#4caf50';
-        if (statusLower.includes('completed')) return '#2196f3';
-        if (statusLower.includes('cancelled')) return '#9e9e9e';
-        return '#ff9800';
+    const getStatusStyle = (status) => {
+        const s = (status || '').toLowerCase();
+        if (s.includes('active') || s.includes('ongoing')) return { color: '#4caf50', label: '🟢 Active' };
+        if (s.includes('completed')) return { color: '#2196f3', label: '✅ Completed' };
+        if (s.includes('cancelled')) return { color: '#9e9e9e', label: '❌ Cancelled' };
+        return { color: '#ff9800', label: status || 'Unknown' };
     };
 
     return (
-        <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div className="nasa-data-title" style={{ fontSize: '22px' }}>🔬 NASA Techport</div>
-            <div style={{ fontSize: '16px', marginBottom: '10px', opacity: 0.8 }}>
-                NASA Technology Projects & Innovations
+        <div style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            background: '#0a0a1a',
+            color: '#fff',
+            fontFamily: 'Chicago_12, Geneva_9, sans-serif',
+        }}>
+            {/* Header */}
+            <div style={{
+                padding: '10px 12px',
+                background: '#1a1a2e',
+                borderBottom: '1px solid #333',
+            }}>
+                <div style={{ fontSize: '20px', marginBottom: '6px' }}>🔬 NASA Techport</div>
+                <div style={{ fontSize: '14px', opacity: 0.7 }}>
+                    Technology Projects & Innovations • {projects.length} projects
+                </div>
             </div>
 
-            {/* Error State */}
-            {error && <div className="nasa-error" style={{ fontSize: '16px', marginBottom: '8px' }}>{error}</div>}
+            {/* Error */}
+            {error && (
+                <div style={{ padding: '10px 12px', background: '#550000', fontSize: '16px' }}>
+                    {error}
+                </div>
+            )}
 
-            {/* Projects Grid */}
-            <div style={{ flex: 1, overflow: 'auto' }}>
+            {/* Projects */}
+            <div style={{ flex: 1, overflow: 'auto', padding: '12px' }}>
                 {loading ? (
-                    <div className="nasa-loading" style={{ fontSize: '18px' }}>Loading technology projects...</div>
+                    <div style={{ textAlign: 'center', padding: '40px', fontSize: '20px' }}>
+                        🚀 Loading NASA projects...
+                    </div>
                 ) : (
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                        gap: '10px',
+                        gap: '12px',
                     }}>
-                        {projects.map((project) => (
-                            <div
-                                key={project.projectId}
-                                onClick={() => handleSelectProject(project.projectId)}
-                                style={{
-                                    padding: '12px',
-                                    border: '2px solid var(--secondary)',
-                                    background: 'var(--primary)',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                <div style={{ fontSize: '28px', marginBottom: '6px' }}>🚀</div>
-                                <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '4px' }}>
-                                    {project.title?.substring(0, 50) || `Project ${project.projectId}`}
-                                    {project.title?.length > 50 ? '...' : ''}
+                        {projects.map((project) => {
+                            const status = getStatusStyle(project.statusDescription);
+                            return (
+                                <div
+                                    key={project.projectId}
+                                    onClick={() => setSelectedProject(project)}
+                                    style={{
+                                        padding: '14px',
+                                        background: '#1a1a2e',
+                                        border: `2px solid ${status.color}`,
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    <div style={{ fontSize: '28px', marginBottom: '8px' }}>🚀</div>
+                                    <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '6px' }}>
+                                        {project.title?.substring(0, 50) || `Project ${project.projectId}`}
+                                        {project.title?.length > 50 ? '...' : ''}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '12px',
+                                        padding: '3px 8px',
+                                        background: status.color,
+                                        color: '#fff',
+                                        display: 'inline-block',
+                                        borderRadius: '10px',
+                                    }}>
+                                        {status.label}
+                                    </div>
+                                    {project.startYear && (
+                                        <div style={{ fontSize: '13px', marginTop: '8px', opacity: 0.7 }}>
+                                            Started: {project.startYear}
+                                        </div>
+                                    )}
                                 </div>
-                                <div style={{
-                                    fontSize: '12px',
-                                    padding: '2px 8px',
-                                    background: getStatusColor(project.status),
-                                    color: 'white',
-                                    display: 'inline-block',
-                                    borderRadius: '8px',
-                                    marginTop: '4px',
-                                }}>
-                                    {project.status || 'Unknown Status'}
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
@@ -123,7 +149,7 @@ export default function TechportApp({ windowId: _windowId }) {
                     style={{
                         position: 'fixed',
                         top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'rgba(0,0,0,0.9)',
+                        background: 'rgba(0,0,0,0.95)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -134,69 +160,98 @@ export default function TechportApp({ windowId: _windowId }) {
                 >
                     <div
                         style={{
-                            background: 'var(--primary)',
-                            padding: '20px',
-                            border: '3px solid var(--secondary)',
+                            background: '#1a1a2e',
+                            padding: '24px',
+                            border: `3px solid ${getStatusStyle(selectedProject.statusDescription).color}`,
                             maxWidth: '600px',
                             maxHeight: '80vh',
                             overflow: 'auto',
+                            width: '100%',
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {loadingDetails ? (
-                            <div style={{ textAlign: 'center', padding: '40px', fontSize: '18px' }}>
-                                Loading project details...
+                        <h3 style={{ fontSize: '22px', marginBottom: '16px' }}>
+                            🚀 {selectedProject.title || `Project ${selectedProject.projectId}`}
+                        </h3>
+
+                        <div style={{ fontSize: '16px', lineHeight: 1.7 }}>
+                            {selectedProject.description && (
+                                <p style={{ marginBottom: '16px' }}>{selectedProject.description}</p>
+                            )}
+
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr',
+                                gap: '12px',
+                                marginBottom: '16px',
+                            }}>
+                                {selectedProject.statusDescription && (
+                                    <div style={infoBox}>
+                                        <strong>Status:</strong><br />
+                                        {getStatusStyle(selectedProject.statusDescription).label}
+                                    </div>
+                                )}
+                                {selectedProject.startYear && (
+                                    <div style={infoBox}>
+                                        <strong>Started:</strong><br />
+                                        {selectedProject.startYear}
+                                    </div>
+                                )}
+                                {selectedProject.endYear && (
+                                    <div style={infoBox}>
+                                        <strong>Ended:</strong><br />
+                                        {selectedProject.endYear}
+                                    </div>
+                                )}
+                                {selectedProject.responsibleMd && (
+                                    <div style={infoBox}>
+                                        <strong>Office:</strong><br />
+                                        {selectedProject.responsibleMd}
+                                    </div>
+                                )}
                             </div>
-                        ) : (
-                            <>
-                                <h3 style={{ fontSize: '22px', marginBottom: '12px' }}>
-                                    🚀 {selectedProject.title || `Project ${selectedProject.projectId}`}
-                                </h3>
-                                <div style={{ fontSize: '16px', lineHeight: 1.6 }}>
-                                    {selectedProject.description && (
-                                        <p style={{ marginBottom: '12px' }}>{selectedProject.description}</p>
-                                    )}
 
-                                    {selectedProject.status && (
-                                        <p><strong>Status:</strong> {selectedProject.status}</p>
-                                    )}
+                            {selectedProject.website && (
+                                <p>
+                                    <a
+                                        href={selectedProject.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ color: '#4a9eff' }}
+                                    >
+                                        🔗 Visit Project Website →
+                                    </a>
+                                </p>
+                            )}
+                        </div>
 
-                                    {selectedProject.startDate && (
-                                        <p><strong>Started:</strong> {selectedProject.startDate}</p>
-                                    )}
-
-                                    {selectedProject.endDate && (
-                                        <p><strong>End Date:</strong> {selectedProject.endDate}</p>
-                                    )}
-
-                                    {selectedProject.responsibleMissionDirectorateOrOffice && (
-                                        <p><strong>Office:</strong> {selectedProject.responsibleMissionDirectorateOrOffice}</p>
-                                    )}
-
-                                    {selectedProject.website && (
-                                        <p>
-                                            <a href={selectedProject.website} target="_blank" rel="noopener noreferrer" style={{ color: '#4a90d9' }}>
-                                                View Project Website →
-                                            </a>
-                                        </p>
-                                    )}
-
-                                    {selectedProject.error && (
-                                        <p style={{ color: '#f44336' }}>{selectedProject.error}</p>
-                                    )}
-                                </div>
-
-                                <button className="btn" onClick={() => setSelectedProject(null)} style={{ marginTop: '16px', fontSize: '16px' }}>
-                                    Close
-                                </button>
-                            </>
-                        )}
+                        <button
+                            onClick={() => setSelectedProject(null)}
+                            style={{
+                                marginTop: '16px',
+                                width: '100%',
+                                fontSize: '18px',
+                                padding: '12px',
+                                background: '#0066cc',
+                                color: '#fff',
+                                border: 'none',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Close
+                        </button>
                     </div>
                 </div>
             )}
         </div>
     );
 }
+
+const infoBox = {
+    padding: '10px',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid #333',
+};
 
 TechportApp.propTypes = {
     windowId: PropTypes.string,

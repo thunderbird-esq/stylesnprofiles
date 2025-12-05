@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { getExoplanets } from '../../services/nasaApi';
+import axios from 'axios';
 
 /**
  * Exoplanet Explorer - NASA Exoplanet Archive
+ * Fixed API implementation
  * @component
  */
 export default function ExoplanetApp({ windowId: _windowId }) {
@@ -18,15 +19,32 @@ export default function ExoplanetApp({ windowId: _windowId }) {
         setError(null);
 
         try {
-            const response = await getExoplanets({ query: searchQuery || undefined, limit: 100 });
+            // Use the correct TAP query format
+            let query = 'select top 100 pl_name,hostname,disc_year,discoverymethod,pl_orbper,pl_rade,pl_bmasse,sy_dist from ps';
+
+            if (searchQuery) {
+                query = `select top 100 pl_name,hostname,disc_year,discoverymethod,pl_orbper,pl_rade,pl_bmasse,sy_dist from ps where pl_name like '%${searchQuery}%' or hostname like '%${searchQuery}%'`;
+            }
+
+            query += ' order by disc_year desc';
+
+            console.log('🪐 Fetching exoplanets...');
+            const response = await axios.get('https://exoplanetarchive.ipac.caltech.edu/TAP/sync', {
+                params: {
+                    query,
+                    format: 'json'
+                }
+            });
+
             const data = Array.isArray(response.data) ? response.data : [];
             setPlanets(data);
+
             if (data.length === 0) {
                 setError('No exoplanets found. Try a different search.');
             }
         } catch (err) {
             console.error('Exoplanet fetch error:', err);
-            setError('Failed to load exoplanet data');
+            setError('Failed to load exoplanet data. The archive may be temporarily unavailable.');
         } finally {
             setLoading(false);
         }
@@ -34,7 +52,7 @@ export default function ExoplanetApp({ windowId: _windowId }) {
 
     useEffect(() => {
         fetchPlanets();
-    }, [fetchPlanets]);
+    }, []); // Only fetch on mount
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -48,96 +66,142 @@ export default function ExoplanetApp({ windowId: _windowId }) {
 
     const formatMass = (mass) => {
         if (!mass) return 'Unknown';
-        return `${mass.toFixed(2)} Earth masses`;
+        if (mass > 100) return `${(mass / 317.8).toFixed(1)} Jupiter masses`;
+        return `${mass.toFixed(1)} Earth masses`;
     };
 
     const formatRadius = (radius) => {
         if (!radius) return 'Unknown';
+        if (radius > 5) return `${(radius / 11.2).toFixed(2)} Jupiter radii`;
         return `${radius.toFixed(2)} Earth radii`;
     };
 
-    const getPlanetSize = (radius) => {
-        if (!radius) return { label: 'Unknown', color: '#9e9e9e' };
-        if (radius < 1.5) return { label: 'Rocky', color: '#8b4513' };
-        if (radius < 4) return { label: 'Super-Earth', color: '#4caf50' };
-        if (radius < 10) return { label: 'Neptune-like', color: '#2196f3' };
-        return { label: 'Gas Giant', color: '#ff9800' };
+    const getPlanetType = (radius, mass) => {
+        if (!radius) {
+            if (mass && mass > 100) return { label: 'Gas Giant', color: '#ff9800', emoji: '🟠' };
+            return { label: 'Unknown', color: '#9e9e9e', emoji: '❓' };
+        }
+        if (radius < 1.5) return { label: 'Rocky', color: '#8b4513', emoji: '🪨' };
+        if (radius < 2.5) return { label: 'Super-Earth', color: '#4caf50', emoji: '🌍' };
+        if (radius < 6) return { label: 'Neptune-like', color: '#2196f3', emoji: '🔵' };
+        return { label: 'Gas Giant', color: '#ff9800', emoji: '🟠' };
     };
 
     return (
-        <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div className="nasa-data-title" style={{ fontSize: '22px' }}>🪐 Exoplanet Explorer</div>
-            <div style={{ fontSize: '16px', marginBottom: '10px', opacity: 0.8 }}>
-                NASA Exoplanet Archive - {planets.length} planets loaded
+        <div style={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            background: '#0a0a1a',
+            color: '#fff',
+            fontFamily: 'Chicago_12, Geneva_9, sans-serif',
+        }}>
+            {/* Header */}
+            <div style={{
+                padding: '10px 12px',
+                background: '#1a1a2e',
+                borderBottom: '1px solid #333',
+            }}>
+                <div style={{ fontSize: '20px', marginBottom: '6px' }}>🪐 Exoplanet Explorer</div>
+                <div style={{ fontSize: '14px', opacity: 0.7 }}>
+                    NASA Exoplanet Archive • {planets.length} planets loaded
+                </div>
             </div>
 
-            {/* Search Form */}
-            <form onSubmit={handleSearch} style={{ marginBottom: '12px', display: 'flex', gap: '8px' }}>
+            {/* Search */}
+            <form onSubmit={handleSearch} style={{
+                display: 'flex',
+                gap: '8px',
+                padding: '10px 12px',
+                background: '#151528',
+                borderBottom: '1px solid #333',
+            }}>
                 <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by planet or star name..."
-                    style={{ flex: 1, fontSize: '16px', padding: '8px' }}
+                    style={{
+                        flex: 1,
+                        fontSize: '16px',
+                        padding: '8px 12px',
+                        background: '#252540',
+                        color: '#fff',
+                        border: '1px solid #444',
+                    }}
                 />
-                <button type="submit" className="btn nasa-btn-primary" style={{ fontSize: '16px' }}>
-                    Search
+                <button
+                    type="submit"
+                    disabled={loading}
+                    style={{
+                        fontSize: '16px',
+                        padding: '8px 16px',
+                        background: loading ? '#555' : '#0066cc',
+                        color: '#fff',
+                        border: 'none',
+                        cursor: loading ? 'wait' : 'pointer',
+                    }}
+                >
+                    {loading ? '...' : 'Search'}
                 </button>
             </form>
 
-            {/* Error State */}
-            {error && <div className="nasa-error" style={{ fontSize: '16px', marginBottom: '8px' }}>{error}</div>}
+            {/* Error */}
+            {error && (
+                <div style={{ padding: '10px 12px', background: '#550000', fontSize: '16px' }}>
+                    {error}
+                </div>
+            )}
 
             {/* Planets Grid */}
-            <div style={{ flex: 1, overflow: 'auto' }}>
+            <div style={{ flex: 1, overflow: 'auto', padding: '12px' }}>
                 {loading ? (
-                    <div className="nasa-loading" style={{ fontSize: '18px' }}>Scanning the galaxy...</div>
+                    <div style={{ textAlign: 'center', padding: '40px', fontSize: '20px' }}>
+                        🔭 Scanning the galaxy...
+                    </div>
                 ) : (
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                        gap: '10px',
+                        gap: '12px',
                     }}>
                         {planets.map((planet, idx) => {
-                            const size = getPlanetSize(planet.pl_rade);
+                            const type = getPlanetType(planet.pl_rade, planet.pl_bmasse);
                             return (
                                 <div
                                     key={`${planet.pl_name}-${idx}`}
                                     onClick={() => setSelectedPlanet(planet)}
                                     style={{
-                                        padding: '12px',
-                                        border: `2px solid ${size.color}`,
-                                        background: 'var(--primary)',
+                                        padding: '14px',
+                                        background: '#1a1a2e',
+                                        border: `2px solid ${type.color}`,
                                         cursor: 'pointer',
                                         textAlign: 'center',
+                                        transition: 'transform 0.2s',
                                     }}
+                                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                                 >
-                                    <div style={{
-                                        fontSize: '48px',
-                                        marginBottom: '6px',
-                                        filter: `hue-rotate(${(planet.disc_year || 2000) % 360}deg)`
-                                    }}>
-                                        🪐
-                                    </div>
+                                    <div style={{ fontSize: '40px', marginBottom: '8px' }}>{type.emoji}</div>
                                     <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '4px' }}>
                                         {planet.pl_name}
                                     </div>
-                                    <div style={{ fontSize: '14px', opacity: 0.8 }}>
+                                    <div style={{ fontSize: '14px', opacity: 0.7 }}>
                                         ⭐ {planet.hostname}
                                     </div>
                                     <div style={{
                                         fontSize: '12px',
-                                        marginTop: '4px',
-                                        padding: '2px 6px',
-                                        background: size.color,
-                                        color: 'white',
+                                        marginTop: '8px',
+                                        padding: '3px 8px',
+                                        background: type.color,
+                                        color: '#fff',
                                         display: 'inline-block',
-                                        borderRadius: '8px',
+                                        borderRadius: '10px',
                                     }}>
-                                        {size.label}
+                                        {type.label}
                                     </div>
-                                    <div style={{ fontSize: '13px', marginTop: '4px', opacity: 0.7 }}>
-                                        Discovered {planet.disc_year || '?'}
+                                    <div style={{ fontSize: '13px', marginTop: '6px', opacity: 0.6 }}>
+                                        {planet.disc_year || 'Year unknown'}
                                     </div>
                                 </div>
                             );
@@ -152,7 +216,7 @@ export default function ExoplanetApp({ windowId: _windowId }) {
                     style={{
                         position: 'fixed',
                         top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'rgba(0,0,0,0.9)',
+                        background: 'rgba(0,0,0,0.95)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -163,51 +227,73 @@ export default function ExoplanetApp({ windowId: _windowId }) {
                 >
                     <div
                         style={{
-                            background: 'var(--primary)',
-                            padding: '20px',
-                            border: `3px solid ${getPlanetSize(selectedPlanet.pl_rade).color}`,
+                            background: '#1a1a2e',
+                            padding: '24px',
+                            border: `3px solid ${getPlanetType(selectedPlanet.pl_rade, selectedPlanet.pl_bmasse).color}`,
                             maxWidth: '500px',
                             maxHeight: '80vh',
                             overflow: 'auto',
+                            width: '100%',
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                            <div style={{ fontSize: '72px' }}>🪐</div>
-                            <h3 style={{ fontSize: '24px', marginBottom: '4px' }}>{selectedPlanet.pl_name}</h3>
-                            <div style={{ fontSize: '18px', opacity: 0.8 }}>Host Star: {selectedPlanet.hostname}</div>
-                        </div>
-
-                        <div style={{ fontSize: '16px', lineHeight: 1.8 }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                <div>
-                                    <strong>📅 Discovered:</strong>
-                                    <div>{selectedPlanet.disc_year || 'Unknown'}</div>
-                                </div>
-                                <div>
-                                    <strong>🔬 Method:</strong>
-                                    <div>{selectedPlanet.discoverymethod || 'Unknown'}</div>
-                                </div>
-                                <div>
-                                    <strong>📏 Radius:</strong>
-                                    <div>{formatRadius(selectedPlanet.pl_rade)}</div>
-                                </div>
-                                <div>
-                                    <strong>⚖️ Mass:</strong>
-                                    <div>{formatMass(selectedPlanet.pl_bmasse)}</div>
-                                </div>
-                                <div>
-                                    <strong>🔄 Orbital Period:</strong>
-                                    <div>{selectedPlanet.pl_orbper ? `${selectedPlanet.pl_orbper.toFixed(2)} days` : 'Unknown'}</div>
-                                </div>
-                                <div>
-                                    <strong>📍 Distance:</strong>
-                                    <div>{formatDistance(selectedPlanet.sy_dist)}</div>
-                                </div>
+                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                            <div style={{ fontSize: '72px' }}>
+                                {getPlanetType(selectedPlanet.pl_rade, selectedPlanet.pl_bmasse).emoji}
+                            </div>
+                            <h3 style={{ fontSize: '26px', marginTop: '8px', marginBottom: '4px' }}>
+                                {selectedPlanet.pl_name}
+                            </h3>
+                            <div style={{ fontSize: '18px', opacity: 0.8 }}>
+                                ⭐ Host Star: {selectedPlanet.hostname}
                             </div>
                         </div>
 
-                        <button className="btn" onClick={() => setSelectedPlanet(null)} style={{ marginTop: '16px', fontSize: '16px', width: '100%' }}>
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            gap: '16px',
+                            fontSize: '16px',
+                        }}>
+                            <div style={infoBoxStyle}>
+                                <div style={labelStyle}>📅 Discovered</div>
+                                <div>{selectedPlanet.disc_year || 'Unknown'}</div>
+                            </div>
+                            <div style={infoBoxStyle}>
+                                <div style={labelStyle}>🔬 Method</div>
+                                <div>{selectedPlanet.discoverymethod || 'Unknown'}</div>
+                            </div>
+                            <div style={infoBoxStyle}>
+                                <div style={labelStyle}>📏 Radius</div>
+                                <div>{formatRadius(selectedPlanet.pl_rade)}</div>
+                            </div>
+                            <div style={infoBoxStyle}>
+                                <div style={labelStyle}>⚖️ Mass</div>
+                                <div>{formatMass(selectedPlanet.pl_bmasse)}</div>
+                            </div>
+                            <div style={infoBoxStyle}>
+                                <div style={labelStyle}>🔄 Orbital Period</div>
+                                <div>{selectedPlanet.pl_orbper ? `${selectedPlanet.pl_orbper.toFixed(1)} days` : 'Unknown'}</div>
+                            </div>
+                            <div style={infoBoxStyle}>
+                                <div style={labelStyle}>📍 Distance</div>
+                                <div>{formatDistance(selectedPlanet.sy_dist)}</div>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setSelectedPlanet(null)}
+                            style={{
+                                marginTop: '20px',
+                                width: '100%',
+                                fontSize: '18px',
+                                padding: '12px',
+                                background: '#0066cc',
+                                color: '#fff',
+                                border: 'none',
+                                cursor: 'pointer',
+                            }}
+                        >
                             Close
                         </button>
                     </div>
@@ -216,6 +302,19 @@ export default function ExoplanetApp({ windowId: _windowId }) {
         </div>
     );
 }
+
+const infoBoxStyle = {
+    padding: '12px',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid #333',
+};
+
+const labelStyle = {
+    fontSize: '14px',
+    fontWeight: 'bold',
+    marginBottom: '4px',
+    opacity: 0.8,
+};
 
 ExoplanetApp.propTypes = {
     windowId: PropTypes.string,

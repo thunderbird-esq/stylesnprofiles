@@ -57,11 +57,6 @@ export default function Desktop() {
           onDoubleClick={() => openApp('exoplanets')}
         />
         <DesktopIcon
-          label="Close Approach"
-          icon={APPS['closeapproach'].icon}
-          onDoubleClick={() => openApp('closeapproach')}
-        />
-        <DesktopIcon
           label="Techport"
           icon={APPS['techport'].icon}
           onDoubleClick={() => openApp('techport')}
