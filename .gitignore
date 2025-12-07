@@ -41,3 +41,10 @@ termoutput*.txt
 
 # Test orchestrator cache
 test-orchestrator/
+# Server coverage
+server/coverage/
+
+# Auto-generated reports
+docs/maintenance-report.json
+docs/maintenance-report.md
+

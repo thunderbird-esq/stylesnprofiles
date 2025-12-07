@@ -74,7 +74,7 @@ export async function getKpIndex() {
     if (!Array.isArray(data) || data.length < 2) return [];
 
     // Skip header row, parse data
-    const [header, ...rows] = data;
+    const [_header, ...rows] = data;
     return rows.map(row => ({
         time: row[0],
         kp: parseFloat(row[1]),
@@ -92,7 +92,7 @@ export async function getKpForecast() {
 
     if (!Array.isArray(data) || data.length < 2) return [];
 
-    const [header, ...rows] = data;
+    const [_header, ...rows] = data;
     return rows.map(row => ({
         time: row[0],
         kp: parseFloat(row[1]),
@@ -150,7 +150,7 @@ export async function getSolarWind() {
 
     if (!Array.isArray(data) || data.length < 2) return [];
 
-    const [header, ...rows] = data;
+    const [_header, ...rows] = data;
     // Return last 100 readings (most recent)
     return rows.slice(-100).map(row => ({
         time: row[0],

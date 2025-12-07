@@ -103,7 +103,7 @@ export default function NoaaScalesGauge({ scales, loading }) {
         );
     }
 
-    const { current, today, tomorrow } = scales;
+    const { current, today, tomorrow: _tomorrow } = scales;
 
     return (
         <div>

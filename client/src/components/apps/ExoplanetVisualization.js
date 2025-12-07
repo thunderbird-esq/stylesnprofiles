@@ -47,8 +47,8 @@ export default function ExoplanetVisualization({ planets, onClose }) {
 
     const [isPlaying, setIsPlaying] = useState(true);
     const [timeScale, setTimeScale] = useState(1);
-    const [showOrbits, setShowOrbits] = useState(true);
-    const [showLabels, setShowLabels] = useState(true);
+    const [showOrbits] = useState(true); // eslint-disable-line no-unused-vars
+    const [showLabels] = useState(true); // eslint-disable-line no-unused-vars
     const [hoveredPlanet, setHoveredPlanet] = useState(null);
     const [viewMode, setViewMode] = useState('log'); // 'log' or 'linear'
     const [cameraAngle, setCameraAngle] = useState(0);
