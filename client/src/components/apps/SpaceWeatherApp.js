@@ -7,6 +7,12 @@ import NoaaScalesGauge from './NoaaScalesGauge';
 import KpIndexChart from './KpIndexChart';
 import AlertsTicker from './AlertsTicker';
 import AuroraForecastMap from './AuroraForecastMap';
+// New SWPC data components
+import GoesDataPanel from './GoesDataPanel';
+import SolarWindCharts from './SolarWindCharts';
+import SolarCycleDashboard from './SolarCycleDashboard';
+import DrapViewer from './DrapViewer';
+import SpaceWeatherGallery from './SpaceWeatherGallery';
 
 /**
  * Space Weather App - NOAA SWPC + NASA DONKI
@@ -126,12 +132,21 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
             <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>🌞 Space Weather Monitor</div>
 
             {/* Tab Navigation - Using System 6 btn class */}
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                <button className={getTabClass(activeTab === 'current')} onClick={() => setActiveTab('current')} style={{ fontSize: 'var(--font-size-base)' }}>📡 Current</button>
-                <button className={getTabClass(activeTab === 'alerts')} onClick={() => setActiveTab('alerts')} style={{ fontSize: 'var(--font-size-base)' }}>🚨 Alerts</button>
-                <button className={getTabClass(activeTab === 'aurora')} onClick={() => setActiveTab('aurora')} style={{ fontSize: 'var(--font-size-base)' }}>🌌 Aurora</button>
-                <button className={getTabClass(activeTab === 'donki')} onClick={() => setActiveTab('donki')} style={{ fontSize: 'var(--font-size-base)' }}>☀️ DONKI</button>
-                <button className="btn" onClick={() => setShowSunViz(true)} style={{ fontSize: 'var(--font-size-base)' }}>🌐 3D Sun</button>
+            {/* Tab Navigation - Row 1: Core tabs */}
+            <div style={{ display: 'flex', gap: '2px', marginBottom: '2px', flexWrap: 'wrap' }}>
+                <button className={getTabClass(activeTab === 'current')} onClick={() => setActiveTab('current')} style={{ fontSize: '10px', padding: '3px 6px' }}>📡 Current</button>
+                <button className={getTabClass(activeTab === 'goes')} onClick={() => setActiveTab('goes')} style={{ fontSize: '10px', padding: '3px 6px' }}>🛰️ GOES</button>
+                <button className={getTabClass(activeTab === 'solarwind')} onClick={() => setActiveTab('solarwind')} style={{ fontSize: '10px', padding: '3px 6px' }}>🌬️ Wind</button>
+                <button className={getTabClass(activeTab === 'cycle')} onClick={() => setActiveTab('cycle')} style={{ fontSize: '10px', padding: '3px 6px' }}>☀️ Cycle</button>
+                <button className={getTabClass(activeTab === 'drap')} onClick={() => setActiveTab('drap')} style={{ fontSize: '10px', padding: '3px 6px' }}>📻 HF</button>
+            </div>
+            {/* Tab Navigation - Row 2: Secondary tabs */}
+            <div style={{ display: 'flex', gap: '2px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                <button className={getTabClass(activeTab === 'alerts')} onClick={() => setActiveTab('alerts')} style={{ fontSize: '10px', padding: '3px 6px' }}>🚨 Alerts</button>
+                <button className={getTabClass(activeTab === 'aurora')} onClick={() => setActiveTab('aurora')} style={{ fontSize: '10px', padding: '3px 6px' }}>🌌 Aurora</button>
+                <button className={getTabClass(activeTab === 'donki')} onClick={() => setActiveTab('donki')} style={{ fontSize: '10px', padding: '3px 6px' }}>🔥 DONKI</button>
+                <button className={getTabClass(activeTab === 'gallery')} onClick={() => setActiveTab('gallery')} style={{ fontSize: '10px', padding: '3px 6px' }}>🖼️ Gallery</button>
+                <button className="btn" onClick={() => setShowSunViz(true)} style={{ fontSize: '10px', padding: '3px 6px' }}>🌐 3D</button>
             </div>
 
             {error && <div className="nasa-error" style={{ fontSize: '10px', marginBottom: '6px' }}>{error}</div>}
@@ -157,6 +172,31 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
                 {/* ALERTS TAB */}
                 {activeTab === 'alerts' && (
                     <AlertsTicker alerts={alerts} loading={noaaLoading} maxVisible={10} />
+                )}
+
+                {/* GOES SATELLITE TAB */}
+                {activeTab === 'goes' && (
+                    <GoesDataPanel onError={(err) => setError(err)} />
+                )}
+
+                {/* SOLAR WIND TAB */}
+                {activeTab === 'solarwind' && (
+                    <SolarWindCharts onError={(err) => setError(err)} />
+                )}
+
+                {/* SOLAR CYCLE TAB */}
+                {activeTab === 'cycle' && (
+                    <SolarCycleDashboard onError={(err) => setError(err)} />
+                )}
+
+                {/* D-RAP HF RADIO TAB */}
+                {activeTab === 'drap' && (
+                    <DrapViewer />
+                )}
+
+                {/* GALLERY TAB */}
+                {activeTab === 'gallery' && (
+                    <SpaceWeatherGallery />
                 )}
 
                 {/* AURORA TAB */}
