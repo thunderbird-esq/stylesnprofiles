@@ -34,23 +34,14 @@ export default function TechportApp({ windowId: _windowId }) {
 
             for (const id of FEATURED_IDS.slice(0, 8)) {
                 try {
-                    // Try direct API call first
-                    let response;
-                    try {
-                        response = await axios.get(
-                            `https://api.nasa.gov/techport/api/projects/${id}`,
-                            {
-                                params: { api_key: apiKey },
-                                timeout: 15000,
-                            }
-                        );
-                    } catch (directErr) {
-                        // If CORS error, try with proxy
-                        console.log(`Techport project ${id} direct failed, trying proxy...`);
-                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://api.nasa.gov/techport/api/projects/${id}?api_key=${apiKey}`)}`;
-                        const proxyResponse = await axios.get(proxyUrl, { timeout: 15000 });
-                        response = { data: JSON.parse(proxyResponse.data.contents) };
-                    }
+                    // Use CORS proxy directly (NASA Techport doesn't support CORS)
+                    const targetUrl = `https://api.nasa.gov/techport/api/projects/${id}?api_key=${apiKey}`;
+                    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+
+                    const response = await axios.get(proxyUrl, {
+                        timeout: 10000,
+                        headers: { 'Accept': 'application/json' }
+                    });
 
                     if (response.data?.project) {
                         validProjects.push(response.data.project);
@@ -58,12 +49,12 @@ export default function TechportApp({ windowId: _windowId }) {
                     }
 
                     // Small delay between requests
-                    await new Promise(r => setTimeout(r, 200));
+                    await new Promise(r => setTimeout(r, 300));
                 } catch (err) {
                     console.warn(`Techport project ${id} failed:`, err.message);
 
                     // If rate limited, show message and stop
-                    if (err.response?.data?.error?.code === 'OVER_RATE_LIMIT') {
+                    if (err.response?.status === 429 || err.response?.data?.error?.code === 'OVER_RATE_LIMIT') {
                         setError('Rate limited. Add your NASA API key in Settings.');
                         break;
                     }
@@ -72,8 +63,8 @@ export default function TechportApp({ windowId: _windowId }) {
 
             setProjects(validProjects);
 
-            if (validProjects.length === 0 && !error) {
-                setError('Could not load projects. The Techport API may be temporarily unavailable.');
+            if (validProjects.length === 0) {
+                setError('Could not load projects. The Techport API may be temporarily unavailable. Try refreshing.');
             }
         } catch (err) {
             console.error('Techport error:', err);
@@ -81,7 +72,7 @@ export default function TechportApp({ windowId: _windowId }) {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [FEATURED_IDS]);
 
     useEffect(() => {
         fetchProjects();
