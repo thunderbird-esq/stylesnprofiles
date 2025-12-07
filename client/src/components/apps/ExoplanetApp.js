@@ -141,9 +141,9 @@ export default function ExoplanetApp({ windowId: _windowId }) {
 
             {/* Discovery Timeline */}
             {years.length > 0 && (
-                <div style={{ marginBottom: '8px', padding: '4px', border: '1px solid var(--tertiary)', fontSize: '9px' }}>
-                    <div style={{ marginBottom: '2px', fontWeight: 'bold' }}>Discoveries by Year:</div>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', height: '20px', gap: '1px' }}>
+                <div style={{ marginBottom: '8px', padding: '6px', border: '1px solid var(--tertiary)', fontSize: 'var(--font-size-base)' }}>
+                    <div style={{ marginBottom: '4px', fontWeight: 'bold' }}>Discoveries by Year:</div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', height: '24px', gap: '2px' }}>
                         {years.slice(-15).map(year => (
                             <div
                                 key={year}
@@ -157,7 +157,7 @@ export default function ExoplanetApp({ windowId: _windowId }) {
                             />
                         ))}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2px' }}>
                         <span>{years.slice(-15)[0]}</span>
                         <span>{years[years.length - 1]}</span>
                     </div>
@@ -171,14 +171,14 @@ export default function ExoplanetApp({ windowId: _windowId }) {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search planet or star..."
-                    style={{ flex: 1, fontSize: '11px', padding: '4px' }}
+                    style={{ flex: 1, fontSize: 'var(--font-size-lg)', padding: '6px' }}
                 />
-                <button type="submit" className="btn" disabled={loading} style={{ fontSize: '11px' }}>
+                <button type="submit" className="btn" disabled={loading} style={{ fontSize: 'var(--font-size-lg)' }}>
                     {loading ? '...' : 'Search'}
                 </button>
             </form>
 
-            {error && <div className="nasa-error" style={{ fontSize: '11px', marginBottom: '6px' }}>{error}</div>}
+            {error && <div className="nasa-error" style={{ fontSize: 'var(--font-size-lg)', marginBottom: '6px' }}>{error}</div>}
 
             {/* Planets List */}
             <div style={{ flex: 1, overflow: 'auto' }}>
@@ -198,22 +198,22 @@ export default function ExoplanetApp({ windowId: _windowId }) {
                                     key={`${planet.pl_name}-${idx}`}
                                     onClick={() => setSelectedPlanet(planet)}
                                     style={{
-                                        padding: '6px 8px',
+                                        padding: '8px 10px',
                                         border: '1px solid var(--secondary)',
                                         cursor: 'pointer',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '8px',
+                                        gap: '10px',
                                     }}
                                 >
-                                    <span style={{ fontSize: '18px' }}>{type.icon}</span>
+                                    <span style={{ fontSize: '22px' }}>{type.icon}</span>
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ fontSize: '12px', fontWeight: 'bold' }}>{planet.pl_name}</div>
-                                        <div style={{ fontSize: '10px', opacity: 0.7 }}>
+                                        <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'bold' }}>{planet.pl_name}</div>
+                                        <div style={{ fontSize: 'var(--font-size-base)', opacity: 0.7 }}>
                                             ⭐ {planet.hostname} • {planet.disc_year || '?'} • {type.label}
                                         </div>
                                     </div>
-                                    <div style={{ fontSize: '10px', opacity: 0.6, textAlign: 'right' }}>
+                                    <div style={{ fontSize: 'var(--font-size-base)', opacity: 0.6, textAlign: 'right' }}>
                                         {planet.sy_dist ? `${Math.round(planet.sy_dist)} ly` : ''}
                                     </div>
                                 </div>

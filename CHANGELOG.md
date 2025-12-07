@@ -40,6 +40,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Title: 75% larger (`var(--font-size-xxl)` = 24px)
 - Explanation text: 40% larger (18px with better line-height)
 
+### 🔧 Phase 4: UI Polish + API Fixes
+
+#### Space Weather Tabs (System 6 Styling)
+- Replaced inline styles with proper `.btn` and `.btn-active` CSS classes
+- Added `.btn-active` to system.css for inverted selected state
+- Tabs now have rounded borders matching System 6 HIG
+
+#### Exoplanets Text Sizing
+- Discovery timeline: larger font, better spacing
+- Search input and button: 40% larger
+- Planet list items: larger names (16px), metadata (12px)
+- Icons: increased from 18px to 22px
+
+#### Techport Fix
+- Added CORS proxy fallback using allorigins.win
+- Better error messages with detailed logging
+- Now successfully loads 8 projects
+
+#### Mars Rovers Fix
+- Default sol changed from 100 to `max_sol - 10` (recent photos)
+- Curiosity now loads sol ~4376 with actual photos
+- Better manifest and photo error handling
+
 ---
 
 ## [0.5.0] - 2025-12-05 (Week 5 - Part 2)

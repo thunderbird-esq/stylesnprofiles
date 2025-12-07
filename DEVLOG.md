@@ -82,6 +82,49 @@ Applied 40% larger text sizing to 6 apps using CSS variables and utility classes
 
 ---
 
+## 2025-12-07 - Phase 4: UI Polish + API Fixes
+
+### Session Summary
+Fixed Space Weather tabs to use proper System 6 styling, enlarged Exoplanet text throughout, and fixed Mars Rovers and Techport API loading issues.
+
+### Completed Tasks
+
+**Space Weather Tabs**
+- Issue: Tabs used inline styles with plain squares, not System 6 buttons
+- Fix: Created `.btn-active` CSS class for inverted selected state
+- Result: Tabs now use `.btn`/`.btn-active` classes with proper rounded borders
+
+**Exoplanets Text Sizing**
+- Discovery timeline: `var(--font-size-base)` with better spacing
+- Search input/button: `var(--font-size-lg)` (40% larger)
+- Planet list items: names 16px, metadata 12px
+- Icons: 22px (up from 18px)
+
+**Techport API Fix**
+- Issue: API requests were failing silently
+- Fix: Added CORS proxy fallback via allorigins.win
+- Result: Now successfully loads 8 NASA technology projects
+
+**Mars Rovers API Fix**
+- Issue: Default sol 100 had no photos for Curiosity
+- Fix: Changed default to `max_sol - 10` (recent sol with photos)
+- Result: Curiosity now loads sol ~4376 with actual Mars imagery
+
+### Files Changed
+- `client/src/styles/system.css` - Added `.btn-active` class
+- `client/src/components/apps/SpaceWeatherApp.js` - Use btn classes
+- `client/src/components/apps/ExoplanetApp.js` - Larger text throughout
+- `client/src/components/apps/TechportApp.js` - CORS proxy fallback
+- `client/src/components/apps/MarsRoverApp.js` - Better default sol
+
+### Verified
+- Space Weather tabs: Rounded System 6 button styling
+- Exoplanets: All text 40% larger
+- Techport: Loads 8 projects successfully
+- Mars Rovers: Loads sol 4376 with photos
+
+---
+
 ## 2025-12-05 - Week 5: NASA API Expansion
 
 ### Session Summary

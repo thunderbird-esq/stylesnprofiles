@@ -118,28 +118,20 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
         return <SunVisualization events={donkiEvents} solarRegions={solarRegions} onClose={() => setShowSunViz(false)} />;
     }
 
-    // Tab button style
-    const tabStyle = (isActive) => ({
-        fontSize: 'var(--font-size-base)',
-        padding: '4px 10px',
-        background: isActive ? 'var(--secondary)' : 'var(--primary)',
-        color: isActive ? 'var(--primary)' : 'var(--secondary)',
-        border: '1px solid var(--secondary)',
-        cursor: 'pointer',
-        fontWeight: isActive ? 'bold' : 'normal',
-    });
+    // Tab button active style (for inverted selected state)
+    const getTabClass = (isActive) => isActive ? 'btn-active' : 'btn';
 
     return (
         <div className="nasa-data-section app-text-lg" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>🌞 Space Weather Monitor</div>
 
-            {/* Tab Navigation */}
-            <div style={{ display: 'flex', gap: '2px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                <button style={tabStyle(activeTab === 'current')} onClick={() => setActiveTab('current')}>📡 Current</button>
-                <button style={tabStyle(activeTab === 'alerts')} onClick={() => setActiveTab('alerts')}>🚨 Alerts</button>
-                <button style={tabStyle(activeTab === 'aurora')} onClick={() => setActiveTab('aurora')}>🌌 Aurora</button>
-                <button style={tabStyle(activeTab === 'donki')} onClick={() => setActiveTab('donki')}>☀️ DONKI</button>
-                <button style={tabStyle(activeTab === '3d')} onClick={() => setShowSunViz(true)}>🌐 3D Sun</button>
+            {/* Tab Navigation - Using System 6 btn class */}
+            <div style={{ display: 'flex', gap: '4px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                <button className={getTabClass(activeTab === 'current')} onClick={() => setActiveTab('current')} style={{ fontSize: 'var(--font-size-base)' }}>📡 Current</button>
+                <button className={getTabClass(activeTab === 'alerts')} onClick={() => setActiveTab('alerts')} style={{ fontSize: 'var(--font-size-base)' }}>🚨 Alerts</button>
+                <button className={getTabClass(activeTab === 'aurora')} onClick={() => setActiveTab('aurora')} style={{ fontSize: 'var(--font-size-base)' }}>🌌 Aurora</button>
+                <button className={getTabClass(activeTab === 'donki')} onClick={() => setActiveTab('donki')} style={{ fontSize: 'var(--font-size-base)' }}>☀️ DONKI</button>
+                <button className="btn" onClick={() => setShowSunViz(true)} style={{ fontSize: 'var(--font-size-base)' }}>🌐 3D Sun</button>
             </div>
 
             {error && <div className="nasa-error" style={{ fontSize: '10px', marginBottom: '6px' }}>{error}</div>}

@@ -30,23 +30,39 @@ export default function MarsRoverApp({ windowId: _windowId }) {
 
     // Fetch rover manifest
     useEffect(() => {
+        console.log('🔴 Mars: Fetching manifest for', rover);
         getMarsRoverManifest(rover)
             .then(res => {
-                setManifest(res.data.photo_manifest);
-                setSol(res.data.photo_manifest.max_sol > 100 ? 100 : res.data.photo_manifest.max_sol);
+                console.log('✓ Mars manifest loaded:', res.data);
+                if (res.data?.photo_manifest) {
+                    setManifest(res.data.photo_manifest);
+                    const maxSol = res.data.photo_manifest.max_sol;
+                    // Use a recent sol that's likely to have photos (max_sol - 10)
+                    // Curiosity: ~4300+, Perseverance: ~1300+
+                    const recentSol = Math.max(1, maxSol - 10);
+                    setSol(recentSol);
+                } else {
+                    console.warn('Mars manifest missing photo_manifest');
+                    setError('Could not load rover info. Check API key in Settings.');
+                }
             })
-            .catch(err => console.error('Failed to fetch manifest:', err));
+            .catch(err => {
+                console.error('Failed to fetch manifest:', err);
+                setError(`Failed to load ${rover} info: ${err.message}`);
+            });
     }, [rover]);
 
     // Fetch photos
     const fetchPhotos = useCallback(() => {
+        console.log('🔴 Mars: Fetching photos', { rover, sol, camera, page });
         setLoading(true);
         setError(null);
 
         getMarsPhotos({ rover, sol, camera: camera || undefined, page })
             .then(res => {
+                console.log('✓ Mars photos response:', res.data);
                 // Check for API error response
-                if (res.data.error) {
+                if (res.data?.error) {
                     if (res.data.error.code === 'OVER_RATE_LIMIT') {
                         setError('⚠️ API rate limit exceeded. Get your FREE API key at api.nasa.gov and enter it in Settings (⚙️ menu).');
                     } else {
@@ -54,9 +70,10 @@ export default function MarsRoverApp({ windowId: _windowId }) {
                     }
                     return;
                 }
-                setPhotos(res.data.photos || []);
-                if (res.data.photos?.length === 0) {
-                    setError('No photos found for this sol/camera combination. Try a different sol or camera.');
+                const photos = res.data?.photos || [];
+                setPhotos(photos);
+                if (photos.length === 0) {
+                    setError(`No photos found for ${rover} on sol ${sol}${camera ? ` with ${camera} camera` : ''}. Try a different sol or camera.`);
                 }
             })
             .catch(err => {
@@ -65,7 +82,7 @@ export default function MarsRoverApp({ windowId: _windowId }) {
                 if (errMsg?.includes('rate limit') || errMsg?.includes('OVER_RATE_LIMIT')) {
                     setError('⚠️ API rate limit exceeded. Get your FREE API key at api.nasa.gov and enter it in Settings (⚙️ menu).');
                 } else {
-                    setError(errMsg || 'Failed to load Mars photos. Check your API key in Settings.');
+                    setError(`Failed to load Mars photos: ${errMsg || 'Unknown error'}`);
                 }
             })
             .finally(() => setLoading(false));

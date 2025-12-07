@@ -506,6 +506,24 @@ h2 {
   border-radius: 12px;
 }
 
+/* Active/selected button state (for tabs, toggles) */
+.btn-active {
+  min-height: 20px;
+  min-width: 59px;
+  padding: 0 20px;
+  text-align: center;
+  background: var(--secondary);
+  border-style: solid;
+  border-width: 5.5px;
+  border-image: url('./icon/button.svg') 30 stretch;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 18px;
+  font-family: Chicago_12;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
 /* text input */
 input {
   border: 1.5px solid var(--secondary);

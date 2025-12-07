@@ -34,16 +34,27 @@ export default function TechportApp({ windowId: _windowId }) {
 
             for (const id of FEATURED_IDS.slice(0, 8)) {
                 try {
-                    const response = await axios.get(
-                        `https://api.nasa.gov/techport/api/projects/${id}`,
-                        {
-                            params: { api_key: apiKey },
-                            timeout: 15000,
-                        }
-                    );
+                    // Try direct API call first
+                    let response;
+                    try {
+                        response = await axios.get(
+                            `https://api.nasa.gov/techport/api/projects/${id}`,
+                            {
+                                params: { api_key: apiKey },
+                                timeout: 15000,
+                            }
+                        );
+                    } catch (directErr) {
+                        // If CORS error, try with proxy
+                        console.log(`Techport project ${id} direct failed, trying proxy...`);
+                        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://api.nasa.gov/techport/api/projects/${id}?api_key=${apiKey}`)}`;
+                        const proxyResponse = await axios.get(proxyUrl, { timeout: 15000 });
+                        response = { data: JSON.parse(proxyResponse.data.contents) };
+                    }
 
                     if (response.data?.project) {
                         validProjects.push(response.data.project);
+                        console.log(`✓ Loaded project ${id}: ${response.data.project.title}`);
                     }
 
                     // Small delay between requests
@@ -62,11 +73,11 @@ export default function TechportApp({ windowId: _windowId }) {
             setProjects(validProjects);
 
             if (validProjects.length === 0 && !error) {
-                setError('Could not load projects. Check API key in Settings.');
+                setError('Could not load projects. The Techport API may be temporarily unavailable.');
             }
         } catch (err) {
             console.error('Techport error:', err);
-            setError('Failed to load NASA projects.');
+            setError(`Failed to load NASA projects: ${err.message}`);
         } finally {
             setLoading(false);
         }
