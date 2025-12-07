@@ -1,0 +1,25 @@
+{
+    "extends": [
+        "stylelint-config-standard"
+    ],
+    "rules": {
+        "comment-empty-line-before": null,
+        "declaration-empty-line-before": null,
+        "selector-class-pattern": null,
+        "custom-property-pattern": null,
+        "no-descending-specificity": null,
+        "color-function-notation": null,
+        "alpha-value-notation": null,
+        "selector-pseudo-element-no-unknown": [
+            true,
+            {
+                "ignorePseudoElements": [
+                    "input-placeholder"
+                ]
+            }
+        ],
+        "property-no-vendor-prefix": null,
+        "value-no-vendor-prefix": null
+    },
+    "customSyntax": "postcss-scss"
+}

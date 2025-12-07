@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-12-07 (Phase 1 - Design System Foundation)
+
+### 🎨 Design System Foundation
+
+#### Scrollbar SVG Fix
+- **ROOT CAUSE IDENTIFIED**: `svg-load()` is PostCSS function, not native CSS
+- Replaced text character arrows (▲▼◄►) with proper SVG data URIs
+- Scrollbar buttons now display authentic Apple System 6 pixel-art arrows
+- Active state SVG images for pressed button feedback
+
+#### CSS Font Sizing Variables
+- Added `--font-size-base: 12px` through `--font-size-xxl: 24px`
+- `--font-size-lg: 16px` (40% larger than base)
+- `--font-size-xl: 21px` (75% larger than base)
+
+#### Utility Classes
+- `.text-sm`, `.text-base`, `.text-lg`, `.text-xl`, `.text-xxl`
+- `.app-text-lg` container class for scaling all app content
+
+#### Documentation
+- Created `SYSTEM6_DESIGN_STANDARDS.md` with color tokens, font sizing, and local asset requirements
+- Added `.stylelintrc.json` for CSS linting standards
+
+---
+
 ## [0.5.0] - 2025-12-05 (Week 5 - Part 2)
 
 ### 🎨 Apple System 6 HIG Overhaul
