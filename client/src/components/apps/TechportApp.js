@@ -95,6 +95,23 @@ export default function TechportApp({ windowId: _windowId }) {
         return '🟡';
     };
 
+    // Get project icon based on mission type/keywords
+    const getProjectIcon = (project) => {
+        const title = (project.title || '').toLowerCase();
+        const desc = (project.description || '').toLowerCase();
+        const text = title + ' ' + desc;
+        if (text.includes('lunar') || text.includes('moon')) return '🌙';
+        if (text.includes('mars')) return '🔴';
+        if (text.includes('satellite') || text.includes('orbit')) return '🛰️';
+        if (text.includes('propulsion') || text.includes('engine')) return '🚀';
+        if (text.includes('solar') || text.includes('sun')) return '☀️';
+        if (text.includes('robot') || text.includes('rover')) return '🤖';
+        if (text.includes('material') || text.includes('thermal')) return '🧪';
+        if (text.includes('communication') || text.includes('antenna')) return '📡';
+        if (text.includes('habitat') || text.includes('life support')) return '🏠';
+        return '💻';
+    };
+
     return (
         <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div className="nasa-data-title">🔬 NASA Techport</div>
@@ -128,30 +145,41 @@ export default function TechportApp({ windowId: _windowId }) {
                         <button className="btn" onClick={fetchProjects} style={{ marginTop: '10px' }}>Retry</button>
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         {projects.map((project) => (
                             <div
                                 key={project.projectId}
                                 onClick={() => setSelectedProject(project)}
                                 style={{
-                                    padding: '8px',
-                                    border: '1px solid var(--secondary)',
+                                    padding: '10px',
+                                    border: '2px solid var(--secondary)',
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'flex-start',
-                                    gap: '8px',
+                                    gap: '10px',
+                                    background: 'var(--primary)',
+                                    transition: 'transform 0.15s, box-shadow 0.15s',
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '3px 3px 0 var(--secondary)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'none';
+                                    e.currentTarget.style.boxShadow = 'none';
                                 }}
                             >
-                                <span style={{ fontSize: '18px' }}>🚀</span>
+                                <span style={{ fontSize: '24px' }}>{getProjectIcon(project)}</span>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: '12px', fontWeight: 'bold' }}>
+                                    <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'bold' }}>
                                         {project.title?.substring(0, 50)}{project.title?.length > 50 ? '…' : ''}
                                     </div>
-                                    <div style={{ fontSize: '10px', opacity: 0.7, marginTop: '2px' }}>
+                                    <div style={{ fontSize: 'var(--font-size-base)', opacity: 0.7, marginTop: '4px' }}>
                                         {getStatusIcon(project.statusDescription)} {project.statusDescription || 'Unknown'}
-                                        {project.startYear && ` • ${project.startYear}`}
+                                        {project.startYear && ` • Started ${project.startYear}`}
                                     </div>
                                 </div>
+                                <span style={{ fontSize: '18px', opacity: 0.5 }}>▶</span>
                             </div>
                         ))}
                     </div>

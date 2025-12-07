@@ -28,6 +28,27 @@ export default function MarsRoverApp({ windowId: _windowId }) {
         perseverance: ['EDL_RUCAM', 'EDL_RDCAM', 'EDL_DDCAM', 'EDL_PUCAM1', 'EDL_PUCAM2', 'NAVCAM_LEFT', 'NAVCAM_RIGHT', 'MCZ_LEFT', 'MCZ_RIGHT', 'FRONT_HAZCAM_LEFT_A', 'FRONT_HAZCAM_RIGHT_A', 'REAR_HAZCAM_LEFT', 'REAR_HAZCAM_RIGHT', 'SKYCAM', 'SHERLOC_WATSON'],
     };
 
+    // Camera tooltip descriptions
+    const getCameraTooltip = (cam) => {
+        const tips = {
+            FHAZ: 'Front Hazard Avoidance Camera',
+            RHAZ: 'Rear Hazard Avoidance Camera',
+            MAST: 'Mast Camera (MastCam)',
+            CHEMCAM: 'Chemistry and Camera Complex',
+            MAHLI: 'Mars Hand Lens Imager',
+            MARDI: 'Mars Descent Imager',
+            NAVCAM: 'Navigation Camera',
+            PANCAM: 'Panoramic Camera',
+            MINITES: 'Miniature Thermal Emission Spectrometer',
+            NAVCAM_LEFT: 'Left Navigation Camera',
+            NAVCAM_RIGHT: 'Right Navigation Camera',
+            MCZ_LEFT: 'Left MastCam-Z',
+            MCZ_RIGHT: 'Right MastCam-Z',
+            SKYCAM: 'Sky Camera',
+        };
+        return tips[cam] || cam;
+    };
+
     // Fetch rover manifest
     useEffect(() => {
         console.log('🔴 Mars: Fetching manifest for', rover);
@@ -121,22 +142,32 @@ export default function MarsRoverApp({ windowId: _windowId }) {
                     </select>
                 </div>
 
-                {/* Sol Input */}
+                {/* Sol Slider */}
                 <div className="field-row" style={{ marginBottom: '8px' }}>
                     <label>Sol (Mars day):</label>
-                    <input
-                        type="number"
-                        value={sol}
-                        onChange={handleSolChange}
-                        min="0"
-                        max={manifest?.max_sol || 5000}
-                        style={{ width: '80px', marginLeft: '8px' }}
-                    />
-                    {manifest && (
-                        <span style={{ marginLeft: '8px', fontSize: '12px', opacity: 0.7 }}>
-                            (max: {manifest.max_sol})
-                        </span>
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, marginLeft: '8px' }}>
+                        <input
+                            type="range"
+                            value={sol}
+                            onChange={handleSolChange}
+                            min="1"
+                            max={manifest?.max_sol || 5000}
+                            style={{ flex: 1 }}
+                        />
+                        <input
+                            type="number"
+                            value={sol}
+                            onChange={handleSolChange}
+                            min="1"
+                            max={manifest?.max_sol || 5000}
+                            style={{ width: '60px' }}
+                        />
+                        {manifest && (
+                            <span style={{ fontSize: '11px', opacity: 0.7 }}>
+                                / {manifest.max_sol}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
                 {/* Camera Filter */}
@@ -199,7 +230,8 @@ export default function MarsRoverApp({ windowId: _windowId }) {
                                 style={{ width: '100%', height: '100px', objectFit: 'cover' }}
                                 loading="lazy"
                             />
-                            <div style={{ fontSize: '11px', marginTop: '4px' }}>
+                            <div style={{ fontSize: '11px', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span title={getCameraTooltip(photo.camera.name)} style={{ cursor: 'help' }}>📷</span>
                                 {photo.camera.name}
                             </div>
                         </div>

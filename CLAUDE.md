@@ -25,13 +25,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **System 6 modals** - Black title bar, white close button, 4px shadow
 - **Chicago font** - Primary typeface
 - **Consistent controls** - Use `.btn` class for all buttons
+- **Font sizes** - Use CSS variables: `--font-size-base` (12px), `--font-size-lg` (16px), `--font-size-xl` (21px), `--font-size-xxl` (24px)
+- **Animations** - Use `.skeleton*` for loading states, `blink` and `pulse` keyframes for markers
+- **Tooltips** - Use `.sys6-tooltip` class for System 6 themed tooltips
 
 ### Key Files
 - `client/src/services/nasaApi.js` - NASA API functions
 - `client/src/contexts/AppContext.js` - App registration and window management
 - `client/src/components/system6/Desktop.js` - Desktop icons
-- `client/src/styles/system.css` - System 6 styling
+- `client/src/styles/system.css` - System 6 styling, font variables, animations
 - `client/src/components/apps/SunVisualization.js` - Three.js sun for Space Weather
+- `client/src/components/apps/ExoplanetVisualization.js` - Three.js exoplanet orbits
+- `client/src/components/apps/NeoOrbitViewer.js` - Three.js asteroid orbits
+- `client/src/components/apps/KpIndexChart.js` - Kp index bar chart with thresholds
 
 ## Development Commands
 

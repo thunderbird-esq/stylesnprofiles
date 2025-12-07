@@ -207,35 +207,54 @@ export default function EpicApp({ windowId: _windowId }) {
                 )}
             </div>
 
-            {/* Thumbnail Strip */}
+            {/* Thumbnail Filmstrip */}
             {images.length > 1 && (
                 <div style={{
                     display: 'flex',
-                    gap: '3px',
-                    padding: '6px',
+                    gap: '4px',
+                    padding: '8px',
                     overflowX: 'auto',
-                    borderTop: '1px solid var(--tertiary)',
-                    marginTop: '6px',
-                    background: 'var(--primary)', /* Opaque background */
+                    borderTop: '2px solid var(--secondary)',
+                    marginTop: '8px',
+                    background: '#333', /* Dark filmstrip background */
                 }}>
                     {images.map((img, idx) => (
-                        <img
+                        <div
                             key={img.identifier}
-                            src={buildEpicImageUrl(img, collection)}
-                            alt={`Frame ${idx + 1}`}
                             onClick={() => {
                                 setIsPlaying(false);
                                 setSelectedIndex(idx);
                             }}
                             style={{
-                                width: '40px',
-                                height: '40px',
-                                objectFit: 'cover',
+                                position: 'relative',
                                 cursor: 'pointer',
-                                border: idx === selectedIndex ? '2px solid var(--secondary)' : '1px solid var(--tertiary)',
-                                opacity: idx === selectedIndex ? 1 : 0.7,
+                                border: idx === selectedIndex ? '3px solid #fff' : '2px solid #666',
+                                borderRadius: '2px',
                             }}
-                        />
+                        >
+                            <img
+                                src={buildEpicImageUrl(img, collection)}
+                                alt={`Frame ${idx + 1}`}
+                                style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    objectFit: 'cover',
+                                    display: 'block',
+                                    opacity: idx === selectedIndex ? 1 : 0.7,
+                                }}
+                            />
+                            <span style={{
+                                position: 'absolute',
+                                bottom: '2px',
+                                right: '2px',
+                                background: 'rgba(0,0,0,0.7)',
+                                color: '#fff',
+                                fontSize: '9px',
+                                padding: '1px 3px',
+                            }}>
+                                {idx + 1}
+                            </span>
+                        </div>
                     ))}
                 </div>
             )}

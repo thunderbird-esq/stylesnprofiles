@@ -63,6 +63,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Curiosity now loads sol ~4376 with actual photos
 - Better manifest and photo error handling
 
+### ✨ Phase 5: Enhanced Visualization
+
+#### APOD Enhancements
+- Image zoom modal with click-to-enlarge (press Escape to close)
+- Metadata overlay showing date, copyright, media type, HD availability
+- Reorganized image controls: Show Info, Zoom, HD buttons
+
+#### Space Weather - Kp Index Chart
+- Increased chart height from 80px to 120px for better visibility
+- Added G1/G2/G3 storm threshold lines (dashed horizontal markers)
+- Interactive hover tooltips showing exact Kp value and timestamp
+- Expanded legend with 10px markers and borders
+
+#### EPIC Earth Camera
+- Enhanced filmstrip with dark background styling
+- Numbered frame indicators on each thumbnail
+- Larger thumbnails (48px vs 40px) with white selection border
+
+#### Mars Rovers
+- Sol slider with combined range input + number input
+- Camera tooltip descriptions (hover 📷 icon for full camera name)
+- Camera descriptions: FHAZ, RHAZ, MAST, CHEMCAM, etc.
+
+#### Techport
+- Project category icons based on mission type (🌙 Lunar, 🔴 Mars, 🛰️ Satellite, etc.)
+- Card hover effects: lift + shadow on mouse enter
+- Larger project titles and status text
+
+#### Global CSS Utilities (system.css)
+- `@keyframes skeleton-loading` - Loading skeleton animation
+- `@keyframes blink` - Pulsing marker animation for Earth Events
+- `@keyframes pulse` - Box-shadow pulse effect
+- `.skeleton`, `.skeleton-text`, `.skeleton-title`, `.skeleton-image` classes
+- `.sys6-tooltip` - System 6 themed tooltip styling
+- `@media print` - Print-friendly mode for visualizations
+
 ---
 
 ## [0.5.0] - 2025-12-05 (Week 5 - Part 2)

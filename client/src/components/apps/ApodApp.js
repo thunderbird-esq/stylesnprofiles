@@ -35,6 +35,8 @@ export default function ApodApp({ windowId: _windowId }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [showZoom, setShowZoom] = useState(false);
+  const [showMetadata, setShowMetadata] = useState(false);
 
   const today = new Date();
   const isToday = formatDate(currentDate) === formatDate(today);
@@ -88,6 +90,29 @@ export default function ApodApp({ windowId: _windowId }) {
 
   return (
     <div className="nasa-app-content" style={{ padding: '10px' }}>
+      {/* Zoom Modal */}
+      {showZoom && apodData.media_type === 'image' && (
+        <div
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.9)', zIndex: 1000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'zoom-out',
+          }}
+          onClick={() => setShowZoom(false)}
+        >
+          <img
+            src={apodData.hdurl || apodData.url}
+            alt={apodData.title}
+            style={{ maxWidth: '95vw', maxHeight: '95vh', objectFit: 'contain' }}
+          />
+          <div style={{
+            position: 'absolute', top: '10px', right: '10px',
+            color: '#fff', fontSize: '24px', cursor: 'pointer',
+          }}>✕</div>
+        </div>
+      )}
+
       {/* Date Navigation */}
       <div
         className="apod-nav mb-2"
@@ -146,35 +171,62 @@ export default function ApodApp({ windowId: _windowId }) {
             padding: '10px',
             background: '#000',
             textAlign: 'center',
+            position: 'relative',
           }}
         >
           <img
             src={apodData.url}
             alt={apodData.title}
+            onClick={() => setShowZoom(true)}
             style={{
               maxWidth: '100%',
               height: 'auto',
               border: '1px solid var(--secondary)',
+              cursor: 'zoom-in',
             }}
           />
-          {/* HD View Button */}
-          {apodData.hdurl && (
-            <div style={{ marginTop: '8px' }}>
+          {/* Metadata Overlay */}
+          {showMetadata && (
+            <div style={{
+              position: 'absolute', bottom: '20px', left: '20px',
+              background: 'rgba(0,0,0,0.8)', color: '#fff',
+              padding: '10px', fontSize: '12px', textAlign: 'left',
+              border: '1px solid #666', maxWidth: '300px',
+            }}>
+              <div><strong>Date:</strong> {apodData.date}</div>
+              {apodData.copyright && <div><strong>©</strong> {apodData.copyright}</div>}
+              <div><strong>Type:</strong> {apodData.media_type}</div>
+              {apodData.hdurl && <div><strong>HD Available:</strong> Yes</div>}
+            </div>
+          )}
+          {/* Image Controls */}
+          <div style={{ marginTop: '8px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+            <button
+              className="btn"
+              onClick={() => setShowMetadata(!showMetadata)}
+              style={{ fontSize: '12px' }}
+            >
+              ℹ️ {showMetadata ? 'Hide' : 'Show'} Info
+            </button>
+            <button
+              className="btn"
+              onClick={() => setShowZoom(true)}
+              style={{ fontSize: '12px' }}
+            >
+              🔍 Zoom
+            </button>
+            {apodData.hdurl && (
               <a
                 href={apodData.hdurl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn"
-                style={{
-                  display: 'inline-block',
-                  background: '#fff',
-                  textDecoration: 'none',
-                }}
+                style={{ display: 'inline-block', background: '#fff', textDecoration: 'none', fontSize: '12px' }}
               >
-                🔍 View HD Quality
+                📷 HD
               </a>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       ) : (
         <div className="mb-2" style={{ textAlign: 'center', padding: '20px' }}>
