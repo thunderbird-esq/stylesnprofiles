@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import ExoplanetVisualization from './ExoplanetVisualization';
 
 /**
  * Exoplanet Explorer - NASA Exoplanet Archive
@@ -13,6 +14,7 @@ export default function ExoplanetApp({ windowId: _windowId }) {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPlanet, setSelectedPlanet] = useState(null);
+    const [show3DView, setShow3DView] = useState(false);
 
     const fetchPlanets = useCallback(async () => {
         setLoading(true);
@@ -116,11 +118,25 @@ export default function ExoplanetApp({ windowId: _windowId }) {
     const years = Object.keys(yearHistogram).map(Number).sort((a, b) => a - b);
     const maxCount = Math.max(...Object.values(yearHistogram), 1);
 
+    // If showing 3D visualization
+    if (show3DView && planets.length > 0) {
+        return <ExoplanetVisualization planets={planets} onClose={() => setShow3DView(false)} />;
+    }
+
     return (
         <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div className="nasa-data-title">🪐 Exoplanet Explorer</div>
-            <div style={{ fontSize: '11px', marginBottom: '6px', opacity: 0.8 }}>
-                NASA Exoplanet Archive • {planets.length} planets loaded
+            <div style={{ fontSize: '11px', marginBottom: '6px', opacity: 0.8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>NASA Exoplanet Archive • {planets.length} planets loaded</span>
+                {planets.length > 0 && (
+                    <button
+                        className="btn"
+                        onClick={() => setShow3DView(true)}
+                        style={{ fontSize: '10px', padding: '2px 8px' }}
+                    >
+                        🌌 3D View
+                    </button>
+                )}
             </div>
 
             {/* Discovery Timeline */}
