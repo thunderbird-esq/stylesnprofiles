@@ -136,9 +136,9 @@ export default function EarthEventsApp({ windowId: _windowId }) {
     );
 
     return (
-        <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div className="nasa-data-title">🌍 Earth Events Tracker</div>
-            <div style={{ fontSize: '12px', marginBottom: '8px' }}>
+        <div className="nasa-data-section app-text-lg" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>🌍 Earth Events Tracker</div>
+            <div style={{ fontSize: 'var(--font-size-lg)', marginBottom: '8px' }}>
                 EONET Active Natural Events • {events.length} tracked
             </div>
 

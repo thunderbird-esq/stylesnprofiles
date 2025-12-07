@@ -133,7 +133,7 @@ export default function ApodApp({ windowId: _windowId }) {
       </div>
 
       {/* Title */}
-      <h2 className="nasa-data-title" style={{ marginBottom: '8px', fontSize: '16px' }}>
+      <h2 className="nasa-data-title" style={{ marginBottom: '8px', fontSize: 'var(--font-size-xxl)' }}>
         {apodData.title}
       </h2>
 
@@ -219,10 +219,10 @@ export default function ApodApp({ windowId: _windowId }) {
 
       {/* Explanation */}
       <div className="nasa-data-content">
-        <div className="nasa-data-title mb-1" style={{ fontSize: '14px' }}>
+        <div className="nasa-data-title mb-1" style={{ fontSize: 'var(--font-size-lg)' }}>
           Explanation:
         </div>
-        <p style={{ lineHeight: '1.4', fontSize: '13px' }}>{apodData.explanation}</p>
+        <p style={{ lineHeight: '1.5', fontSize: '18px' }}>{apodData.explanation}</p>
       </div>
 
       {/* Copyright */}

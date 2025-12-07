@@ -124,15 +124,15 @@ export default function ExoplanetApp({ windowId: _windowId }) {
     }
 
     return (
-        <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div className="nasa-data-title">🪐 Exoplanet Explorer</div>
-            <div style={{ fontSize: '11px', marginBottom: '6px', opacity: 0.8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="nasa-data-section app-text-lg" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>🪐 Exoplanet Explorer</div>
+            <div style={{ fontSize: 'var(--font-size-lg)', marginBottom: '6px', opacity: 0.8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span>NASA Exoplanet Archive • {planets.length} planets loaded</span>
                 {planets.length > 0 && (
                     <button
                         className="btn"
                         onClick={() => setShow3DView(true)}
-                        style={{ fontSize: '10px', padding: '2px 8px' }}
+                        style={{ fontSize: 'var(--font-size-base)', padding: '2px 8px' }}
                     >
                         🌌 3D View
                     </button>

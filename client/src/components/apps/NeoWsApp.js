@@ -64,8 +64,8 @@ export default function NeoWsApp({ windowId: _windowId }) {
   return (
     <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div className="nasa-data-title">☄️ Near Earth Objects ({todayStr})</div>
-      <div style={{ fontSize: '11px', marginBottom: '6px', opacity: 0.8 }}>
+      <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>☄️ Near Earth Objects ({todayStr})</div>
+      <div style={{ fontSize: 'var(--font-size-lg)', marginBottom: '6px', opacity: 0.8 }}>
         Tracking {neoData.element_count} objects today
       </div>
 
@@ -75,7 +75,7 @@ export default function NeoWsApp({ windowId: _windowId }) {
         gridTemplateColumns: 'repeat(3, 1fr)',
         gap: '4px',
         marginBottom: '8px',
-        fontSize: '10px',
+        fontSize: 'var(--font-size-base)',
       }}>
         <div style={{
           padding: '6px',
@@ -147,7 +147,7 @@ function NeoListItem({ neo, onSelect }) {
           )}
         </div>
         <div style={{ display: 'flex', gap: '4px' }}>
-          <button className="btn" onClick={() => onSelect(neo)} style={{ fontSize: '10px', padding: '2px 6px' }}>
+          <button className="btn" onClick={() => onSelect(neo)} style={{ fontSize: 'var(--font-size-base)', padding: '2px 8px' }}>
             Details
           </button>
           <SaveButton

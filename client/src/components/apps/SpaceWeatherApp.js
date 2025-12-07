@@ -120,8 +120,8 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
 
     // Tab button style
     const tabStyle = (isActive) => ({
-        fontSize: '10px',
-        padding: '3px 8px',
+        fontSize: 'var(--font-size-base)',
+        padding: '4px 10px',
         background: isActive ? 'var(--secondary)' : 'var(--primary)',
         color: isActive ? 'var(--primary)' : 'var(--secondary)',
         border: '1px solid var(--secondary)',
@@ -130,8 +130,8 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
     });
 
     return (
-        <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div className="nasa-data-title">🌞 Space Weather Monitor</div>
+        <div className="nasa-data-section app-text-lg" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>🌞 Space Weather Monitor</div>
 
             {/* Tab Navigation */}
             <div style={{ display: 'flex', gap: '2px', marginBottom: '8px', flexWrap: 'wrap' }}>

@@ -78,8 +78,8 @@ export default function EpicApp({ windowId: _windowId }) {
     return (
         <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             {/* Header */}
-            <div className="nasa-data-title">🌍 EPIC Earth Camera</div>
-            <div style={{ fontSize: '11px', marginBottom: '6px', opacity: 0.8 }}>
+            <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>🌍 EPIC Earth Camera</div>
+            <div style={{ fontSize: 'var(--font-size-lg)', marginBottom: '6px', opacity: 0.8 }}>
                 Deep Space Climate Observatory (DSCOVR)
             </div>
 
@@ -94,11 +94,11 @@ export default function EpicApp({ windowId: _windowId }) {
                 alignItems: 'center',
             }}>
                 <div className="field-row">
-                    <label style={{ fontSize: '11px' }}>Color:</label>
+                    <label style={{ fontSize: 'var(--font-size-lg)' }}>Color:</label>
                     <select
                         value={collection}
                         onChange={(e) => setCollection(e.target.value)}
-                        style={{ fontSize: '11px' }}
+                        style={{ fontSize: 'var(--font-size-lg)' }}
                     >
                         <option value="natural">Natural</option>
                         <option value="enhanced">Enhanced</option>
@@ -106,17 +106,17 @@ export default function EpicApp({ windowId: _windowId }) {
                 </div>
 
                 <div className="field-row">
-                    <label style={{ fontSize: '11px' }}>Date:</label>
+                    <label style={{ fontSize: 'var(--font-size-lg)' }}>Date:</label>
                     <input
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
                         max={new Date().toISOString().split('T')[0]}
-                        style={{ fontSize: '11px' }}
+                        style={{ fontSize: 'var(--font-size-lg)' }}
                     />
                 </div>
 
-                <button className="btn" onClick={fetchImages} disabled={loading} style={{ fontSize: '11px' }}>
+                <button className="btn" onClick={fetchImages} disabled={loading} style={{ fontSize: 'var(--font-size-lg)' }}>
                     {loading ? '...' : 'Load'}
                 </button>
             </div>
@@ -216,6 +216,7 @@ export default function EpicApp({ windowId: _windowId }) {
                     overflowX: 'auto',
                     borderTop: '1px solid var(--tertiary)',
                     marginTop: '6px',
+                    background: 'var(--primary)', /* Opaque background */
                 }}>
                     {images.map((img, idx) => (
                         <img

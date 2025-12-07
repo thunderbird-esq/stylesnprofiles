@@ -46,6 +46,42 @@ Fixed scrollbar SVG rendering issue and established CSS font sizing variables fo
 
 ---
 
+## 2025-12-07 - Phase 2+3: Text Sizing
+
+### Session Summary
+Applied 40% larger text sizing to 6 apps using CSS variables and utility classes. APOD received 75% larger title.
+
+### Completed Tasks
+
+**Phase 2: Text Sizing (40% Larger)**
+- NEO Tracker: Header, stats buttons, and Details button
+- EPIC Earth: Header, controls, labels + opaque thumbnail background
+- Space Weather: Header, tabs (added `app-text-lg` container)
+- Earth Events: Header, subtitle (added `app-text-lg` container)
+- Exoplanets: Header, subtitle, buttons (added `app-text-lg` container)
+- Earth Viewer: Header, subtitle (added `app-text-lg` container)
+
+**Phase 3: APOD Specific**
+- Title: `var(--font-size-xxl)` = 24px (75% larger than base 12px)
+- Explanation: 18px with line-height 1.5 (40% larger, improved readability)
+- Explanation label: `var(--font-size-lg)` = 16px
+
+### Files Changed
+- `client/src/components/apps/ApodApp.js` - Title 75%, description 40%
+- `client/src/components/apps/NeoWsApp.js` - Header, buttons, stats
+- `client/src/components/apps/EpicApp.js` - Header, controls, opaque background
+- `client/src/components/apps/SpaceWeatherApp.js` - Header, tabs, app-text-lg
+- `client/src/components/apps/EarthEventsApp.js` - Header, app-text-lg
+- `client/src/components/apps/ExoplanetApp.js` - Header, app-text-lg
+- `client/src/components/apps/EarthViewerApp.js` - Header, app-text-lg
+
+### Verified
+- Build successful: JS bundle +81B only
+- Deployed to GitHub Pages
+- Screenshots confirm larger text in APOD, Space Weather, Earth Events
+
+---
+
 ## 2025-12-05 - Week 5: NASA API Expansion
 
 ### Session Summary

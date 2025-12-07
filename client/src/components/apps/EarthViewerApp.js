@@ -117,9 +117,9 @@ export default function EarthViewerApp({ windowId: _windowId }) {
     };
 
     return (
-        <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div className="nasa-data-title">🌐 Earth Viewer (GIBS)</div>
-            <div style={{ fontSize: '10px', marginBottom: '6px', opacity: 0.8 }}>
+        <div className="nasa-data-section app-text-lg" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>🌐 Earth Viewer (GIBS)</div>
+            <div style={{ fontSize: 'var(--font-size-lg)', marginBottom: '6px', opacity: 0.8 }}>
                 NASA Global Imagery Browse Services • {Object.keys(LAYER_CATEGORIES).length} categories
             </div>
 

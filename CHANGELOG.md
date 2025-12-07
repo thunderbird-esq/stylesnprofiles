@@ -5,9 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.0] - 2025-12-07 (Phase 1 - Design System Foundation)
+## [0.6.0] - 2025-12-07 (Phase 1-3 - Design System + Text Sizing)
 
-### 🎨 Design System Foundation
+### 🎨 Phase 1: Design System Foundation
 
 #### Scrollbar SVG Fix
 - **ROOT CAUSE IDENTIFIED**: `svg-load()` is PostCSS function, not native CSS
@@ -27,6 +27,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Documentation
 - Created `SYSTEM6_DESIGN_STANDARDS.md` with color tokens, font sizing, and local asset requirements
 - Added `.stylelintrc.json` for CSS linting standards
+
+### 📏 Phase 2: Text Sizing (40% Larger)
+- **NEO Tracker**: Header, buttons, stats text enlarged
+- **EPIC Earth**: Header, controls, labels + opaque thumbnail background
+- **Space Weather**: Header, tabs, all buttons (now uses `app-text-lg`)
+- **Earth Events**: Header, subtitle (now uses `app-text-lg`)
+- **Exoplanets**: Header, subtitle, buttons (now uses `app-text-lg`)
+- **Earth Viewer**: Header, subtitle (now uses `app-text-lg`)
+
+### 🌟 Phase 3: APOD Specific
+- Title: 75% larger (`var(--font-size-xxl)` = 24px)
+- Explanation text: 40% larger (18px with better line-height)
 
 ---
 
