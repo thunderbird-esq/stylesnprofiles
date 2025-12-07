@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-12-07 (Comprehensive SWPC Data Integration)
+
+### 🌞 Space Weather Major Expansion
+
+#### New SWPC API Functions (25+ added to noaaSwpcApi.js)
+- **Solar Wind**: `getSolarWindMag()`, `getSolarWindPlasma()`, `getPropagatedSolarWind()`
+- **GOES Satellite**: `getGoesXrays()`, `getGoesProtons()`, `getGoesElectrons()`, `getGoesMagnetometers()`
+- **Solar Cycle**: `getSunspotReport()`, `getPredictedSunspotNumber()`, `get10cmFlux()`
+- **Geomagnetic**: `getKyotoDst()`, `getBoulderKIndex()`, `getPlanetaryKIndex1m()`, `getPredictedAIndex()`
+- **Images**: `getDrapImageUrls()`, `getAceImageUrls()`, `getSynopticMapUrl()`, `getGeospaceImageUrls()`
+- **Utilities**: `getDstClassification()`, `getFlareClass()`
+
+#### New Space Weather Tabs (10 total, up from 4)
+Row 1: 📡 Current | 🛰️ GOES | 🌬️ Wind | ☀️ Cycle | 📻 HF
+Row 2: 🚨 Alerts | 🌌 Aurora | 🔥 DONKI | 🖼️ Gallery | 🌐 3D
+
+#### New Components
+- **GoesDataPanel.js** - X-ray/proton/electron flux sparklines, flare history
+- **SolarWindCharts.js** - IMF Bz, Dst storm index, wind speed with zones
+- **SolarCycleDashboard.js** - Cycle 25 progress bar, F10.7 flux, sunspot regions
+- **DrapViewer.js** - HF radio absorption maps (5-30 MHz), polar views
+- **SpaceWeatherGallery.js** - Synoptic maps, ACE plots, geospace imagery
+
+### 🌌 Aurora Enhancements
+- Added Kp correlation badge with current index and visibility latitude
+- Added best viewing time estimator from 3-day forecast
+- Dynamic messaging for strong aurora activity (Kp ≥ 5)
+- Kp-to-latitude mapping (Kp 0=66°N to Kp 9=40°N)
+
+### 🚨 Alert Enhancements
+- Category filter buttons (Watch/Warning/Alert/Summary/Other)
+- Color-coded borders and backgrounds by category
+- Expand/collapse inline message view
+- Notifications timeline toggle (📊 button)
+- Live indicator with pulse animation
+- Increased default max visible from 5 to 10
+
+### Build
+- Bundle size: 276.12KB gzip (+1.58KB from Aurora/Alert enhancements)
+- Files added: 5 new components
+- Lines added: ~2,300
+
 ## [0.6.0] - 2025-12-07 (Phase 1-3 - Design System + Text Sizing)
 
 ### 🎨 Phase 1: Design System Foundation

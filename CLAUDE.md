@@ -31,6 +31,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Key Files
 - `client/src/services/nasaApi.js` - NASA API functions
+- `client/src/services/noaaSwpcApi.js` - NOAA SWPC API (35+ functions for GOES, solar wind, Dst, etc.)
 - `client/src/contexts/AppContext.js` - App registration and window management
 - `client/src/components/system6/Desktop.js` - Desktop icons
 - `client/src/styles/system.css` - System 6 styling, font variables, animations
@@ -38,6 +39,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `client/src/components/apps/ExoplanetVisualization.js` - Three.js exoplanet orbits
 - `client/src/components/apps/NeoOrbitViewer.js` - Three.js asteroid orbits
 - `client/src/components/apps/KpIndexChart.js` - Kp index bar chart with thresholds
+- `client/src/components/apps/GoesDataPanel.js` - GOES X-ray/proton/electron charts
+- `client/src/components/apps/SolarWindCharts.js` - IMF Bz, Dst, solar wind speed
+- `client/src/components/apps/SolarCycleDashboard.js` - Cycle 25 progress, sunspots
+- `client/src/components/apps/DrapViewer.js` - D-RAP HF radio absorption maps
+- `client/src/components/apps/SpaceWeatherGallery.js` - Image gallery (synoptic, ACE)
 
 ## Development Commands
 
