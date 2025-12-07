@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getNeoFeed } from '../../services/nasaApi';
 import { SaveButton } from '../favorites';

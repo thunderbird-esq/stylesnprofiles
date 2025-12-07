@@ -1,6 +1,55 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
+// Organized layer categories - defined outside component for referential stability
+const LAYER_CATEGORIES = {
+    'True Color': [
+        { id: 'MODIS_Terra_CorrectedReflectance_TrueColor', name: 'Terra True Color', format: 'jpg' },
+        { id: 'MODIS_Aqua_CorrectedReflectance_TrueColor', name: 'Aqua True Color', format: 'jpg' },
+        { id: 'VIIRS_SNPP_CorrectedReflectance_TrueColor', name: 'VIIRS SNPP', format: 'jpg' },
+        { id: 'VIIRS_NOAA20_CorrectedReflectance_TrueColor', name: 'VIIRS NOAA-20', format: 'jpg' },
+    ],
+    'Fires & Thermal': [
+        { id: 'MODIS_Terra_Thermal_Anomalies_Day', name: 'Fire/Thermal (Day)', format: 'png' },
+        { id: 'MODIS_Terra_Thermal_Anomalies_Night', name: 'Fire/Thermal (Night)', format: 'png' },
+        { id: 'VIIRS_SNPP_Thermal_Anomalies_375m_Day', name: 'VIIRS Fire Day', format: 'png' },
+    ],
+    'Atmosphere': [
+        { id: 'MODIS_Terra_Aerosol', name: 'Aerosol Optical Depth', format: 'png' },
+        { id: 'MODIS_Terra_Cloud_Top_Temp_Day', name: 'Cloud Top Temp', format: 'png' },
+        { id: 'MODIS_Terra_Water_Vapor_5km_Day', name: 'Water Vapor', format: 'png' },
+    ],
+    'Land & Vegetation': [
+        { id: 'MODIS_Terra_NDVI_8Day', name: 'Vegetation Index', format: 'png' },
+        { id: 'MODIS_Terra_Land_Surface_Temp_Day', name: 'Land Surface Temp', format: 'png' },
+        { id: 'MODIS_Terra_Snow_Cover', name: 'Snow Cover', format: 'png' },
+    ],
+    'Ocean': [
+        { id: 'MODIS_Terra_Chlorophyll_A', name: 'Chlorophyll (Ocean)', format: 'png' },
+        { id: 'GHRSST_L4_MUR_Sea_Surface_Temperature', name: 'Sea Surface Temp', format: 'png' },
+    ],
+    'Reference': [
+        { id: 'BlueMarble_NextGeneration', name: 'Blue Marble', format: 'jpg', static: '2004-08' },
+        { id: 'VIIRS_Black_Marble', name: 'Black Marble (Night)', format: 'png', static: '2016-01-01' },
+    ],
+};
+
+// Flatten all layers for lookup - computed once at module level
+const ALL_LAYERS = Object.values(LAYER_CATEGORIES).flat();
+
+// Region presets - defined outside component for referential stability
+const REGIONS = {
+    global: { name: 'Global', bbox: [-90, -180, 90, 180] },
+    northAmerica: { name: 'North America', bbox: [15, -130, 55, -60] },
+    europe: { name: 'Europe', bbox: [35, -15, 70, 40] },
+    asia: { name: 'Asia', bbox: [5, 60, 55, 140] },
+    africa: { name: 'Africa', bbox: [-35, -20, 37, 55] },
+    southAmerica: { name: 'South America', bbox: [-55, -80, 15, -35] },
+    australia: { name: 'Australia', bbox: [-45, 110, -10, 155] },
+    arctic: { name: 'Arctic', bbox: [60, -180, 90, 180] },
+    antarctic: { name: 'Antarctic', bbox: [-90, -180, -60, 180] },
+};
+
 /**
  * Earth Viewer App - NASA GIBS/Worldview satellite imagery
  * Apple System 6 HIG with enhanced layer browsing and zoom
@@ -15,57 +64,6 @@ export default function EarthViewerApp({ windowId: _windowId }) {
     const [selectedRegion, setSelectedRegion] = useState('global');
     const [zoom, setZoom] = useState(1);
 
-    // Organized layer categories
-    const LAYER_CATEGORIES = {
-        'True Color': [
-            { id: 'MODIS_Terra_CorrectedReflectance_TrueColor', name: 'Terra True Color', format: 'jpg' },
-            { id: 'MODIS_Aqua_CorrectedReflectance_TrueColor', name: 'Aqua True Color', format: 'jpg' },
-            { id: 'VIIRS_SNPP_CorrectedReflectance_TrueColor', name: 'VIIRS SNPP', format: 'jpg' },
-            { id: 'VIIRS_NOAA20_CorrectedReflectance_TrueColor', name: 'VIIRS NOAA-20', format: 'jpg' },
-        ],
-        'Fires & Thermal': [
-            { id: 'MODIS_Terra_Thermal_Anomalies_Day', name: 'Fire/Thermal (Day)', format: 'png' },
-            { id: 'MODIS_Terra_Thermal_Anomalies_Night', name: 'Fire/Thermal (Night)', format: 'png' },
-            { id: 'VIIRS_SNPP_Thermal_Anomalies_375m_Day', name: 'VIIRS Fire Day', format: 'png' },
-        ],
-        'Atmosphere': [
-            { id: 'MODIS_Terra_Aerosol', name: 'Aerosol Optical Depth', format: 'png' },
-            { id: 'MODIS_Terra_Cloud_Top_Temp_Day', name: 'Cloud Top Temp', format: 'png' },
-            { id: 'MODIS_Terra_Water_Vapor_5km_Day', name: 'Water Vapor', format: 'png' },
-        ],
-        'Land & Vegetation': [
-            { id: 'MODIS_Terra_NDVI_8Day', name: 'Vegetation Index', format: 'png' },
-            { id: 'MODIS_Terra_Land_Surface_Temp_Day', name: 'Land Surface Temp', format: 'png' },
-            { id: 'MODIS_Terra_Snow_Cover', name: 'Snow Cover', format: 'png' },
-        ],
-        'Ocean': [
-            { id: 'MODIS_Terra_Chlorophyll_A', name: 'Chlorophyll (Ocean)', format: 'png' },
-            { id: 'GHRSST_L4_MUR_Sea_Surface_Temperature', name: 'Sea Surface Temp', format: 'png' },
-        ],
-        'Reference': [
-            { id: 'BlueMarble_NextGeneration', name: 'Blue Marble', format: 'jpg', static: '2004-08' },
-            { id: 'VIIRS_Black_Marble', name: 'Black Marble (Night)', format: 'png', static: '2016-01-01' },
-        ],
-    };
-
-    // Flatten for lookup
-    const ALL_LAYERS = useMemo(() =>
-        Object.values(LAYER_CATEGORIES).flat(),
-        []);
-
-    // Region presets
-    const REGIONS = {
-        global: { name: 'Global', bbox: [-90, -180, 90, 180] },
-        northAmerica: { name: 'North America', bbox: [15, -130, 55, -60] },
-        europe: { name: 'Europe', bbox: [35, -15, 70, 40] },
-        asia: { name: 'Asia', bbox: [5, 60, 55, 140] },
-        africa: { name: 'Africa', bbox: [-35, -20, 37, 55] },
-        southAmerica: { name: 'South America', bbox: [-55, -80, 15, -35] },
-        australia: { name: 'Australia', bbox: [-45, 110, -10, 155] },
-        arctic: { name: 'Arctic', bbox: [60, -180, 90, 180] },
-        antarctic: { name: 'Antarctic', bbox: [-90, -180, -60, 180] },
-    };
-
     // Default to 2 days ago
     useEffect(() => {
         const twoDaysAgo = new Date();
@@ -75,7 +73,7 @@ export default function EarthViewerApp({ windowId: _windowId }) {
 
     const currentLayer = useMemo(() =>
         ALL_LAYERS.find(l => l.id === selectedLayer),
-        [selectedLayer, ALL_LAYERS]);
+        [selectedLayer]);
 
     useEffect(() => {
         if (!selectedDate || !currentLayer) return;

@@ -86,7 +86,7 @@ export async function getKpIndex() {
     const data = await fetchSWPC('/products/noaa-planetary-k-index.json');
     if (!Array.isArray(data) || data.length < 2) return [];
 
-    const [_header, ...rows] = data;
+    const rows = data.slice(1);
     return rows.map(row => ({
         time: row[0],
         kp: parseFloat(row[1]),
@@ -103,7 +103,7 @@ export async function getKpForecast() {
     const data = await fetchSWPC('/products/noaa-planetary-k-index-forecast.json');
     if (!Array.isArray(data) || data.length < 2) return [];
 
-    const [_header, ...rows] = data;
+    const rows = data.slice(1);
     return rows.map(row => ({
         time: row[0],
         kp: parseFloat(row[1]),
@@ -121,7 +121,7 @@ export async function getKyotoDst() {
     const data = await fetchSWPC('/products/kyoto-dst.json');
     if (!Array.isArray(data) || data.length < 2) return [];
 
-    const [_header, ...rows] = data;
+    const rows = data.slice(1);
     return rows.map(row => ({
         time: row[0],
         dst: parseInt(row[1], 10),
@@ -241,7 +241,7 @@ export async function getSolarCycle25F107() {
 export async function get10cmFlux() {
     const data = await fetchSWPC('/products/10cm-flux-30-day.json');
     if (!Array.isArray(data) || data.length < 2) return [];
-    const [_header, ...rows] = data;
+    const rows = data.slice(1);
     return rows.map(row => ({
         time: row[0],
         flux: parseFloat(row[1]),
@@ -261,7 +261,7 @@ export async function getSolarWindPlasma(period = '1-day') {
     const data = await fetchSWPC(`/products/solar-wind/plasma-${period}.json`);
     if (!Array.isArray(data) || data.length < 2) return [];
 
-    const [_header, ...rows] = data;
+    const rows = data.slice(1);
     return rows.map(row => ({
         time: row[0],
         density: parseFloat(row[1]),
@@ -279,7 +279,7 @@ export async function getSolarWindMag(period = '1-day') {
     const data = await fetchSWPC(`/products/solar-wind/mag-${period}.json`);
     if (!Array.isArray(data) || data.length < 2) return [];
 
-    const [_header, ...rows] = data;
+    const rows = data.slice(1);
     return rows.map(row => ({
         time: row[0],
         bx: parseFloat(row[1]),
@@ -298,7 +298,7 @@ export async function getSolarWindMag(period = '1-day') {
 export async function getPropagatedSolarWind() {
     const data = await fetchSWPC('/products/geospace/propagated-solar-wind-1-hour.json');
     if (!Array.isArray(data) || data.length < 2) return [];
-    const [_header, ...rows] = data;
+    const rows = data.slice(1);
     return rows;
 }
 
@@ -594,7 +594,7 @@ export function getFlareClass(flux) {
 // DEFAULT EXPORT
 // ============================================================================
 
-export default {
+const noaaSwpcApi = {
     // Scales & Alerts
     getNoaaScales,
     getAlerts,
@@ -656,3 +656,6 @@ export default {
     // Constants
     VALID_PERIODS,
 };
+
+export default noaaSwpcApi;
+

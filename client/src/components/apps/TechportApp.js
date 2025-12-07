@@ -2,24 +2,25 @@ import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
+// Known working project IDs - defined outside component for referential stability
+const FEATURED_IDS = [17700, 93617, 94234, 94385, 96541, 95987, 88534, 91815, 93746, 94127];
+
 /**
- * Techport App - NASA Technology Projects
+ * TechportApp - NASA Technology Projects Explorer
+ * Displays NASA technology projects with details
  * Apple System 6 HIG styling
  * @component
  */
 export default function TechportApp({ windowId: _windowId }) {
     const [projects, setProjects] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedProject, setSelectedProject] = useState(null);
 
     // Get API key - user's key or demo
     const getApiKey = () => {
         return localStorage.getItem('nasa_api_key') || 'DEMO_KEY';
     };
-
-    // Known working project IDs
-    const FEATURED_IDS = [17700, 93617, 94234, 94385, 96541, 95987, 88534, 91815, 93746, 94127];
 
     const fetchProjects = useCallback(async () => {
         setLoading(true);
@@ -72,7 +73,7 @@ export default function TechportApp({ windowId: _windowId }) {
         } finally {
             setLoading(false);
         }
-    }, [FEATURED_IDS]);
+    }, []);
 
     useEffect(() => {
         fetchProjects();

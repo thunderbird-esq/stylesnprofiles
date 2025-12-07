@@ -198,7 +198,7 @@ export const removeItemFromCollection = async (collectionId, itemId) => {
   }
 };
 
-export default {
+const collectionsService = {
   getCollections,
   createCollection,
   getCollectionById,
@@ -209,3 +209,4 @@ export default {
   removeItemFromCollection,
 };
 
+export default collectionsService;
