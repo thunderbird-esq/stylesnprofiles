@@ -26,7 +26,7 @@ function CycleProgress({ current, peak, cycleStart, peakDate }) {
 
     return (
         <div style={{ padding: '8px', border: '1px solid var(--tertiary)' }}>
-            <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '6px' }}>
+            <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '6px' }}>
                 ☀️ Solar Cycle 25 Progress
             </div>
 
@@ -50,7 +50,7 @@ function CycleProgress({ current, peak, cycleStart, peakDate }) {
                     top: '-18px',
                     left: `${progress}%`,
                     transform: 'translateX(-50%)',
-                    fontSize: '9px',
+                    fontSize: 'var(--font-size-caption)',
                     fontWeight: 'bold',
                 }}>
                     {current?.toFixed(0) || '—'}
@@ -58,7 +58,7 @@ function CycleProgress({ current, peak, cycleStart, peakDate }) {
             </div>
 
             {/* Labels */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', fontSize: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', fontSize: 'var(--font-size-chart)' }}>
                 <span>{cycleStart || 'Dec 2019'}</span>
                 <span style={{ fontWeight: 'bold' }}>Peak: {peak} ({peakDate || '2024-2025'})</span>
             </div>
@@ -95,13 +95,13 @@ function TrendChart({ data, valueKey, height = 50, color = '#f90', label }) {
 
     return (
         <div style={{ border: '1px solid var(--tertiary)', padding: '6px' }}>
-            <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+            <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                 {label}
             </div>
             <svg width={width} height={height} style={{ display: 'block' }}>
                 <path d={points} fill="none" stroke={color} strokeWidth={1.5} />
             </svg>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '8px', opacity: 0.6 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-chart)', opacity: 0.6 }}>
                 <span>Min: {minVal.toFixed(0)}</span>
                 <span>Current: {values[values.length - 1]?.toFixed(0)}</span>
                 <span>Max: {maxVal.toFixed(0)}</span>
@@ -124,7 +124,7 @@ TrendChart.propTypes = {
 function ActiveRegions({ sunspots }) {
     if (!sunspots || sunspots.length === 0) {
         return (
-            <div style={{ padding: '8px', border: '1px solid var(--tertiary)', fontSize: '10px', textAlign: 'center' }}>
+            <div style={{ padding: '8px', border: '1px solid var(--tertiary)', fontSize: 'var(--font-size-label)', textAlign: 'center' }}>
                 No active sunspot regions
             </div>
         );
@@ -141,14 +141,14 @@ function ActiveRegions({ sunspots }) {
 
     return (
         <div style={{ border: '1px solid var(--tertiary)', padding: '6px' }}>
-            <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '6px' }}>
+            <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '6px' }}>
                 🔴 Active Sunspot Regions ({Object.keys(uniqueRegions).length})
             </div>
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 gap: '4px',
-                fontSize: '9px',
+                fontSize: 'var(--font-size-caption)',
             }}>
                 {regions.map((r, i) => (
                     <div key={i} style={{
@@ -157,7 +157,7 @@ function ActiveRegions({ sunspots }) {
                         textAlign: 'center',
                     }}>
                         <div style={{ fontWeight: 'bold' }}>AR{r.Region}</div>
-                        <div style={{ fontSize: '8px', opacity: 0.7 }}>
+                        <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.7 }}>
                             {r.Numspot || '?'} spots
                         </div>
                     </div>
@@ -223,7 +223,7 @@ export default function SolarCycleDashboard({ onError }) {
 
     if (loading && sunspots.length === 0) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px' }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)' }}>
                 Loading solar cycle data...
             </div>
         );
@@ -231,7 +231,7 @@ export default function SolarCycleDashboard({ onError }) {
 
     if (error) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px', color: '#c00' }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)', color: '#c00' }}>
                 Error: {error}
                 <button onClick={fetchData} style={{ marginLeft: '8px' }}>Retry</button>
             </div>
@@ -245,7 +245,7 @@ export default function SolarCycleDashboard({ onError }) {
                 padding: '4px',
                 marginBottom: '8px',
                 background: 'var(--secondary)',
-                fontSize: '10px',
+                fontSize: 'var(--font-size-label)',
                 fontWeight: 'bold',
             }}>
                 🌟 Solar Cycle 25 Dashboard
@@ -280,24 +280,24 @@ export default function SolarCycleDashboard({ onError }) {
                 display: 'flex',
                 gap: '4px',
                 marginTop: '8px',
-                fontSize: '9px',
+                fontSize: 'var(--font-size-caption)',
             }}>
                 <div style={{ flex: 1, padding: '6px', background: 'var(--tertiary)', textAlign: 'center' }}>
-                    <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{currentSSN?.toFixed(0) || '—'}</div>
+                    <div style={{ fontSize: 'var(--font-size-body)', fontWeight: 'bold' }}>{currentSSN?.toFixed(0) || '—'}</div>
                     <div>Current SSN</div>
                 </div>
                 <div style={{ flex: 1, padding: '6px', background: 'var(--tertiary)', textAlign: 'center' }}>
-                    <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{flux10cm[flux10cm.length - 1]?.flux?.toFixed(0) || '—'}</div>
+                    <div style={{ fontSize: 'var(--font-size-body)', fontWeight: 'bold' }}>{flux10cm[flux10cm.length - 1]?.flux?.toFixed(0) || '—'}</div>
                     <div>F10.7 Flux</div>
                 </div>
                 <div style={{ flex: 1, padding: '6px', background: 'var(--tertiary)', textAlign: 'center' }}>
-                    <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{Object.keys(sunspots.reduce((acc, s) => { acc[s.Region] = true; return acc; }, {})).length}</div>
+                    <div style={{ fontSize: 'var(--font-size-body)', fontWeight: 'bold' }}>{Object.keys(sunspots.reduce((acc, s) => { acc[s.Region] = true; return acc; }, {})).length}</div>
                     <div>Active Regions</div>
                 </div>
             </div>
 
             {/* Refresh indicator */}
-            <div style={{ fontSize: '8px', opacity: 0.5, textAlign: 'right', marginTop: '6px' }}>
+            <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.5, textAlign: 'right', marginTop: '6px' }}>
                 {loading ? 'Updating...' : `Last update: ${new Date().toLocaleTimeString()}`}
             </div>
         </div>

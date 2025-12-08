@@ -39,7 +39,7 @@ function getVisibilityInfo(kp) {
 function KpBadge({ kp, loading }) {
     if (loading || kp === null) {
         return (
-            <div style={{ fontSize: '9px', opacity: 0.6, textAlign: 'center', padding: '4px' }}>
+            <div style={{ fontSize: 'var(--font-size-caption)', opacity: 0.6, textAlign: 'center', padding: '4px' }}>
                 Loading Kp...
             </div>
         );
@@ -56,7 +56,7 @@ function KpBadge({ kp, loading }) {
             padding: '6px',
             background: 'var(--tertiary)',
             marginBottom: '6px',
-            fontSize: '9px',
+            fontSize: 'var(--font-size-caption)',
         }}>
             <div style={{
                 width: '36px',
@@ -67,7 +67,7 @@ function KpBadge({ kp, loading }) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontWeight: 'bold',
-                fontSize: '14px',
+                fontSize: 'var(--font-size-body)',
                 color: '#000',
             }}>
                 {kp.toFixed(1)}
@@ -119,7 +119,7 @@ function BestViewingTime({ forecast }) {
 
     return (
         <div style={{
-            fontSize: '9px',
+            fontSize: 'var(--font-size-caption)',
             padding: '4px 6px',
             background: isGood ? 'rgba(0,255,0,0.1)' : 'var(--tertiary)',
             border: isGood ? '1px solid #0f0' : '1px solid var(--tertiary)',
@@ -190,7 +190,7 @@ function ViewlineProbability({ selectedLat, onLatChange }) {
 
     return (
         <div style={{
-            fontSize: '9px',
+            fontSize: 'var(--font-size-caption)',
             padding: '4px 6px',
             border: '1px solid var(--tertiary)',
             marginBottom: '6px',
@@ -203,7 +203,7 @@ function ViewlineProbability({ selectedLat, onLatChange }) {
                 <select
                     value={selectedLat}
                     onChange={(e) => onLatChange(parseInt(e.target.value, 10))}
-                    style={{ fontSize: '9px', padding: '2px' }}
+                    style={{ fontSize: 'var(--font-size-caption)', padding: '2px' }}
                 >
                     {latitudes.map(l => (
                         <option key={l.lat} value={l.lat}>{l.label}</option>
@@ -289,7 +289,7 @@ export default function AuroraForecastMap({ loading }) {
 
     if (loading && kpLoading) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px' }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)' }}>
                 Loading aurora forecast...
             </div>
         );
@@ -299,7 +299,7 @@ export default function AuroraForecastMap({ loading }) {
         <div>
             {/* Header */}
             <div style={{
-                fontSize: '10px',
+                fontSize: 'var(--font-size-label)',
                 fontWeight: 'bold',
                 marginBottom: '6px',
                 padding: '2px 4px',
@@ -314,14 +314,14 @@ export default function AuroraForecastMap({ loading }) {
                     <button
                         className={`btn ${hemisphere === 'northern' ? 'btn-active' : ''}`}
                         onClick={() => { setHemisphere('northern'); setImageLoading(true); }}
-                        style={{ fontSize: '9px', padding: '1px 6px' }}
+                        style={{ fontSize: 'var(--font-size-caption)', padding: '1px 6px' }}
                     >
                         🌍 North
                     </button>
                     <button
                         className={`btn ${hemisphere === 'southern' ? 'btn-active' : ''}`}
                         onClick={() => { setHemisphere('southern'); setImageLoading(true); }}
-                        style={{ fontSize: '9px', padding: '1px 6px' }}
+                        style={{ fontSize: 'var(--font-size-caption)', padding: '1px 6px' }}
                     >
                         🌏 South
                     </button>
@@ -354,7 +354,7 @@ export default function AuroraForecastMap({ loading }) {
                     <div style={{
                         position: 'absolute',
                         color: '#fff',
-                        fontSize: '11px',
+                        fontSize: 'var(--font-size-label)',
                         zIndex: 1,
                     }}>
                         Loading aurora map...
@@ -362,10 +362,10 @@ export default function AuroraForecastMap({ loading }) {
                 )}
 
                 {imageError ? (
-                    <div style={{ color: '#fff', fontSize: '11px', padding: '20px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '32px', marginBottom: '8px' }}>🌌</div>
+                    <div style={{ color: '#fff', fontSize: 'var(--font-size-label)', padding: '20px', textAlign: 'center' }}>
+                        <div style={{ fontSize: 'var(--font-size-xxl)', marginBottom: '8px' }}>🌌</div>
                         <div>Aurora image unavailable</div>
-                        <div style={{ fontSize: '9px', opacity: 0.6, marginTop: '4px' }}>
+                        <div style={{ fontSize: 'var(--font-size-caption)', opacity: 0.6, marginTop: '4px' }}>
                             Check NOAA SWPC for latest forecast
                         </div>
                     </div>
@@ -388,7 +388,7 @@ export default function AuroraForecastMap({ loading }) {
             <div style={{
                 display: 'flex',
                 gap: '8px',
-                fontSize: '8px',
+                fontSize: 'var(--font-size-chart)',
                 marginTop: '4px',
                 padding: '4px',
                 border: '1px solid var(--tertiary)',
@@ -403,7 +403,7 @@ export default function AuroraForecastMap({ loading }) {
 
             {/* Info based on current Kp */}
             <div style={{
-                fontSize: '9px',
+                fontSize: 'var(--font-size-caption)',
                 opacity: 0.6,
                 marginTop: '4px',
                 textAlign: 'center',
@@ -425,7 +425,7 @@ export default function AuroraForecastMap({ loading }) {
                     href="https://www.swpc.noaa.gov/products/aurora-30-minute-forecast"
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ fontSize: '9px', color: '#00c' }}
+                    style={{ fontSize: 'var(--font-size-caption)', color: '#00c' }}
                 >
                     🔗 View on NOAA SWPC
                 </a>

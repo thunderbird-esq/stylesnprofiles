@@ -105,7 +105,7 @@ function FlareBadge({ flare }) {
             <div style={{
                 padding: '4px 8px',
                 background: 'var(--tertiary)',
-                fontSize: '10px',
+                fontSize: 'var(--font-size-label)',
                 textAlign: 'center',
             }}>
                 No recent flares
@@ -121,7 +121,7 @@ function FlareBadge({ flare }) {
             padding: '6px 10px',
             background: flareInfo.color,
             color: '#fff',
-            fontSize: '11px',
+            fontSize: 'var(--font-size-label)',
             textAlign: 'center',
             fontWeight: 'bold',
         }}>
@@ -212,7 +212,7 @@ export default function GoesDataPanel({ onError }) {
 
     if (loading && xrayData.length === 0) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px' }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)' }}>
                 Loading GOES satellite data...
             </div>
         );
@@ -220,7 +220,7 @@ export default function GoesDataPanel({ onError }) {
 
     if (error) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px', color: '#c00' }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)', color: '#c00' }}>
                 Error: {error}
                 <button onClick={fetchData} style={{ marginLeft: '8px' }}>
                     Retry
@@ -240,14 +240,14 @@ export default function GoesDataPanel({ onError }) {
                 padding: '4px',
                 background: 'var(--secondary)',
             }}>
-                <span style={{ fontSize: '10px', fontWeight: 'bold' }}>📡 GOES Satellite</span>
+                <span style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold' }}>📡 GOES Satellite</span>
                 <div style={{ display: 'flex', gap: '2px' }}>
                     {PERIODS.map(p => (
                         <button
                             key={p.value}
                             onClick={() => setPeriod(p.value)}
                             className={period === p.value ? 'btn btn-active' : 'btn'}
-                            style={{ padding: '2px 6px', fontSize: '9px' }}
+                            style={{ padding: '2px 6px', fontSize: 'var(--font-size-caption)' }}
                         >
                             {p.label}
                         </button>
@@ -260,7 +260,7 @@ export default function GoesDataPanel({ onError }) {
 
             {/* X-ray Flux Chart */}
             <div style={{ marginTop: '8px', border: '1px solid var(--tertiary)', padding: '6px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                     ☀️ X-ray Flux (W/m²)
                 </div>
                 <Sparkline
@@ -270,14 +270,14 @@ export default function GoesDataPanel({ onError }) {
                     logScale={true}
                     thresholds={xrayThresholds}
                 />
-                <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '2px' }}>
+                <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '2px' }}>
                     C-class (yellow) | M-class (red) | X-class (magenta)
                 </div>
             </div>
 
             {/* Proton Flux Chart */}
             <div style={{ marginTop: '6px', border: '1px solid var(--tertiary)', padding: '6px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                     ⚡ Proton Flux (pfu)
                 </div>
                 <Sparkline
@@ -286,14 +286,14 @@ export default function GoesDataPanel({ onError }) {
                     color="#00f"
                     logScale={true}
                 />
-                <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '2px' }}>
+                <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '2px' }}>
                     &gt;10 MeV protons | S1+ storm if &gt;10 pfu
                 </div>
             </div>
 
             {/* Electron Flux Chart */}
             <div style={{ marginTop: '6px', border: '1px solid var(--tertiary)', padding: '6px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                     ⚛️ Electron Flux
                 </div>
                 <Sparkline
@@ -302,7 +302,7 @@ export default function GoesDataPanel({ onError }) {
                     color="#080"
                     logScale={true}
                 />
-                <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '2px' }}>
+                <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '2px' }}>
                     &gt;2 MeV electrons | Satellite charging hazard
                 </div>
             </div>
@@ -310,7 +310,7 @@ export default function GoesDataPanel({ onError }) {
             {/* Magnetometer Chart */}
             {magData.length > 0 && (
                 <div style={{ marginTop: '6px', border: '1px solid var(--tertiary)', padding: '6px' }}>
-                    <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                    <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                         🧲 Magnetometer (Hp)
                     </div>
                     <Sparkline
@@ -319,7 +319,7 @@ export default function GoesDataPanel({ onError }) {
                         color="#808"
                         logScale={false}
                     />
-                    <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '2px' }}>
+                    <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '2px' }}>
                         GOES Hp field component | Geomagnetic disturbance indicator
                     </div>
                 </div>
@@ -328,10 +328,10 @@ export default function GoesDataPanel({ onError }) {
             {/* Recent Flares List */}
             {flareHistory.length > 0 && (
                 <div style={{ marginTop: '8px', border: '1px solid var(--tertiary)', padding: '6px' }}>
-                    <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                    <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                         🔥 Recent Flares (7 days)
                     </div>
-                    <div style={{ maxHeight: '80px', overflowY: 'auto', fontSize: '9px' }}>
+                    <div style={{ maxHeight: '80px', overflowY: 'auto', fontSize: 'var(--font-size-caption)' }}>
                         {flareHistory.map((f, i) => (
                             <div key={i} style={{
                                 display: 'flex',
@@ -355,7 +355,7 @@ export default function GoesDataPanel({ onError }) {
             )}
 
             {/* Data freshness indicator */}
-            <div style={{ fontSize: '8px', opacity: 0.5, textAlign: 'right', marginTop: '6px' }}>
+            <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.5, textAlign: 'right', marginTop: '6px' }}>
                 {loading ? 'Updating...' : `Last update: ${new Date().toLocaleTimeString()}`}
             </div>
         </div>

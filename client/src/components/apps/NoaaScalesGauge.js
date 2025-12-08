@@ -23,7 +23,7 @@ function ScaleGauge({ type, label, value, description }) {
             minWidth: '80px',
         }}>
             {/* Label */}
-            <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+            <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                 {label}
             </div>
 
@@ -50,7 +50,7 @@ function ScaleGauge({ type, label, value, description }) {
 
             {/* Value */}
             <div style={{
-                fontSize: '14px',
+                fontSize: 'var(--font-size-body)',
                 fontWeight: 'bold',
                 color: severity.color,
             }}>
@@ -58,12 +58,12 @@ function ScaleGauge({ type, label, value, description }) {
             </div>
 
             {/* Severity text */}
-            <div style={{ fontSize: '9px', opacity: 0.8 }}>
+            <div style={{ fontSize: 'var(--font-size-caption)', opacity: 0.8 }}>
                 {severity.text}
             </div>
 
             {/* Description */}
-            <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '2px' }}>
+            <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '2px' }}>
                 {description}
             </div>
         </div>
@@ -89,7 +89,7 @@ ScaleGauge.defaultProps = {
 export default function NoaaScalesGauge({ scales, loading }) {
     if (loading) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px' }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)' }}>
                 Loading NOAA scales...
             </div>
         );
@@ -97,7 +97,7 @@ export default function NoaaScalesGauge({ scales, loading }) {
 
     if (!scales?.current) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px', opacity: 0.6 }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)', opacity: 0.6 }}>
                 NOAA scales unavailable
             </div>
         );
@@ -109,7 +109,7 @@ export default function NoaaScalesGauge({ scales, loading }) {
         <div>
             {/* Current Conditions */}
             <div style={{
-                fontSize: '10px',
+                fontSize: 'var(--font-size-label)',
                 fontWeight: 'bold',
                 marginBottom: '6px',
                 padding: '2px 4px',
@@ -143,7 +143,7 @@ export default function NoaaScalesGauge({ scales, loading }) {
             {/* Today's Probabilities */}
             {today && (
                 <div style={{
-                    fontSize: '9px',
+                    fontSize: 'var(--font-size-caption)',
                     padding: '4px',
                     border: '1px solid var(--tertiary)',
                     marginBottom: '4px',
@@ -157,7 +157,7 @@ export default function NoaaScalesGauge({ scales, loading }) {
             )}
 
             {/* Timestamp */}
-            <div style={{ fontSize: '8px', opacity: 0.5, textAlign: 'right' }}>
+            <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.5, textAlign: 'right' }}>
                 Updated: {current.DateStamp} {current.TimeStamp} UTC
             </div>
         </div>

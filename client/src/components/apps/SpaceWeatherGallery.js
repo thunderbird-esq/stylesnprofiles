@@ -56,14 +56,14 @@ function ImageViewer({ src, alt, maxHeight = 180 }) {
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     color: '#fff',
-                    fontSize: '10px',
+                    fontSize: 'var(--font-size-label)',
                 }}>
                     Loading...
                 </div>
             )}
 
             {error ? (
-                <div style={{ padding: '40px', color: '#fff', fontSize: '10px' }}>
+                <div style={{ padding: '40px', color: '#fff', fontSize: 'var(--font-size-label)' }}>
                     Image unavailable
                 </div>
             ) : (
@@ -108,7 +108,7 @@ export default function SpaceWeatherGallery() {
 
     const renderSolarContent = () => (
         <>
-            <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '6px' }}>
+            <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '6px' }}>
                 Synoptic Map (Solar Disk)
             </div>
             <ImageViewer
@@ -116,7 +116,7 @@ export default function SpaceWeatherGallery() {
                 alt="Solar Synoptic Map"
                 maxHeight={200}
             />
-            <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '4px', textAlign: 'center' }}>
+            <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '4px', textAlign: 'center' }}>
                 Shows active regions, filaments, and coronal holes
             </div>
         </>
@@ -126,14 +126,14 @@ export default function SpaceWeatherGallery() {
         <>
             {/* Instrument selector */}
             <div style={{ marginBottom: '6px' }}>
-                <div style={{ fontSize: '9px', fontWeight: 'bold', marginBottom: '4px' }}>Instrument:</div>
+                <div style={{ fontSize: 'var(--font-size-caption)', fontWeight: 'bold', marginBottom: '4px' }}>Instrument:</div>
                 <div style={{ display: 'flex', gap: '2px' }}>
                     {ACE_INSTRUMENTS.map(inst => (
                         <button
                             key={inst.value}
                             onClick={() => setAceInstrument(inst.value)}
                             className={aceInstrument === inst.value ? 'btn btn-active' : 'btn'}
-                            style={{ padding: '2px 6px', fontSize: '9px' }}
+                            style={{ padding: '2px 6px', fontSize: 'var(--font-size-caption)' }}
                         >
                             {inst.label}
                         </button>
@@ -143,14 +143,14 @@ export default function SpaceWeatherGallery() {
 
             {/* Period selector */}
             <div style={{ marginBottom: '6px' }}>
-                <div style={{ fontSize: '9px', fontWeight: 'bold', marginBottom: '4px' }}>Period:</div>
+                <div style={{ fontSize: 'var(--font-size-caption)', fontWeight: 'bold', marginBottom: '4px' }}>Period:</div>
                 <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap' }}>
                     {ACE_PERIODS.map(p => (
                         <button
                             key={p}
                             onClick={() => setAcePeriod(p)}
                             className={acePeriod === p ? 'btn btn-active' : 'btn'}
-                            style={{ padding: '2px 6px', fontSize: '9px' }}
+                            style={{ padding: '2px 6px', fontSize: 'var(--font-size-caption)' }}
                         >
                             {p}
                         </button>
@@ -163,7 +163,7 @@ export default function SpaceWeatherGallery() {
                 alt={`ACE ${aceInstrument} ${acePeriod}`}
                 maxHeight={180}
             />
-            <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '4px', textAlign: 'center' }}>
+            <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '4px', textAlign: 'center' }}>
                 ACE satellite at L1 point (1.5M km from Earth)
             </div>
         </>
@@ -173,14 +173,14 @@ export default function SpaceWeatherGallery() {
         <>
             {/* Geospace period selector */}
             <div style={{ marginBottom: '6px' }}>
-                <div style={{ fontSize: '9px', fontWeight: 'bold', marginBottom: '4px' }}>Period:</div>
+                <div style={{ fontSize: 'var(--font-size-caption)', fontWeight: 'bold', marginBottom: '4px' }}>Period:</div>
                 <div style={{ display: 'flex', gap: '2px' }}>
                     {['3-hour', '1-day', '3-day', '7-day'].map(p => (
                         <button
                             key={p}
                             onClick={() => setGeoPeriod(p)}
                             className={geoPeriod === p ? 'btn btn-active' : 'btn'}
-                            style={{ padding: '2px 6px', fontSize: '9px' }}
+                            style={{ padding: '2px 6px', fontSize: 'var(--font-size-caption)' }}
                         >
                             {p}
                         </button>
@@ -195,7 +195,7 @@ export default function SpaceWeatherGallery() {
             />
 
             <div style={{ marginTop: '8px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                     Electron Fluence Forecast
                 </div>
                 <ImageViewer
@@ -209,7 +209,7 @@ export default function SpaceWeatherGallery() {
 
     const renderAlertsContent = () => (
         <>
-            <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '6px' }}>
+            <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '6px' }}>
                 Notifications Timeline
             </div>
             <ImageViewer
@@ -219,7 +219,7 @@ export default function SpaceWeatherGallery() {
             />
 
             <div style={{ marginTop: '8px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                     Station K-Index
                 </div>
                 <ImageViewer
@@ -238,7 +238,7 @@ export default function SpaceWeatherGallery() {
                 padding: '4px',
                 marginBottom: '8px',
                 background: 'var(--secondary)',
-                fontSize: '10px',
+                fontSize: 'var(--font-size-label)',
                 fontWeight: 'bold',
             }}>
                 🖼️ Space Weather Gallery
@@ -251,7 +251,7 @@ export default function SpaceWeatherGallery() {
                         key={c.value}
                         onClick={() => setCategory(c.value)}
                         className={category === c.value ? 'btn btn-active' : 'btn'}
-                        style={{ flex: 1, padding: '4px', fontSize: '9px' }}
+                        style={{ flex: 1, padding: '4px', fontSize: 'var(--font-size-caption)' }}
                     >
                         {c.label}
                     </button>
@@ -267,7 +267,7 @@ export default function SpaceWeatherGallery() {
             </div>
 
             {/* Footer */}
-            <div style={{ fontSize: '8px', opacity: 0.5, textAlign: 'center', marginTop: '8px' }}>
+            <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.5, textAlign: 'center', marginTop: '8px' }}>
                 Images from NOAA Space Weather Prediction Center
             </div>
         </div>

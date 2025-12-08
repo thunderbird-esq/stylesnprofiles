@@ -1,5 +1,68 @@
 # Development Log
 
+## 2025-12-07 - Responsive Scaling System Refactor
+
+### Session Summary
+Implemented comprehensive responsive scaling system following Apple Human Interface Guidelines (1986-87) discipline while adapting for modern displays. Refactored entire codebase to use CSS custom properties for consistent, scalable typography.
+
+### Problem Addressed
+- Text was too small on modern displays (12px base was 1987 Macintosh native)
+- 90%+ of components used hardcoded pixel values (`8px`, `9px`, `10px`, `11px`)
+- `--system-scale` CSS variable existed but was never applied
+- No global scaling mechanism for user preference
+
+### Solution Architecture
+1. **Content Scale Variable**: Added `--content-scale` CSS variable (default 1.0) for user-adjustable scaling
+2. **Increased Base Sizes**: Upgraded from 12px → 14px base for modern displays
+3. **Semantic Font Variables**: Added HIG-aligned semantic sizes:
+   - `--font-size-title` (18px) - Window titles, section headers
+   - `--font-size-body` (14px) - Primary content text
+   - `--font-size-label` (12px) - Form labels, list items  
+   - `--font-size-caption` (10px) - Helper text, timestamps
+   - `--font-size-chart` (10px) - Chart axis labels, data annotations
+
+### Files Modified
+
+| File | Replacements | Notes |
+|------|-------------|-------|
+| `system.css` | Core | New :root variables, utility classes, app-scalable container |
+| `GoesDataPanel.js` | 15 | All font sizes now use CSS variables |
+| `SolarWindCharts.js` | 14 | All font sizes now use CSS variables |
+| `AlertsTicker.js` | 18 | All font sizes now use CSS variables |
+| `AuroraForecastMap.js` | 17 | All font sizes now use CSS variables |
+| `SolarCycleDashboard.js` | 16 | All font sizes now use CSS variables |
+| `NoaaScalesGauge.js` | 9 | All font sizes now use CSS variables |
+| `DrapViewer.js` | 10 | All font sizes now use CSS variables |
+| `SpaceWeatherGallery.js` | 17 | All font sizes now use CSS variables |
+
+### New CSS Architecture
+
+```css
+:root {
+  --content-scale: 1;  /* User-adjustable: 1.0 = 100%, 1.25 = 125% */
+  --font-size-base: calc(14px * var(--content-scale));
+  --font-size-sm: calc(12px * var(--content-scale));
+  --font-size-xs: calc(10px * var(--content-scale));
+  --font-size-lg: calc(18px * var(--content-scale));
+  --font-size-xl: calc(24px * var(--content-scale));
+  --font-size-xxl: calc(28px * var(--content-scale));
+}
+```
+
+### Design Principles Applied
+- **Apple HIG Typography Hierarchy**: Clear visual hierarchy with semantic naming
+- **System 6 Discipline**: Maintained pixel-perfect aesthetic where possible
+- **Modern Adaptation**: Scaled proportionally for Retina/HiDPI displays
+- **Zero Bloat**: No new dependencies, pure CSS custom properties
+- **Future-Proof**: User can adjust `--content-scale` via JavaScript for preferences
+
+### Build Results
+- ✅ Compiled successfully with zero warnings
+- ✅ All 8 Space Weather components refactored
+- ✅ 100+ hardcoded font sizes replaced with CSS variables
+
+---
+
 ## 2025-12-07 - SWPC Data Integration (ALL 8 PHASES)
 
 ### Session Summary

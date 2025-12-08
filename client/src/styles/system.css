@@ -44,16 +44,38 @@
   /* Component Tokens */
   --disabled: var(--sys-color-darkgrey);
 
-  /* ---- 📝 Font Sizing ---- */
-  /* Base size for app content */
-  --font-size-base: 12px;
-  --font-size-sm: 10px;
-  --font-size-lg: 16px;
-  /* ~40% larger than base */
-  --font-size-xl: 21px;
-  /* ~75% larger than base */
-  --font-size-xxl: 24px;
-  /* 2x base */
+  /* ---- 📝 Font Sizing System ---- */
+  /* 
+   * Modern displays require larger base sizes than original 1987 Macintosh.
+   * We scale proportionally to maintain System 6 design ratios.
+   * User can adjust via --content-scale (1.0 = default, 1.25 = 125%, etc.)
+   */
+
+  /* User-adjustable content scale (default 1.0) */
+  --content-scale: 1;
+
+  /* Base font sizes - increased for modern displays */
+  --font-size-base: calc(14px * var(--content-scale));
+  --font-size-sm: calc(12px * var(--content-scale));
+  --font-size-xs: calc(10px * var(--content-scale));
+  --font-size-lg: calc(18px * var(--content-scale));
+  --font-size-xl: calc(24px * var(--content-scale));
+  --font-size-xxl: calc(28px * var(--content-scale));
+
+  /* Semantic component sizes - Apple HIG hierarchy */
+  --font-size-title: var(--font-size-lg);
+  /* Window titles, section headers */
+  --font-size-body: var(--font-size-base);
+  /* Primary content text */
+  --font-size-label: var(--font-size-sm);
+  /* Form labels, list items */
+  --font-size-caption: var(--font-size-xs);
+  /* Helper text, timestamps */
+  --font-size-chart: var(--font-size-xs);
+  /* Chart axis labels, data annotations */
+
+  /* Menu bar (fixed for System 6 authenticity) */
+  --font-size-menu: 14px;
 }
 
 @font-face {
@@ -1051,7 +1073,14 @@ ul [role='menu-item'].divider::after {
 /* ============================================ */
 /* Font Sizing Utility Classes                  */
 /* Use these for consistent text scaling        */
+/* Apple HIG: Typography should be clear,       */
+/* legible, and appropriately sized for context */
 /* ============================================ */
+
+/* Size utilities */
+.text-xs {
+  font-size: var(--font-size-xs) !important;
+}
 
 .text-sm {
   font-size: var(--font-size-sm) !important;
@@ -1063,20 +1092,69 @@ ul [role='menu-item'].divider::after {
 
 .text-lg {
   font-size: var(--font-size-lg) !important;
-  /* 40% larger than base */
 }
 
 .text-xl {
   font-size: var(--font-size-xl) !important;
-  /* 75% larger than base */
 }
 
 .text-xxl {
   font-size: var(--font-size-xxl) !important;
-  /* 2x base */
 }
 
-/* App content scaling utility - apply to app containers */
+/* Semantic utilities - use these for consistent component hierarchy */
+.text-title {
+  font-size: var(--font-size-title) !important;
+}
+
+.text-body {
+  font-size: var(--font-size-body) !important;
+}
+
+.text-label {
+  font-size: var(--font-size-label) !important;
+}
+
+.text-caption {
+  font-size: var(--font-size-caption) !important;
+}
+
+.text-chart {
+  font-size: var(--font-size-chart) !important;
+}
+
+/* ============================================ */
+/* App Scalable Container                       */
+/* Apply to app root for full font scaling      */
+/* ============================================ */
+
+.app-scalable {
+  font-size: var(--font-size-body);
+}
+
+/* All interactive elements inherit from container */
+.app-scalable button,
+.app-scalable .btn,
+.app-scalable select,
+.app-scalable input,
+.app-scalable textarea {
+  font-size: inherit;
+}
+
+/* Headers use title size */
+.app-scalable h1,
+.app-scalable h2,
+.app-scalable h3 {
+  font-size: var(--font-size-title);
+}
+
+/* Small text elements use label size */
+.app-scalable small,
+.app-scalable .small {
+  font-size: var(--font-size-label);
+}
+
+/* Legacy support for app-text-lg */
 .app-text-lg {
   font-size: var(--font-size-lg);
 }

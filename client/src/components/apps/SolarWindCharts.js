@@ -147,12 +147,12 @@ function ConditionsBadge({ label, value, unit, severity }) {
             background: severity?.color || 'var(--tertiary)',
             color: severity?.color ? '#fff' : 'inherit',
         }}>
-            <div style={{ fontSize: '9px', opacity: 0.9 }}>{label}</div>
-            <div style={{ fontSize: '14px', fontWeight: 'bold' }}>
+            <div style={{ fontSize: 'var(--font-size-caption)', opacity: 0.9 }}>{label}</div>
+            <div style={{ fontSize: 'var(--font-size-body)', fontWeight: 'bold' }}>
                 {value}{unit}
             </div>
             {severity?.text && (
-                <div style={{ fontSize: '8px' }}>{severity.text}</div>
+                <div style={{ fontSize: 'var(--font-size-chart)' }}>{severity.text}</div>
             )}
         </div>
     );
@@ -230,7 +230,7 @@ export default function SolarWindCharts({ onError }) {
 
     if (loading && magData.length === 0) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px' }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)' }}>
                 Loading solar wind data...
             </div>
         );
@@ -238,7 +238,7 @@ export default function SolarWindCharts({ onError }) {
 
     if (error) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px', color: '#c00' }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)', color: '#c00' }}>
                 Error: {error}
                 <button onClick={fetchData} style={{ marginLeft: '8px' }}>Retry</button>
             </div>
@@ -256,14 +256,14 @@ export default function SolarWindCharts({ onError }) {
                 padding: '4px',
                 background: 'var(--secondary)',
             }}>
-                <span style={{ fontSize: '10px', fontWeight: 'bold' }}>🌬️ Solar Wind</span>
+                <span style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold' }}>🌬️ Solar Wind</span>
                 <div style={{ display: 'flex', gap: '2px' }}>
                     {PERIODS.map(p => (
                         <button
                             key={p.value}
                             onClick={() => setPeriod(p.value)}
                             className={period === p.value ? 'btn btn-active' : 'btn'}
-                            style={{ padding: '2px 6px', fontSize: '9px' }}
+                            style={{ padding: '2px 6px', fontSize: 'var(--font-size-caption)' }}
                         >
                             {p.label}
                         </button>
@@ -295,7 +295,7 @@ export default function SolarWindCharts({ onError }) {
 
             {/* IMF Bz Chart */}
             <div style={{ border: '1px solid var(--tertiary)', padding: '6px', marginBottom: '6px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                     🧲 IMF Bz (Interplanetary Magnetic Field)
                 </div>
                 <TimeSeriesChart
@@ -307,14 +307,14 @@ export default function SolarWindCharts({ onError }) {
                     yRange={[-20, 20]}
                     unit="nT"
                 />
-                <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '2px' }}>
+                <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '2px' }}>
                     Southward (negative) Bz → Geomagnetic storms likely
                 </div>
             </div>
 
             {/* Solar Wind Speed Chart */}
             <div style={{ border: '1px solid var(--tertiary)', padding: '6px', marginBottom: '6px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                     💨 Solar Wind Speed
                 </div>
                 <TimeSeriesChart
@@ -324,14 +324,14 @@ export default function SolarWindCharts({ onError }) {
                     color="#f60"
                     unit="km/s"
                 />
-                <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '2px' }}>
+                <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '2px' }}>
                     Normal: 300-500 km/s | High-speed stream: &gt;600 km/s
                 </div>
             </div>
 
             {/* Dst Index Chart */}
             <div style={{ border: '1px solid var(--tertiary)', padding: '6px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
                     🌍 Dst Index (Storm Intensity)
                 </div>
                 <TimeSeriesChart
@@ -343,13 +343,13 @@ export default function SolarWindCharts({ onError }) {
                     unit="nT"
                     invertY={true}
                 />
-                <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '2px' }}>
+                <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.6, marginTop: '2px' }}>
                     Quiet: &gt;-30 | Moderate: -50 to -100 | Intense: &lt;-100 nT
                 </div>
             </div>
 
             {/* Refresh indicator */}
-            <div style={{ fontSize: '8px', opacity: 0.5, textAlign: 'right', marginTop: '6px' }}>
+            <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.5, textAlign: 'right', marginTop: '6px' }}>
                 {loading ? 'Updating...' : `Last update: ${new Date().toLocaleTimeString()}`}
             </div>
         </div>

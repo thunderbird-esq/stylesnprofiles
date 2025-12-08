@@ -53,7 +53,7 @@ export default function DrapViewer() {
                 padding: '4px',
                 marginBottom: '8px',
                 background: 'var(--secondary)',
-                fontSize: '10px',
+                fontSize: 'var(--font-size-label)',
                 fontWeight: 'bold',
             }}>
                 📻 D-RAP HF Radio Absorption
@@ -61,7 +61,7 @@ export default function DrapViewer() {
 
             {/* Description */}
             <div style={{
-                fontSize: '9px',
+                fontSize: 'var(--font-size-caption)',
                 marginBottom: '8px',
                 padding: '4px',
                 background: 'var(--tertiary)',
@@ -73,7 +73,7 @@ export default function DrapViewer() {
 
             {/* Frequency Selector */}
             <div style={{ marginBottom: '6px' }}>
-                <div style={{ fontSize: '9px', fontWeight: 'bold', marginBottom: '4px' }}>Frequency:</div>
+                <div style={{ fontSize: 'var(--font-size-caption)', fontWeight: 'bold', marginBottom: '4px' }}>Frequency:</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px' }}>
                     {FREQUENCIES.map(f => (
                         <button
@@ -84,7 +84,7 @@ export default function DrapViewer() {
                                 setLoading(true);
                             }}
                             className={frequency === f.value ? 'btn btn-active' : 'btn'}
-                            style={{ padding: '2px 6px', fontSize: '9px' }}
+                            style={{ padding: '2px 6px', fontSize: 'var(--font-size-caption)' }}
                         >
                             {f.label}
                         </button>
@@ -94,7 +94,7 @@ export default function DrapViewer() {
 
             {/* View Selector */}
             <div style={{ marginBottom: '8px' }}>
-                <div style={{ fontSize: '9px', fontWeight: 'bold', marginBottom: '4px' }}>View:</div>
+                <div style={{ fontSize: 'var(--font-size-caption)', fontWeight: 'bold', marginBottom: '4px' }}>View:</div>
                 <div style={{ display: 'flex', gap: '2px' }}>
                     {VIEWS.map(v => (
                         <button
@@ -105,7 +105,7 @@ export default function DrapViewer() {
                                 setLoading(true);
                             }}
                             className={view === v.value ? 'btn btn-active' : 'btn'}
-                            style={{ padding: '2px 8px', fontSize: '9px' }}
+                            style={{ padding: '2px 8px', fontSize: 'var(--font-size-caption)' }}
                         >
                             {v.label}
                         </button>
@@ -128,7 +128,7 @@ export default function DrapViewer() {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         color: '#fff',
-                        fontSize: '10px',
+                        fontSize: 'var(--font-size-label)',
                     }}>
                         Loading...
                     </div>
@@ -138,7 +138,7 @@ export default function DrapViewer() {
                     <div style={{
                         padding: '40px',
                         color: '#fff',
-                        fontSize: '10px'
+                        fontSize: 'var(--font-size-label)'
                     }}>
                         Image unavailable
                     </div>
@@ -166,7 +166,7 @@ export default function DrapViewer() {
                 marginTop: '8px',
                 padding: '6px',
                 border: '1px solid var(--tertiary)',
-                fontSize: '9px',
+                fontSize: 'var(--font-size-caption)',
             }}>
                 <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Absorption Legend (dB):</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -181,7 +181,7 @@ export default function DrapViewer() {
             {/* R-Scale Context */}
             <div style={{
                 marginTop: '6px',
-                fontSize: '8px',
+                fontSize: 'var(--font-size-chart)',
                 opacity: 0.6,
                 textAlign: 'center',
             }}>

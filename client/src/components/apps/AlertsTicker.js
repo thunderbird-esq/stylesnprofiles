@@ -74,7 +74,7 @@ function FilterButton({ category, active, count, onClick }) {
             onClick={onClick}
             className={active ? 'btn btn-active' : 'btn'}
             style={{
-                fontSize: '8px',
+                fontSize: 'var(--font-size-chart)',
                 padding: '1px 4px',
                 opacity: active ? 1 : 0.5,
                 borderColor: active ? cat.color : undefined,
@@ -135,7 +135,7 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
 
     if (loading) {
         return (
-            <div style={{ padding: '12px', textAlign: 'center', fontSize: '11px' }}>
+            <div style={{ padding: '12px', textAlign: 'center', fontSize: 'var(--font-size-label)' }}>
                 Loading alerts...
             </div>
         );
@@ -143,7 +143,7 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
 
     if (!alerts || alerts.length === 0) {
         return (
-            <div style={{ padding: '8px', fontSize: '11px', opacity: 0.6, textAlign: 'center' }}>
+            <div style={{ padding: '8px', fontSize: 'var(--font-size-label)', opacity: 0.6, textAlign: 'center' }}>
                 ✓ No active space weather alerts
             </div>
         );
@@ -153,7 +153,7 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
         <div>
             {/* Header with live indicator */}
             <div style={{
-                fontSize: '10px',
+                fontSize: 'var(--font-size-label)',
                 fontWeight: 'bold',
                 marginBottom: '4px',
                 padding: '2px 4px',
@@ -179,12 +179,12 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
                     <button
                         className={showTimeline ? 'btn btn-active' : 'btn'}
                         onClick={() => setShowTimeline(!showTimeline)}
-                        style={{ fontSize: '8px', padding: '1px 4px' }}
+                        style={{ fontSize: 'var(--font-size-chart)', padding: '1px 4px' }}
                     >
                         📊
                     </button>
                     {onRefresh && (
-                        <button className="btn" onClick={onRefresh} style={{ fontSize: '8px', padding: '1px 4px' }}>
+                        <button className="btn" onClick={onRefresh} style={{ fontSize: 'var(--font-size-chart)', padding: '1px 4px' }}>
                             🔄
                         </button>
                     )}
@@ -193,7 +193,7 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
 
             {/* Last refresh timestamp */}
             {lastRefresh && (
-                <div style={{ fontSize: '8px', opacity: 0.5, marginBottom: '4px', textAlign: 'right' }}>
+                <div style={{ fontSize: 'var(--font-size-chart)', opacity: 0.5, marginBottom: '4px', textAlign: 'right' }}>
                     Updated: {new Date(lastRefresh).toLocaleTimeString()}
                 </div>
             )}
@@ -253,15 +253,15 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
                                     gap: '6px',
                                     padding: '4px 6px',
                                     cursor: 'pointer',
-                                    fontSize: '10px',
+                                    fontSize: 'var(--font-size-label)',
                                 }}
                             >
-                                <span style={{ fontSize: '12px' }}>{catInfo.icon}</span>
+                                <span style={{ fontSize: 'var(--font-size-body)' }}>{catInfo.icon}</span>
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontWeight: 'bold', color: catInfo.color }}>
                                         {catInfo.label}: {summary}
                                     </div>
-                                    <div style={{ fontSize: '9px', opacity: 0.6 }}>{time}</div>
+                                    <div style={{ fontSize: 'var(--font-size-caption)', opacity: 0.6 }}>{time}</div>
                                 </div>
                                 <span style={{ opacity: 0.5 }}>{isExpanded ? '▼' : '▶'}</span>
                             </div>
@@ -271,7 +271,7 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
                                 <div style={{
                                     padding: '6px 10px',
                                     borderTop: '1px solid var(--tertiary)',
-                                    fontSize: '9px',
+                                    fontSize: 'var(--font-size-caption)',
                                     maxHeight: '150px',
                                     overflow: 'auto',
                                 }}>
@@ -287,7 +287,7 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
                                     <button
                                         className="btn"
                                         onClick={(e) => { e.stopPropagation(); setSelectedAlert(alert); }}
-                                        style={{ marginTop: '6px', fontSize: '9px', padding: '2px 8px' }}
+                                        style={{ marginTop: '6px', fontSize: 'var(--font-size-caption)', padding: '2px 8px' }}
                                     >
                                         View Full Details
                                     </button>
@@ -300,7 +300,7 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
 
             {/* Show more indicator */}
             {filteredAlerts.length > maxVisible && (
-                <div style={{ fontSize: '9px', textAlign: 'center', opacity: 0.6, marginTop: '4px' }}>
+                <div style={{ fontSize: 'var(--font-size-caption)', textAlign: 'center', opacity: 0.6, marginTop: '4px' }}>
                     +{filteredAlerts.length - maxVisible} more alerts
                 </div>
             )}
@@ -325,19 +325,19 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
                     >
                         <div style={{
                             background: 'var(--secondary)', color: 'var(--primary)',
-                            padding: '4px 8px', fontSize: '12px', fontWeight: 'bold',
+                            padding: '4px 8px', fontSize: 'var(--font-size-body)', fontWeight: 'bold',
                             display: 'flex', justifyContent: 'space-between',
                         }}>
                             <span>{CATEGORIES[getAlertCategory(selectedAlert.product_id)].icon} Alert Details</span>
                             <button onClick={() => setSelectedAlert(null)} style={{
                                 background: 'var(--primary)', color: 'var(--secondary)',
                                 border: '1px solid var(--primary)', padding: '0 6px',
-                                cursor: 'pointer', fontSize: '10px'
+                                cursor: 'pointer', fontSize: 'var(--font-size-label)'
                             }}>✕</button>
                         </div>
 
-                        <div style={{ padding: '12px', fontSize: '11px' }}>
-                            <div style={{ marginBottom: '8px', fontSize: '9px', opacity: 0.6 }}>
+                        <div style={{ padding: '12px', fontSize: 'var(--font-size-label)' }}>
+                            <div style={{ marginBottom: '8px', fontSize: 'var(--font-size-caption)', opacity: 0.6 }}>
                                 {selectedAlert.issue_datetime} • ID: {selectedAlert.product_id}
                             </div>
                             <pre style={{
@@ -352,7 +352,7 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
                             <button
                                 className="btn"
                                 onClick={() => setSelectedAlert(null)}
-                                style={{ marginTop: '12px', width: '100%', fontSize: '11px' }}
+                                style={{ marginTop: '12px', width: '100%', fontSize: 'var(--font-size-label)' }}
                             >
                                 Close
                             </button>
