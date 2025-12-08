@@ -27,11 +27,6 @@ export default function Desktop() {
           onDoubleClick={() => openApp('neo')}
         />
         <DesktopIcon
-          label="Mars Rovers"
-          icon={APPS['mars'].icon}
-          onDoubleClick={() => openApp('mars')}
-        />
-        <DesktopIcon
           label="EPIC Earth"
           icon={APPS['epic'].icon}
           onDoubleClick={() => openApp('epic')}
@@ -57,11 +52,6 @@ export default function Desktop() {
           onDoubleClick={() => openApp('exoplanets')}
         />
         <DesktopIcon
-          label="Techport"
-          icon={APPS['techport'].icon}
-          onDoubleClick={() => openApp('techport')}
-        />
-        <DesktopIcon
           label="Earth Viewer"
           icon={APPS['earthviewer'].icon}
           onDoubleClick={() => openApp('earthviewer')}
@@ -71,6 +61,39 @@ export default function Desktop() {
           icon={APPS['bookmarks'].icon}
           onDoubleClick={() => openApp('bookmarks')}
         />
+      </div>
+
+      {/* REHAB Folder - Apps needing API repair */}
+      <div className="desktop-folder" style={{
+        position: 'absolute',
+        right: '20px',
+        top: '40px',
+        padding: '8px',
+        border: '2px solid var(--secondary)',
+        background: 'rgba(0,0,0,0.3)',
+        borderRadius: '4px',
+      }}>
+        <div style={{
+          fontSize: 'var(--font-size-caption)',
+          color: 'var(--secondary)',
+          marginBottom: '8px',
+          textAlign: 'center',
+          fontWeight: 'bold',
+        }}>
+          📁 REHAB
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <DesktopIcon
+            label="Mars Rovers"
+            icon={APPS['mars'].icon}
+            onDoubleClick={() => openApp('mars')}
+          />
+          <DesktopIcon
+            label="Techport"
+            icon={APPS['techport'].icon}
+            onDoubleClick={() => openApp('techport')}
+          />
+        </div>
       </div>
 
       {/* Render Open Windows */}
