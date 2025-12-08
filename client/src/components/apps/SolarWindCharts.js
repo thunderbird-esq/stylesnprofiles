@@ -275,19 +275,19 @@ export default function SolarWindCharts({ onError }) {
             <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
                 <ConditionsBadge
                     label="Speed"
-                    value={summary.speed?.toFixed(0) || '—'}
+                    value={summary.speed != null ? Number(summary.speed).toFixed(0) : '—'}
                     unit=" km/s"
                 />
                 <ConditionsBadge
                     label="Bz"
-                    value={summary.bz?.toFixed(1) || '—'}
+                    value={summary.bz != null ? Number(summary.bz).toFixed(1) : '—'}
                     unit=" nT"
-                    severity={summary.bz < -10 ? { color: '#f00', text: '⚠️ Southward' } :
-                        summary.bz < 0 ? { color: '#f90', text: 'Slightly South' } : null}
+                    severity={Number(summary.bz) < -10 ? { color: '#f00', text: '⚠️ Southward' } :
+                        Number(summary.bz) < 0 ? { color: '#f90', text: 'Slightly South' } : null}
                 />
                 <ConditionsBadge
                     label="Dst"
-                    value={currentDst?.toFixed(0) || '—'}
+                    value={currentDst != null ? Number(currentDst).toFixed(0) : '—'}
                     unit=" nT"
                     severity={dstSeverity}
                 />
