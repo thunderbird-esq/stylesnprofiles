@@ -13,8 +13,12 @@ import {
     getGoesXrayFlaresLatest,
     getGoesProtons,
     getGoesElectrons,
+    getGoesMagnetometers,
     getFlareClass,
 } from '../../services/noaaSwpcApi';
+
+// Refresh interval constant
+const REFRESH_INTERVAL_MS = 60000;  // 1 minute
 
 // Time period options
 const PERIODS = [
@@ -138,6 +142,7 @@ export default function GoesDataPanel({ onError }) {
     const [xrayData, setXrayData] = useState([]);
     const [protonData, setProtonData] = useState([]);
     const [electronData, setElectronData] = useState([]);
+    const [magData, setMagData] = useState([]);
     const [latestFlare, setLatestFlare] = useState(null);
     const [flareHistory, setFlareHistory] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -148,10 +153,11 @@ export default function GoesDataPanel({ onError }) {
         setError(null);
 
         try {
-            const [xrays, protons, electrons, flareLatest, flares] = await Promise.all([
+            const [xrays, protons, electrons, mags, flareLatest, flares] = await Promise.all([
                 getGoesXrays(period),
                 getGoesProtons(period),
                 getGoesElectrons(period),
+                getGoesMagnetometers(period).catch(() => []),
                 getGoesXrayFlaresLatest(),
                 getGoesXrayFlares(),
             ]);
@@ -174,6 +180,12 @@ export default function GoesDataPanel({ onError }) {
                 value: parseFloat(d.flux) || 0,
             })));
 
+            // Process magnetometer data (Hp component)
+            setMagData(mags.slice(-200).map(d => ({
+                time: d.time_tag,
+                value: parseFloat(d.Hp) || 0,
+            })));
+
             setLatestFlare(flareLatest);
             setFlareHistory(flares.slice(0, 10));
         } catch (err) {
@@ -187,7 +199,7 @@ export default function GoesDataPanel({ onError }) {
 
     useEffect(() => {
         fetchData();
-        const interval = setInterval(fetchData, 60000); // Refresh every minute
+        const interval = setInterval(fetchData, REFRESH_INTERVAL_MS);
         return () => clearInterval(interval);
     }, [fetchData]);
 
@@ -294,6 +306,24 @@ export default function GoesDataPanel({ onError }) {
                     &gt;2 MeV electrons | Satellite charging hazard
                 </div>
             </div>
+
+            {/* Magnetometer Chart */}
+            {magData.length > 0 && (
+                <div style={{ marginTop: '6px', border: '1px solid var(--tertiary)', padding: '6px' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '4px' }}>
+                        🧲 Magnetometer (Hp)
+                    </div>
+                    <Sparkline
+                        data={magData}
+                        height={40}
+                        color="#808"
+                        logScale={false}
+                    />
+                    <div style={{ fontSize: '8px', opacity: 0.6, marginTop: '2px' }}>
+                        GOES Hp field component | Geomagnetic disturbance indicator
+                    </div>
+                </div>
+            )}
 
             {/* Recent Flares List */}
             {flareHistory.length > 0 && (

@@ -6,7 +6,10 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { getAuroraImageUrls, getKpIndex, getKpForecast } from '../../services/noaaSwpcApi';
+import { getAuroraImageUrls, getKpIndex, getKpForecast, getAuroraForecast } from '../../services/noaaSwpcApi';
+
+// Refresh interval constant
+const REFRESH_INTERVAL_MS = 300000;  // 5 minutes
 
 // Kp to aurora visibility latitude mapping
 const KP_LATITUDE_MAP = [
@@ -134,6 +137,104 @@ BestViewingTime.propTypes = {
 };
 
 /**
+ * Viewline Probability Component - shows aurora viewing probability by latitude
+ * Fetches OVATION aurora forecast data
+ */
+function ViewlineProbability({ selectedLat, onLatChange }) {
+    const [probability, setProbability] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // Latitude band options
+    const latitudes = [
+        { lat: 65, label: '65°N (Iceland, N. Norway)' },
+        { lat: 60, label: '60°N (Alaska, Helsinki)' },
+        { lat: 55, label: '55°N (Seattle, Edinburgh)' },
+        { lat: 50, label: '50°N (London, Calgary)' },
+        { lat: 45, label: '45°N (Minneapolis, Paris)' },
+    ];
+
+    useEffect(() => {
+        const fetchOvation = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const data = await getAuroraForecast();
+
+                // OVATION data contains observation_time and aurora probabilities
+                // Extract probability data for selected latitude
+                if (data && data.coordinates) {
+                    // Find average probability for the selected latitude band (+/- 2.5°)
+                    const coords = data.coordinates.filter(c =>
+                        Math.abs(c[1] - selectedLat) < 2.5
+                    );
+
+                    if (coords.length > 0) {
+                        // Probability is in third position (aurora %)
+                        const avgProb = coords.reduce((sum, c) => sum + (c[2] || 0), 0) / coords.length;
+                        setProbability(Math.round(avgProb));
+                    } else {
+                        setProbability(null);
+                    }
+                }
+            } catch (err) {
+                console.error('OVATION fetch error:', err);
+                setError('Could not load viewline data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOvation();
+    }, [selectedLat]);
+
+    return (
+        <div style={{
+            fontSize: '9px',
+            padding: '4px 6px',
+            border: '1px solid var(--tertiary)',
+            marginBottom: '6px',
+        }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                📊 Viewline Probability
+            </div>
+
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <select
+                    value={selectedLat}
+                    onChange={(e) => onLatChange(parseInt(e.target.value, 10))}
+                    style={{ fontSize: '9px', padding: '2px' }}
+                >
+                    {latitudes.map(l => (
+                        <option key={l.lat} value={l.lat}>{l.label}</option>
+                    ))}
+                </select>
+
+                {loading ? (
+                    <span style={{ opacity: 0.6 }}>Loading...</span>
+                ) : error ? (
+                    <span style={{ color: '#c00' }}>{error}</span>
+                ) : probability !== null ? (
+                    <span style={{
+                        fontWeight: 'bold',
+                        color: probability > 50 ? '#0f0' : probability > 20 ? '#ff0' : '#888'
+                    }}>
+                        {probability}% chance visible
+                    </span>
+                ) : (
+                    <span style={{ opacity: 0.6 }}>No data</span>
+                )}
+            </div>
+        </div>
+    );
+}
+
+ViewlineProbability.propTypes = {
+    selectedLat: PropTypes.number.isRequired,
+    onLatChange: PropTypes.func.isRequired,
+};
+
+/**
  * Aurora Forecast Map Component
  */
 export default function AuroraForecastMap({ loading }) {
@@ -143,6 +244,7 @@ export default function AuroraForecastMap({ loading }) {
     const [currentKp, setCurrentKp] = useState(null);
     const [kpForecast, setKpForecast] = useState([]);
     const [kpLoading, setKpLoading] = useState(true);
+    const [selectedLat, setSelectedLat] = useState(55);  // Default to 55°N
 
     const imageUrls = getAuroraImageUrls();
     const currentUrl = hemisphere === 'northern' ? imageUrls.northern : imageUrls.southern;
@@ -171,7 +273,7 @@ export default function AuroraForecastMap({ loading }) {
 
     useEffect(() => {
         fetchKpData();
-        const interval = setInterval(fetchKpData, 300000); // Every 5 minutes
+        const interval = setInterval(fetchKpData, REFRESH_INTERVAL_MS);
         return () => clearInterval(interval);
     }, [fetchKpData]);
 
@@ -231,6 +333,12 @@ export default function AuroraForecastMap({ loading }) {
 
             {/* Best Viewing Time */}
             <BestViewingTime forecast={kpForecast} />
+
+            {/* Viewline Probability */}
+            <ViewlineProbability
+                selectedLat={selectedLat}
+                onLatChange={setSelectedLat}
+            />
 
             {/* Map container */}
             <div style={{

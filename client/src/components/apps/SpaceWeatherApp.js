@@ -29,6 +29,7 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
     const [kpIndex, setKpIndex] = useState([]);
     const [solarRegions, setSolarRegions] = useState([]);
     const [noaaLoading, setNoaaLoading] = useState(true);
+    const [alertsLastRefresh, setAlertsLastRefresh] = useState(null);
 
     // DONKI data
     const [donkiEvents, setDonkiEvents] = useState([]);
@@ -58,6 +59,7 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
             setAlerts(alertsData);
             setKpIndex(kpData);
             setSolarRegions(regionsData);
+            setAlertsLastRefresh(new Date());
         } catch (err) {
             console.error('NOAA fetch error:', err);
             setError('Failed to load NOAA data');
@@ -171,7 +173,13 @@ export default function SpaceWeatherApp({ windowId: _windowId }) {
 
                 {/* ALERTS TAB */}
                 {activeTab === 'alerts' && (
-                    <AlertsTicker alerts={alerts} loading={noaaLoading} maxVisible={10} />
+                    <AlertsTicker
+                        alerts={alerts}
+                        loading={noaaLoading}
+                        maxVisible={10}
+                        onRefresh={fetchNoaaData}
+                        lastRefresh={alertsLastRefresh}
+                    />
                 )}
 
                 {/* GOES SATELLITE TAB */}

@@ -95,7 +95,7 @@ FilterButton.propTypes = {
 /**
  * Alerts Ticker Component
  */
-export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefresh }) {
+export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefresh, lastRefresh }) {
     const [selectedAlert, setSelectedAlert] = useState(null);
     const [expandedId, setExpandedId] = useState(null);
     const [showTimeline, setShowTimeline] = useState(false);
@@ -190,6 +190,13 @@ export default function AlertsTicker({ alerts, loading, maxVisible = 10, onRefre
                     )}
                 </div>
             </div>
+
+            {/* Last refresh timestamp */}
+            {lastRefresh && (
+                <div style={{ fontSize: '8px', opacity: 0.5, marginBottom: '4px', textAlign: 'right' }}>
+                    Updated: {new Date(lastRefresh).toLocaleTimeString()}
+                </div>
+            )}
 
             {/* Filter buttons */}
             <div style={{ display: 'flex', gap: '2px', marginBottom: '4px', flexWrap: 'wrap' }}>
@@ -374,6 +381,7 @@ AlertsTicker.propTypes = {
     loading: PropTypes.bool,
     maxVisible: PropTypes.number,
     onRefresh: PropTypes.func,
+    lastRefresh: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)]),
 };
 
 AlertsTicker.defaultProps = {
@@ -381,4 +389,5 @@ AlertsTicker.defaultProps = {
     loading: false,
     maxVisible: 10,
     onRefresh: null,
+    lastRefresh: null,
 };

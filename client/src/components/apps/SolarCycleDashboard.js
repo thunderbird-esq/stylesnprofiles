@@ -10,7 +10,13 @@ import {
     getSunspotReport,
     getPredictedSunspotNumber,
     get10cmFlux,
+    getSolarCycle25SSN,
 } from '../../services/noaaSwpcApi';
+
+// Constants - solar cycle 25 predictions
+const CYCLE_25_PEAK_SSN = 180;  // NOAA prediction
+const CYCLE_25_PEAK_DATE = '2024-2025';
+const CYCLE_25_START = 'Dec 2019';
 
 /**
  * Progress bar for cycle position
@@ -172,7 +178,7 @@ export default function SolarCycleDashboard({ onError }) {
     const [sunspots, setSunspots] = useState([]);
     const [predictions, setPredictions] = useState([]);
     const [flux10cm, setFlux10cm] = useState([]);
-    // const [cycle25, setCycle25] = useState([]); // Reserved for future use
+    const [cycle25Data, setCycle25Data] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -181,17 +187,17 @@ export default function SolarCycleDashboard({ onError }) {
         setError(null);
 
         try {
-            const [spots, predicted, flux] = await Promise.all([
+            const [spots, predicted, flux, cycle25] = await Promise.all([
                 getSunspotReport(),
                 getPredictedSunspotNumber(),
                 get10cmFlux(),
-                // getSolarCycle25SSN().catch(() => []), // Removed as cycle25 is commented out
+                getSolarCycle25SSN().catch(() => []),
             ]);
 
             setSunspots(spots);
             setPredictions(predicted);
             setFlux10cm(flux);
-            // setCycle25(c25); // Removed as cycle25 is commented out
+            setCycle25Data(cycle25);
         } catch (err) {
             console.error('Solar cycle error:', err);
             setError(err.message);
@@ -210,9 +216,10 @@ export default function SolarCycleDashboard({ onError }) {
         ? parseFloat(predictions[predictions.length - 1]?.predicted_ssn || 0)
         : null;
 
-    // Cycle 25 predicted peak
-    const peakSSN = 180; // NOAA prediction
-    const peakDate = '2024-2025';
+    // Use cycle25Data if available, otherwise use constants
+    const peakSSN = cycle25Data.length > 0
+        ? Math.max(...cycle25Data.map(d => parseFloat(d.high_value) || 0))
+        : CYCLE_25_PEAK_SSN;
 
     if (loading && sunspots.length === 0) {
         return (
@@ -248,8 +255,8 @@ export default function SolarCycleDashboard({ onError }) {
             <CycleProgress
                 current={currentSSN}
                 peak={peakSSN}
-                cycleStart="Dec 2019"
-                peakDate={peakDate}
+                cycleStart={CYCLE_25_START}
+                peakDate={CYCLE_25_PEAK_DATE}
             />
 
             {/* F10.7 Trend */}
