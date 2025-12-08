@@ -36,7 +36,7 @@ function TimeSeriesChart({
     unit = '',
     invertY = false,
 }) {
-    if (!data || data.length === 0) return null;
+    if (!data || data.length < 2) return null;
 
     const width = 280;
     const padding = { left: 30, right: 5, top: 5, bottom: 15 };
@@ -193,9 +193,14 @@ export default function SolarWindCharts({ onError }) {
             setMagData(mag.slice(-200));
             setPlasmaData(plasma.slice(-200));
             setDstData(dst.slice(-100));
+
+            // Safe access for summary values
+            const lastPlasma = plasma.length > 0 ? plasma[plasma.length - 1] : null;
+            const lastMag = mag.length > 0 ? mag[mag.length - 1] : null;
+
             setSummary({
-                speed: speedSum?.WindSpeed || plasma[plasma.length - 1]?.speed,
-                bz: bzSum?.Bz || mag[mag.length - 1]?.bz,
+                speed: speedSum?.WindSpeed || lastPlasma?.speed || null,
+                bz: bzSum?.Bz || lastMag?.bz || null,
             });
         } catch (err) {
             console.error('Solar wind error:', err);
