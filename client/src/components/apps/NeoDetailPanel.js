@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import NeoOrbitViewer from './NeoOrbitViewer';
+import { CountdownTimer } from '../shared/DataVisuals';
 
 /**
  * Format a number with thousands separators
@@ -13,6 +14,33 @@ import NeoOrbitViewer from './NeoOrbitViewer';
 const formatNumber = (num) => {
     if (num === undefined || num === null) return 'N/A';
     return Number(num).toLocaleString();
+};
+
+/**
+ * Get size comparison to familiar objects
+ */
+const getSizeComparison = (meters) => {
+    if (!meters) return null;
+    const comparisons = [
+        { name: 'car', size: 4.5, emoji: '🚗' },
+        { name: 'bus', size: 12, emoji: '🚌' },
+        { name: 'Boeing 747', size: 70.7, emoji: '✈️' },
+        { name: 'Statue of Liberty', size: 93, emoji: '🗽' },
+        { name: 'football field', size: 109, emoji: '🏈' },
+        { name: 'Eiffel Tower', size: 330, emoji: '🗼' },
+        { name: 'Empire State Building', size: 443, emoji: '🏙️' },
+    ];
+
+    for (const item of comparisons) {
+        if (meters <= item.size * 1.5) {
+            const ratio = (meters / item.size).toFixed(1);
+            return `${item.emoji} ~${ratio}x ${item.name}`;
+        }
+    }
+
+    // Larger than all comparisons
+    const ratio = (meters / 443).toFixed(1);
+    return `🏙️ ${ratio}x Empire State Building`;
 };
 
 /**
@@ -77,6 +105,48 @@ export default function NeoDetailPanel({ neo, onClose }) {
                     🌍 View 3D Orbit Trajectory
                 </button>
             </div>
+
+            {/* Countdown Timer for Future Approaches */}
+            {closeApproach && closeApproach.close_approach_date && (
+                <div style={{
+                    padding: '12px',
+                    border: '2px solid var(--secondary)',
+                    marginBottom: '12px',
+                    textAlign: 'center',
+                    background: 'rgba(0,0,0,0.05)',
+                }}>
+                    <div style={{ fontSize: 'var(--font-size-caption)', marginBottom: '4px' }}>
+                        ⏱️ Time to Closest Approach
+                    </div>
+                    <div style={{ fontSize: 'var(--font-size-xxl)', fontFamily: 'Monaco, monospace' }}>
+                        <CountdownTimer
+                            targetDate={closeApproach.close_approach_date_full || closeApproach.close_approach_date}
+                            label=""
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* Size Comparison - makes it tangible */}
+            {diameter.estimated_diameter_max && (
+                <div style={{
+                    padding: '10px',
+                    border: '1px solid var(--tertiary)',
+                    marginBottom: '12px',
+                    textAlign: 'center',
+                    background: 'rgba(255,200,0,0.1)',
+                }}>
+                    <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'bold' }}>
+                        📏 Size Comparison
+                    </div>
+                    <div style={{ fontSize: 'var(--font-size-xl)', marginTop: '4px' }}>
+                        {getSizeComparison(diameter.estimated_diameter_max)}
+                    </div>
+                    <div style={{ fontSize: 'var(--font-size-base)', opacity: 0.7, marginTop: '4px' }}>
+                        ({formatNumber(diameter.estimated_diameter_min?.toFixed(0))} - {formatNumber(diameter.estimated_diameter_max?.toFixed(0))} meters)
+                    </div>
+                </div>
+            )}
 
             {/* Basic Info */}
             <div className="nasa-data-section">

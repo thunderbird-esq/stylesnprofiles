@@ -101,6 +101,37 @@ export default function KpIndexChart({ data, loading, height = 120 }) {
                 </span>
             </div>
 
+            {/* Aurora Probability Banner - only show if Kp >= 3 */}
+            {currentKp >= 3 && (
+                <div style={{
+                    padding: '8px',
+                    marginBottom: '6px',
+                    background: 'linear-gradient(90deg, #006600, #00cc00, #006600)',
+                    color: '#fff',
+                    textAlign: 'center',
+                    border: '1px solid #009900',
+                    position: 'relative',
+                    overflow: 'hidden',
+                }}
+                    className={currentKp >= 5 ? 'animate-pulse' : ''}
+                >
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                        <span style={{ fontSize: 'var(--font-size-lg)' }}>
+                            {currentKp >= 7 ? '🌌✨ EXTREME AURORA LIKELY!' :
+                                currentKp >= 5 ? '🌌 AURORA VISIBLE!' :
+                                    currentKp >= 4 ? '✨ High Aurora Chance' :
+                                        '🌙 Aurora Possible'}
+                        </span>
+                        <div style={{ fontSize: 'var(--font-size-caption)', marginTop: '2px' }}>
+                            {currentKp >= 7 ? 'Visible at low latitudes! (US/UK)' :
+                                currentKp >= 5 ? 'Visible at mid-latitudes (Canada/Scotland)' :
+                                    currentKp >= 4 ? 'Visible at high latitudes (Alaska/Norway)' :
+                                        'Visible near Arctic Circle'}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Chart with threshold lines */}
             <div style={{
                 position: 'relative',
