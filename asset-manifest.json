@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/stylesnprofiles/static/css/main.948c24c5.css",
-    "main.js": "/stylesnprofiles/static/js/main.63b85b35.js",
+    "main.css": "/stylesnprofiles/static/css/main.3d5d83ca.css",
+    "main.js": "/stylesnprofiles/static/js/main.5bc444d4.js",
     "static/media/ChicagoFLF.woff": "/stylesnprofiles/static/media/ChicagoFLF.1fc01d6b69fad63e3bf5.woff",
     "static/media/ChicagoFLF.woff2": "/stylesnprofiles/static/media/ChicagoFLF.835bc739763a639988e2.woff2",
     "static/media/ChiKareGo2.woff": "/stylesnprofiles/static/media/ChiKareGo2.3bf61dbb305fae41689f.woff",
@@ -17,11 +17,11 @@
     "static/media/button-default.svg": "/stylesnprofiles/static/media/button-default.33d9fa956730ecacb13b.svg",
     "index.html": "/stylesnprofiles/index.html",
     "static/media/button.svg": "/stylesnprofiles/static/media/button.692d8269c01a5c4053ec.svg",
-    "main.948c24c5.css.map": "/stylesnprofiles/static/css/main.948c24c5.css.map",
-    "main.63b85b35.js.map": "/stylesnprofiles/static/js/main.63b85b35.js.map"
+    "main.3d5d83ca.css.map": "/stylesnprofiles/static/css/main.3d5d83ca.css.map",
+    "main.5bc444d4.js.map": "/stylesnprofiles/static/js/main.5bc444d4.js.map"
   },
   "entrypoints": [
-    "static/css/main.948c24c5.css",
-    "static/js/main.63b85b35.js"
+    "static/css/main.3d5d83ca.css",
+    "static/js/main.5bc444d4.js"
   ]
 }
