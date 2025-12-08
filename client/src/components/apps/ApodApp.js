@@ -37,6 +37,8 @@ export default function ApodApp({ windowId: _windowId }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showZoom, setShowZoom] = useState(false);
   const [showMetadata, setShowMetadata] = useState(false);
+  const [kenBurns, setKenBurns] = useState(false); // Ken Burns zoom effect
+  const [showCalendar, setShowCalendar] = useState(false); // Calendar view toggle
 
   const today = new Date();
   const isToday = formatDate(currentDate) === formatDate(today);
@@ -146,6 +148,21 @@ export default function ApodApp({ windowId: _windowId }) {
               Today
             </button>
           )}
+          <button
+            className={kenBurns ? 'btn btn-active' : 'btn'}
+            onClick={() => setKenBurns(!kenBurns)}
+            title="Ken Burns zoom effect"
+            style={{ marginLeft: '4px' }}
+          >
+            🎬
+          </button>
+          <button
+            className={showCalendar ? 'btn btn-active' : 'btn'}
+            onClick={() => setShowCalendar(!showCalendar)}
+            title="Calendar view"
+          >
+            📅
+          </button>
         </div>
         <input
           type="date"
@@ -178,11 +195,15 @@ export default function ApodApp({ windowId: _windowId }) {
             src={apodData.url}
             alt={apodData.title}
             onClick={() => setShowZoom(true)}
+            className={kenBurns ? 'ken-burns-active' : ''}
             style={{
               maxWidth: '100%',
               height: 'auto',
               border: '1px solid var(--secondary)',
               cursor: 'zoom-in',
+              transition: kenBurns ? 'transform 20s ease-out' : 'none',
+              transform: kenBurns ? 'scale(1.1)' : 'scale(1)',
+              transformOrigin: 'center center',
             }}
           />
           {/* Metadata Overlay */}

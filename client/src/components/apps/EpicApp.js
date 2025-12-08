@@ -16,6 +16,7 @@ export default function EpicApp({ windowId: _windowId }) {
     const [collection, setCollection] = useState('natural');
     const [date, setDate] = useState('');
     const [isPlaying, setIsPlaying] = useState(false);
+    const [playbackSpeed, setPlaybackSpeed] = useState(350); // ms between frames
     const animationRef = useRef(null);
 
     const fetchImages = useCallback(() => {
@@ -48,12 +49,12 @@ export default function EpicApp({ windowId: _windowId }) {
         if (isPlaying && images.length > 1) {
             animationRef.current = setInterval(() => {
                 setSelectedIndex(i => (i + 1) % images.length);
-            }, 350);
+            }, playbackSpeed);
         }
         return () => {
             if (animationRef.current) clearInterval(animationRef.current);
         };
-    }, [isPlaying, images.length]);
+    }, [isPlaying, images.length, playbackSpeed]);
 
     const currentImage = images[selectedIndex];
 
@@ -169,6 +170,34 @@ export default function EpicApp({ windowId: _windowId }) {
                             <button className="btn" onClick={handleNext} style={{ fontSize: '11px', padding: '2px 8px' }}>
                                 Next ▶
                             </button>
+
+                            {/* Speed controls */}
+                            <div style={{
+                                marginLeft: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '2px',
+                                borderLeft: '1px solid var(--tertiary)',
+                                paddingLeft: '8px',
+                            }}>
+                                <span style={{ fontSize: '9px', opacity: 0.7 }}>Speed:</span>
+                                {[700, 350, 150, 50].map(speed => (
+                                    <button
+                                        key={speed}
+                                        className={playbackSpeed === speed ? 'btn btn-active' : 'btn'}
+                                        onClick={() => setPlaybackSpeed(speed)}
+                                        style={{
+                                            fontSize: '9px',
+                                            padding: '1px 4px',
+                                            minWidth: '22px'
+                                        }}
+                                        title={`${speed === 700 ? 'Slow' : speed === 350 ? 'Normal' : speed === 150 ? 'Fast' : 'Rapid'}`}
+                                    >
+                                        {speed === 700 ? '🐢' : speed === 350 ? '▶' : speed === 150 ? '▶▶' : '🚀'}
+                                    </button>
+                                ))}
+                            </div>
+
                             <span style={{ fontSize: '11px', marginLeft: '8px' }}>
                                 {selectedIndex + 1} / {images.length}
                             </span>

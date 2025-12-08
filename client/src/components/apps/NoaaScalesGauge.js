@@ -9,56 +9,102 @@ import PropTypes from 'prop-types';
 import { getScaleSeverity } from '../../services/noaaSwpcApi';
 
 /**
- * Single scale gauge (0-5)
+ * Single scale gauge (0-5) with enhanced visual effects
  */
 function ScaleGauge({ type, label, value, description }) {
     const severity = getScaleSeverity(value, type);
+    const isActive = severity.level > 0;
+    const isCritical = severity.level >= 4;
+    const isWarning = severity.level >= 2;
+
+    // Determine glow class based on severity
+    const getGlowClass = () => {
+        if (isCritical) return 'animate-heartbeat';
+        if (isWarning) return 'animate-pulse';
+        if (isActive) return '';
+        return '';
+    };
 
     return (
         <div style={{
             flex: 1,
             padding: '6px',
-            border: '1px solid var(--tertiary)',
+            border: `1px solid ${isActive ? severity.color : 'var(--tertiary)'}`,
             textAlign: 'center',
             minWidth: '80px',
+            background: isActive ? `rgba(${severity.level >= 3 ? '255,0,0' : severity.level >= 2 ? '255,153,0' : '255,255,0'}, 0.05)` : 'transparent',
+            transition: 'all 0.3s ease',
         }}>
-            {/* Label */}
-            <div style={{ fontSize: 'var(--font-size-label)', fontWeight: 'bold', marginBottom: '4px' }}>
+            {/* Label with live indicator for active scales */}
+            <div style={{
+                fontSize: 'var(--font-size-label)',
+                fontWeight: 'bold',
+                marginBottom: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px'
+            }}>
+                {isActive && (
+                    <span
+                        style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: severity.color,
+                            boxShadow: `0 0 6px ${severity.color}`,
+                        }}
+                        className="animate-pulse"
+                    />
+                )}
                 {label}
             </div>
 
-            {/* Gauge visual */}
+            {/* Gauge visual with glow effect on active bars */}
             <div style={{
                 display: 'flex',
                 gap: '2px',
                 justifyContent: 'center',
                 marginBottom: '4px',
             }}>
-                {[0, 1, 2, 3, 4, 5].map(level => (
-                    <div
-                        key={level}
-                        style={{
-                            width: '10px',
-                            height: '16px',
-                            background: level <= severity.level ? severity.color : '#ddd',
-                            border: '1px solid var(--secondary)',
-                        }}
-                        title={`${type}${level}`}
-                    />
-                ))}
+                {[0, 1, 2, 3, 4, 5].map(level => {
+                    const isLit = level <= severity.level && level > 0;
+                    return (
+                        <div
+                            key={level}
+                            style={{
+                                width: '10px',
+                                height: '16px',
+                                background: isLit ? severity.color : '#ddd',
+                                border: '1px solid var(--secondary)',
+                                boxShadow: isLit ? `0 0 4px ${severity.color}` : 'none',
+                                transition: 'all 0.3s ease',
+                            }}
+                            title={`${type}${level}`}
+                        />
+                    );
+                })}
             </div>
 
-            {/* Value */}
-            <div style={{
-                fontSize: 'var(--font-size-body)',
-                fontWeight: 'bold',
-                color: severity.color,
-            }}>
+            {/* Value with glow and animation */}
+            <div
+                className={getGlowClass()}
+                style={{
+                    fontSize: 'var(--font-size-body)',
+                    fontWeight: 'bold',
+                    color: severity.color,
+                    textShadow: isActive ? `0 0 8px ${severity.color}` : 'none',
+                }}
+            >
                 {severity.level > 0 ? `${type}${severity.level}` : '—'}
             </div>
 
             {/* Severity text */}
-            <div style={{ fontSize: 'var(--font-size-caption)', opacity: 0.8 }}>
+            <div style={{
+                fontSize: 'var(--font-size-caption)',
+                opacity: 0.8,
+                fontWeight: isWarning ? 'bold' : 'normal',
+            }}>
                 {severity.text}
             </div>
 
