@@ -288,6 +288,44 @@ export const getSmallBodyData = async (designation) => {
 };
 
 // ============================================
+// Fireball/Bolide Events (Meteoroid Impacts)
+// ============================================
+
+/**
+ * Fetches fireball/bolide events detected by US government sensors
+ * These are bright meteors caused by small asteroids entering Earth's atmosphere
+ * @param {Object} options - Query options  
+ * @param {string} [options.dateMin] - Minimum date YYYY-MM-DD
+ * @param {string} [options.dateMax] - Maximum date YYYY-MM-DD
+ * @param {number} [options.limit=50] - Maximum number of events
+ * @param {number} [options.minEnergy] - Minimum energy in kilotons
+ */
+export const getFireballEvents = async ({ dateMin, dateMax, limit = 50, minEnergy } = {}) => {
+  const params = { limit };
+  if (dateMin) params['date-min'] = dateMin;
+  if (dateMax) params['date-max'] = dateMax;
+  if (minEnergy) params['energy-min'] = minEnergy;
+
+  console.log('☄️🔥 Fireball Events Request');
+  const response = await axios.get(`${SSD_BASE}/fireball.api`, { params });
+
+  // Transform the array data into objects
+  // API returns: [date, energy, impact_e, lat, lat_dir, lon, lon_dir, alt, vel]
+  if (response.data?.data && response.data?.fields) {
+    const fields = response.data.fields;
+    response.data.events = response.data.data.map(row => {
+      const event = {};
+      fields.forEach((field, i) => {
+        event[field] = row[i];
+      });
+      return event;
+    });
+  }
+
+  return response;
+};
+
+// ============================================
 // Exoplanet Archive
 // ============================================
 

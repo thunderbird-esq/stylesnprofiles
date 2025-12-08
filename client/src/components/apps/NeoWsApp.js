@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { getNeoFeed } from '../../services/nasaApi';
 import { SaveButton } from '../favorites';
 import NeoDetailPanel from './NeoDetailPanel';
+import FireballPanel from './FireballPanel';
 import '../favorites/favorites.css';
 
 /**
@@ -20,6 +21,7 @@ export default function NeoWsApp({ windowId: _windowId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedNeo, setSelectedNeo] = useState(null);
+  const [activeTab, setActiveTab] = useState('asteroids'); // 'asteroids' or 'fireballs'
 
   useEffect(() => {
     const today = new Date();
@@ -63,49 +65,88 @@ export default function NeoWsApp({ windowId: _windowId }) {
 
   return (
     <div className="nasa-data-section" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>☄️ Near Earth Objects ({todayStr})</div>
-      <div style={{ fontSize: 'var(--font-size-lg)', marginBottom: '6px', opacity: 0.8 }}>
-        Tracking {neoData.element_count} objects today
+      {/* Header with Tabs */}
+      <div className="nasa-data-title" style={{ fontSize: 'var(--font-size-lg)' }}>
+        ☄️ Near Earth Objects
       </div>
 
-      {/* Stats Summary */}
+      {/* Tab Navigation */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
+        display: 'flex',
         gap: '4px',
         marginBottom: '8px',
-        fontSize: 'var(--font-size-base)',
+        borderBottom: '1px solid var(--secondary)',
+        paddingBottom: '4px',
       }}>
-        <div style={{
-          padding: '6px',
-          border: '1px solid var(--secondary)',
-          textAlign: 'center',
-          background: hazardousCount > 0 ? '#fcc' : 'var(--primary)',
-        }}>
-          <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
-            {hazardousCount > 0 ? '⚠️' : '✓'} {hazardousCount}
-          </div>
-          <div>Hazardous</div>
-        </div>
-        <div style={{ padding: '6px', border: '1px solid var(--secondary)', textAlign: 'center' }}>
-          <div style={{ fontWeight: 'bold', fontSize: '16px' }}>📏 {avgSize}m</div>
-          <div>Avg Size</div>
-        </div>
-        <div style={{ padding: '6px', border: '1px solid var(--secondary)', textAlign: 'center' }}>
-          <div style={{ fontWeight: 'bold', fontSize: '16px' }}>📍 {Math.round(closestNeo.dist).toLocaleString()}</div>
-          <div>Closest (km)</div>
-        </div>
+        <button
+          className={activeTab === 'asteroids' ? 'btn btn-active' : 'btn'}
+          onClick={() => setActiveTab('asteroids')}
+          style={{ fontSize: 'var(--font-size-lg)', padding: '4px 12px' }}
+        >
+          🪨 Asteroids ({neoData?.element_count || 0})
+        </button>
+        <button
+          className={activeTab === 'fireballs' ? 'btn btn-active' : 'btn'}
+          onClick={() => setActiveTab('fireballs')}
+          style={{ fontSize: 'var(--font-size-lg)', padding: '4px 12px' }}
+        >
+          🔥 Fireballs
+        </button>
       </div>
 
-      {/* NEO List with Visual Indicators */}
-      <div style={{ flex: 1, overflow: 'auto' }}>
-        {neos.length > 0 ? (
-          neos.map(neo => <NeoListItem key={neo.id} neo={neo} onSelect={setSelectedNeo} />)
-        ) : (
-          <div className="nasa-data-content">No objects tracked for today.</div>
-        )}
-      </div>
+      {/* Fireballs Tab */}
+      {activeTab === 'fireballs' && (
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          <FireballPanel embedded={true} />
+        </div>
+      )}
+
+      {/* Asteroids Tab */}
+      {activeTab === 'asteroids' && (
+        <>
+          <div style={{ fontSize: 'var(--font-size-lg)', marginBottom: '6px', opacity: 0.8 }}>
+            Tracking {neoData.element_count} objects today ({todayStr})
+          </div>
+
+          {/* Stats Summary */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '4px',
+            marginBottom: '8px',
+            fontSize: 'var(--font-size-base)',
+          }}>
+            <div style={{
+              padding: '6px',
+              border: '1px solid var(--secondary)',
+              textAlign: 'center',
+              background: hazardousCount > 0 ? '#fcc' : 'var(--primary)',
+            }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                {hazardousCount > 0 ? '⚠️' : '✓'} {hazardousCount}
+              </div>
+              <div>Hazardous</div>
+            </div>
+            <div style={{ padding: '6px', border: '1px solid var(--secondary)', textAlign: 'center' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>📏 {avgSize}m</div>
+              <div>Avg Size</div>
+            </div>
+            <div style={{ padding: '6px', border: '1px solid var(--secondary)', textAlign: 'center' }}>
+              <div style={{ fontWeight: 'bold', fontSize: '16px' }}>📍 {Math.round(closestNeo.dist).toLocaleString()}</div>
+              <div>Closest (km)</div>
+            </div>
+          </div>
+
+          {/* NEO List with Visual Indicators */}
+          <div style={{ flex: 1, overflow: 'auto' }}>
+            {neos.length > 0 ? (
+              neos.map(neo => <NeoListItem key={neo.id} neo={neo} onSelect={setSelectedNeo} />)
+            ) : (
+              <div className="nasa-data-content">No objects tracked for today.</div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
