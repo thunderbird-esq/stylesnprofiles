@@ -78,11 +78,12 @@ body {
   background-image: none;
 }
 
-/* Override system.css body background for System 6 desktop */
-body {
+/* Override system.css body background for cleaner desktop if needed */
+/* Commented out to preserve HIG 8x8px desktop pattern */
+/* body {
   background: var(--primary) !important;
   background-image: none !important;
-}
+} */
 
 /* NASA Menu Bar styling - System 6 authentic */
 .nasa-menu-bar {
@@ -225,10 +226,13 @@ body {
 /* NASA Window styling for System 6 integration */
 .nasa-window {
   position: absolute;
+  display: flex;
+  flex-direction: column;
   min-width: 300px;
   min-height: 200px;
-  border: 2px solid var(--secondary);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3);
+  /* Border is inherited from system.css .window class (2px solid) */
+  background-color: var(--primary);
+  overflow: visible;
 }
 
 .nasa-window:focus {
@@ -256,8 +260,30 @@ body {
   cursor: se-resize;
   z-index: 10;
   background:
-    linear-gradient(135deg, transparent 0%, transparent 35%, var(--secondary) 35%, var(--secondary) 45%, transparent 45%, transparent 65%, var(--secondary) 65%, var(--secondary) 75%, transparent 75%),
-    linear-gradient(45deg, transparent 0%, transparent 35%, var(--secondary) 35%, var(--secondary) 45%, transparent 45%, transparent 65%, var(--secondary) 65%, var(--secondary) 75%, transparent 75%);
+    linear-gradient(
+      135deg,
+      transparent 0%,
+      transparent 35%,
+      var(--secondary) 35%,
+      var(--secondary) 45%,
+      transparent 45%,
+      transparent 65%,
+      var(--secondary) 65%,
+      var(--secondary) 75%,
+      transparent 75%
+    ),
+    linear-gradient(
+      45deg,
+      transparent 0%,
+      transparent 35%,
+      var(--secondary) 35%,
+      var(--secondary) 45%,
+      transparent 45%,
+      transparent 65%,
+      var(--secondary) 65%,
+      var(--secondary) 75%,
+      transparent 75%
+    );
   background-size: 8px 8px;
   border-left: 1px solid var(--secondary);
   border-top: 1px solid var(--secondary);
