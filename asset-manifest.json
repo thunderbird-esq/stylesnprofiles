@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/stylesnprofiles/static/css/main.3d5d83ca.css",
-    "main.js": "/stylesnprofiles/static/js/main.5bc444d4.js",
+    "main.css": "/stylesnprofiles/static/css/main.11f7e0a2.css",
+    "main.js": "/stylesnprofiles/static/js/main.ec39c63c.js",
     "static/media/ChicagoFLF.woff": "/stylesnprofiles/static/media/ChicagoFLF.1fc01d6b69fad63e3bf5.woff",
     "static/media/ChicagoFLF.woff2": "/stylesnprofiles/static/media/ChicagoFLF.835bc739763a639988e2.woff2",
     "static/media/ChiKareGo2.woff": "/stylesnprofiles/static/media/ChiKareGo2.3bf61dbb305fae41689f.woff",
@@ -10,18 +10,14 @@
     "static/media/monaco.woff": "/stylesnprofiles/static/media/monaco.1533e461f14a5d071443.woff",
     "static/media/FindersKeepers.woff2": "/stylesnprofiles/static/media/FindersKeepers.a04bc38817a829a7b4f7.woff2",
     "static/media/monaco.woff2": "/stylesnprofiles/static/media/monaco.9f0c755ba32552ecfd97.woff2",
-    "static/media/scrollbar-down-active.svg": "/stylesnprofiles/static/media/scrollbar-down-active.9e6c36d99f9a44af0a59.svg",
-    "static/media/scrollbar-left-active.svg": "/stylesnprofiles/static/media/scrollbar-left-active.9753c90356e4e957dece.svg",
-    "static/media/scrollbar-up-active.svg": "/stylesnprofiles/static/media/scrollbar-up-active.98d9f1d4dd226c31b9b2.svg",
-    "static/media/scrollbar-right-active.svg": "/stylesnprofiles/static/media/scrollbar-right-active.c48e9adad8da075461dd.svg",
     "static/media/button-default.svg": "/stylesnprofiles/static/media/button-default.33d9fa956730ecacb13b.svg",
     "index.html": "/stylesnprofiles/index.html",
     "static/media/button.svg": "/stylesnprofiles/static/media/button.692d8269c01a5c4053ec.svg",
-    "main.3d5d83ca.css.map": "/stylesnprofiles/static/css/main.3d5d83ca.css.map",
-    "main.5bc444d4.js.map": "/stylesnprofiles/static/js/main.5bc444d4.js.map"
+    "main.11f7e0a2.css.map": "/stylesnprofiles/static/css/main.11f7e0a2.css.map",
+    "main.ec39c63c.js.map": "/stylesnprofiles/static/js/main.ec39c63c.js.map"
   },
   "entrypoints": [
-    "static/css/main.3d5d83ca.css",
-    "static/js/main.5bc444d4.js"
+    "static/css/main.11f7e0a2.css",
+    "static/js/main.ec39c63c.js"
   ]
 }
