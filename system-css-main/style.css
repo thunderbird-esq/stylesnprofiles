@@ -137,47 +137,47 @@
 
 ::-webkit-scrollbar-button:vertical:start {
   background-repeat: no-repeat;
-  height: 18px;
+  height: 16px;
   background-image: svg-load("./icon/scrollbar-up.svg");
 }
 
 ::-webkit-scrollbar-button:vertical:start:active {
   background-repeat: no-repeat;
-  height: 18px;
+  height: 16px;
   background-image: svg-load("./icon/scrollbar-up-active.svg");
 }
 
 ::-webkit-scrollbar-button:vertical:end {
-  height: 18px;
+  height: 16px;
   background-image: svg-load("./icon/scrollbar-down.svg");
 }
 
 ::-webkit-scrollbar-button:vertical:end:active {
   background-repeat: no-repeat;
-  height: 18px;
+  height: 16px;
   background-image: svg-load("./icon/scrollbar-down-active.svg");
 }
 
 ::-webkit-scrollbar-button:horizontal:start {
   background-repeat: no-repeat;
-  height: 18px;
+  height: 16px;
   background-image: svg-load("./icon/scrollbar-left.svg");
 }
 
 ::-webkit-scrollbar-button:horizontal:start:active {
   background-repeat: no-repeat;
-  height: 18px;
+  height: 16px;
   background-image: svg-load("./icon/scrollbar-left-active.svg");
 }
 
 ::-webkit-scrollbar-button:horizontal:end {
-  height: 18px;
+  height: 16px;
   background-image: svg-load("./icon/scrollbar-right.svg");
 }
 
 ::-webkit-scrollbar-button:horizontal:end:active {
   background-repeat: no-repeat;
-  height: 18px;
+  height: 16px;
   background-image: svg-load("./icon/scrollbar-right-active.svg");
 }
 
