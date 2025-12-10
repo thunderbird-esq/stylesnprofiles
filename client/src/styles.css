@@ -90,8 +90,8 @@ body {
   left: 0;
   right: 0;
   height: 20px;
-  background-color: var(--primary) !important;
-  border-bottom: 2px solid var(--secondary) !important;
+  background-color: #fff !important;
+  border-bottom: 2px solid #000 !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -154,11 +154,11 @@ body {
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: var(--primary) !important;
-  border: 2px solid var(--secondary) !important;
+  background-color: #fff !important;
+  border: 2px solid #000 !important;
   min-width: 150px;
   z-index: 1001;
-  box-shadow: 2px 2px 0 0 var(--secondary) !important;
+  box-shadow: 2px 2px 0 0 #000 !important;
   overflow: hidden;
 }
 
@@ -228,10 +228,10 @@ body {
   flex-direction: column;
   min-width: 300px;
   min-height: 200px;
-  /* Explicit styles with !important to ensure visibility */
-  border: 2px solid var(--secondary) !important;
-  background-color: var(--primary) !important;
-  box-shadow: 2px 2px 0 0 var(--secondary) !important;
+  /* Explicit styles with !important and hardcoded colors for guaranteed visibility */
+  border: 2px solid #000 !important;
+  background-color: #fff !important;
+  box-shadow: 2px 2px 0 0 #000 !important;
   overflow: visible;
 }
 
@@ -259,9 +259,9 @@ body {
   height: 16px;
   cursor: se-resize;
   z-index: 10;
-  background-color: var(--primary);
-  border-left: 2px solid var(--secondary);
-  border-top: 2px solid var(--secondary);
+  background-color: #fff;
+  border-left: 2px solid #000;
+  border-top: 2px solid #000;
   background-image:
     repeating-linear-gradient(
       45deg,
