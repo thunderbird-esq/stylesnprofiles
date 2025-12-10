@@ -15,8 +15,8 @@
   /* Title bar standard height in System 6 */
   --hig-title-bar-height: 20px;
 
-  /* Authentic System 6 scrollbar width (16px) */
-  --hig-scrollbar-width: 16px;
+  /* Authentic System 6 scrollbar width (adjusted to 18px for modern visibility) */
+  --hig-scrollbar-width: 18px;
 
   /* Button minimum dimensions per HIG */
   --hig-button-min-width: 59px;
@@ -137,41 +137,41 @@
 
 ::-webkit-scrollbar-button:vertical:start {
   background-repeat: no-repeat;
-  height: 16px;
+  height: 18px;
   background-image: svg-load("./icon/scrollbar-up.svg");
 }
 
 ::-webkit-scrollbar-button:vertical:start:active {
   background-repeat: no-repeat;
-  height: 16px;
+  height: 18px;
   background-image: svg-load("./icon/scrollbar-up-active.svg");
 }
 
 ::-webkit-scrollbar-button:vertical:end {
-  height: 16px;
+  height: 18px;
   background-image: svg-load("./icon/scrollbar-down.svg");
 }
 
 ::-webkit-scrollbar-button:vertical:end:active {
   background-repeat: no-repeat;
-  height: 16px;
+  height: 18px;
   background-image: svg-load("./icon/scrollbar-down-active.svg");
 }
 
 ::-webkit-scrollbar-button:horizontal:start {
   background-repeat: no-repeat;
-  height: 16px;
+  height: 18px;
   background-image: svg-load("./icon/scrollbar-left.svg");
 }
 
 ::-webkit-scrollbar-button:horizontal:start:active {
   background-repeat: no-repeat;
-  height: 16px;
+  height: 18px;
   background-image: svg-load("./icon/scrollbar-left-active.svg");
 }
 
 ::-webkit-scrollbar-button:horizontal:end {
-  height: 16px;
+  height: 18px;
   background-image: svg-load("./icon/scrollbar-right.svg");
 }
 
